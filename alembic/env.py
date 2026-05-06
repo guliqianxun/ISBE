@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from isbe.facts.db import db_url, metadata
 import isbe.facts.artifacts  # noqa: F401
+import isbe.topics.nowcasting.facts  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
