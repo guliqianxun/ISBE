@@ -25,3 +25,7 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Allow .gitkeep to preserve empty memory/ subdirs
+!memory/*/*/.gitkeep
+!memory/*/MEMORY.md

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv *)",
+      "Bash(wait %1)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(PYTHONIOENCODING=utf-8 uv run radar --help)"
+    ]
+  }
+}
