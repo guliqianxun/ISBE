@@ -1,6 +1,7 @@
+from datetime import date
 from pathlib import Path
 
-from isbe.memory.lifecycle import reindex_memory_md
+from isbe.memory.lifecycle import archive_old_reading, reindex_memory_md
 
 
 def test_reindex_writes_one_line_per_file(memory_dir: Path, sample_feedback_file: Path):
@@ -57,3 +58,49 @@ body""",
     content = (memory_dir / "MEMORY.md").read_text(encoding="utf-8")
     assert "should be excluded" not in content
     assert "archived reading" not in content
+
+
+def test_archive_moves_files_older_than_8_weeks(memory_dir: Path):
+    # Create reading/2026/W10/<id>.md with updated=2026-03-09 (周一)
+    week_dir = memory_dir / "reading" / "2026" / "W10"
+    week_dir.mkdir(parents=True)
+    old = week_dir / "old_paper.md"
+    old.write_text(
+        """---
+name: old_paper
+description: x
+type: reading
+created: 2026-03-09
+updated: 2026-03-09
+source: agent-inferred
+---
+body""",
+        encoding="utf-8",
+    )
+    # 假装"今天"是 2026-05-15（W19）即 W10+9周 = 应归档
+    moved = archive_old_reading(memory_root=memory_dir, today=date(2026, 5, 15), age_weeks=8)
+    assert moved == 1
+    assert not old.exists()
+    archived = memory_dir / "reading" / ".archive" / "2026" / "W10" / "old_paper.md"
+    assert archived.exists()
+
+
+def test_archive_leaves_recent_files(memory_dir: Path):
+    week_dir = memory_dir / "reading" / "2026" / "W18"
+    week_dir.mkdir(parents=True)
+    recent = week_dir / "recent_paper.md"
+    recent.write_text(
+        """---
+name: recent_paper
+description: x
+type: reading
+created: 2026-05-04
+updated: 2026-05-04
+source: agent-inferred
+---
+body""",
+        encoding="utf-8",
+    )
+    moved = archive_old_reading(memory_root=memory_dir, today=date(2026, 5, 15), age_weeks=8)
+    assert moved == 0
+    assert recent.exists()

@@ -1,8 +1,58 @@
+import re
+import shutil
+from datetime import date, timedelta
 from pathlib import Path
 
 from isbe.memory.loader import EXCLUDED_DIRS, load_index
 
 ARCHIVE_DIR = ".archive"
+
+WEEK_DIR_RE = re.compile(r"^W(\d{2})$")
+
+
+def _iso_week_dirs(reading_root: Path):
+    """Yield (year:int, week:int, path) for reading_root/<YYYY>/W## dirs."""
+    if not reading_root.exists():
+        return
+    for year_dir in reading_root.iterdir():
+        if not year_dir.is_dir() or not year_dir.name.isdigit():
+            continue
+        if year_dir.name == ARCHIVE_DIR:
+            continue
+        for week_dir in year_dir.iterdir():
+            if not week_dir.is_dir():
+                continue
+            m = WEEK_DIR_RE.match(week_dir.name)
+            if not m:
+                continue
+            yield int(year_dir.name), int(m.group(1)), week_dir
+
+
+def archive_old_reading(memory_root: Path, today: date, age_weeks: int = 8) -> int:
+    """Move reading/<YYYY>/W##/* dirs older than age_weeks into reading/.archive/<YYYY>/W##/.
+
+    Returns the number of files moved.
+    """
+    reading_root = memory_root / "reading"
+    archive_root = reading_root / ARCHIVE_DIR
+    cutoff = today - timedelta(weeks=age_weeks)
+    cutoff_year, cutoff_week, _ = cutoff.isocalendar()
+    moved = 0
+    for year, week, week_dir in list(_iso_week_dirs(reading_root)):
+        if (year, week) >= (cutoff_year, cutoff_week):
+            continue
+        dest_dir = archive_root / str(year) / f"W{week:02d}"
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        for f in week_dir.iterdir():
+            if f.is_file():
+                shutil.move(str(f), str(dest_dir / f.name))
+                moved += 1
+        # remove empty source week dir
+        try:
+            week_dir.rmdir()
+        except OSError:
+            pass
+    return moved
 
 
 def reindex_memory_md(memory_root: Path) -> None:
