@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import MetaData, create_engine
+from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
@@ -13,11 +13,11 @@ def db_url() -> str:
     return f"postgresql+psycopg://{user}:{pw}@{host}:{port}/{db}"
 
 
-metadata = MetaData()
-
-
 class Base(DeclarativeBase):
-    metadata = metadata
+    pass
+
+
+metadata = Base.metadata
 
 
 def make_engine():
