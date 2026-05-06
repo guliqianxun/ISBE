@@ -48,7 +48,34 @@ services:
       retries: 5
     restart: unless-stopped
 
+  langfuse-db:
+    image: postgres:16-alpine
+    container_name: isbe-langfuse-db
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfusedata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: isbe-langfuse
+    depends_on:
+      - langfuse-db
+    environment:
+      DATABASE_URL: postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-changeme-32chars-changeme-32chars}
+      SALT: ${LANGFUSE_SALT:-changeme-salt-changeme-salt}
+      NEXTAUTH_URL: http://localhost:3000
+      TELEMETRY_ENABLED: "false"
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 volumes:
   pgdata:
   qdrantdata:
   miniodata:
+  langfusedata:
