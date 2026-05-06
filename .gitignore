@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# uv
+.python-version
+
+# Editor
+.vscode/
+.idea/
+
+# Project state
+memory/*/.pending/
+memory/*/.audit/
+memory/*/reading/raw-*.md
+.env
+
+# Docker volumes (本地)
+data/
+
+# OS
+.DS_Store
+Thumbs.db
