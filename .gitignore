@@ -29,3 +29,4 @@ Thumbs.db
 # Allow .gitkeep to preserve empty memory/ subdirs
 !memory/*/*/.gitkeep
 !memory/*/MEMORY.md
+.claude/settings.local.json
