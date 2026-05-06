@@ -41,6 +41,7 @@ packages = ["src/isbe"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = ["integration: requires running infrastructure (postgres/minio/etc)"]
 
 [tool.ruff]
 line-length = 100
