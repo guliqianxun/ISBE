@@ -26,8 +26,8 @@ def upgrade() -> None:
         sa.Column("kind", sa.String(32), nullable=False),
         sa.Column("period_label", sa.String(32), nullable=False),
         sa.Column("body_uri", sa.String(512), nullable=False),
-        sa.Column("fingerprint", sa.JSON, nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("fingerprint", postgresql.JSONB, nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
     )
     op.create_index("ix_artifacts_topic_id", "artifacts", ["topic_id"])
     op.create_table(
@@ -38,7 +38,7 @@ def upgrade() -> None:
         sa.Column("status", sa.String(16), nullable=False),
         sa.Column("started_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("finished_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("payload", sa.JSON, nullable=False),
+        sa.Column("payload", postgresql.JSONB, nullable=False),
     )
     op.create_index("ix_topic_runs_topic_id", "topic_runs", ["topic_id"])
 

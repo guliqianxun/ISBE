@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, DateTime, String
-from sqlalchemy.dialects.postgresql import UUID as PgUUID
+from sqlalchemy import DateTime, String
+from sqlalchemy.dialects.postgresql import JSONB, UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from isbe.facts.db import Base
@@ -16,8 +16,11 @@ class Artifact(Base):
     kind: Mapped[str] = mapped_column(String(32))  # "weekly_digest" / "daily_digest" ...
     period_label: Mapped[str] = mapped_column(String(32))  # "2026-W19" / "2026-05-06"
     body_uri: Mapped[str] = mapped_column(String(512))  # MinIO key
-    fingerprint: Mapped[dict] = mapped_column(JSON)  # facts ids / memory revs / trace_id
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    fingerprint: Mapped[dict] = mapped_column(JSONB)  # facts ids / memory revs / trace_id
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
 
 
 class TopicRun(Base):
@@ -29,4 +32,4 @@ class TopicRun(Base):
     status: Mapped[str] = mapped_column(String(16))  # "ok" / "failed"
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
-    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+    payload: Mapped[dict] = mapped_column(JSONB, default=dict)
