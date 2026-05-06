@@ -10,6 +10,14 @@ dependencies = [
     "python-frontmatter>=1.1",
     "prefect>=3.0",
     "httpx>=0.27",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "psycopg[binary]>=3.2",
+    "minio>=7.2",
+    "anthropic>=0.40",
+    "langfuse>=2.50,<3",
+    "jinja2>=3.1",
+    "feedparser>=6.0",
 ]
 
 [project.optional-dependencies]
