@@ -1,0 +1,15 @@
+# 订阅主题清单（P0 阶段仅是示例，P1 起被 collectors 消费）
+topics:
+  - id: ai-agents
+    label: AI Agents
+    sources:
+      - type: rss
+        url: https://example.com/feed.xml
+      - type: arxiv
+        category: cs.AI
+
+  - id: llm-inference
+    label: LLM Inference
+    sources:
+      - type: rss
+        url: https://example.com/inference-feed.xml
