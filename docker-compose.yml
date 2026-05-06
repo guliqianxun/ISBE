@@ -74,6 +74,19 @@ services:
       - "3000:3000"
     restart: unless-stopped
 
+  prefect-server:
+    image: prefecthq/prefect:3-latest
+    container_name: isbe-prefect-server
+    command: prefect server start --host 0.0.0.0
+    environment:
+      PREFECT_API_DATABASE_CONNECTION_URL: postgresql+asyncpg://${POSTGRES_USER:-isbe}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/prefect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4200:4200"
+    restart: unless-stopped
+
 volumes:
   pgdata:
   qdrantdata:
