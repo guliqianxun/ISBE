@@ -11,7 +11,7 @@ from isbe.facts.db import make_session_factory
 from isbe.topics.nowcasting.facts import Paper
 
 ARXIV_QUERY_URL = (
-    "http://export.arxiv.org/api/query"
+    "https://export.arxiv.org/api/query"
     "?search_query=cat:cs.LG+AND+(abs:nowcasting+OR+abs:precipitation+OR+abs:radar)"
     "&sortBy=submittedDate&sortOrder=descending&max_results={max_results}"
 )
