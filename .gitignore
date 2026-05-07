@@ -22,6 +22,9 @@ memory/*/reading/raw-*.md
 # Docker volumes (本地)
 data/
 
+# Local artifact mirror (digester output; PG + MinIO are authoritative)
+artifacts/
+
 # OS
 .DS_Store
 Thumbs.db

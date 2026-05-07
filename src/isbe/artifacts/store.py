@@ -2,6 +2,7 @@ import io
 import os
 from datetime import datetime
 from functools import lru_cache
+from pathlib import Path
 from uuid import UUID, uuid4
 
 from minio import Minio
@@ -10,6 +11,7 @@ from isbe.facts.artifacts import Artifact
 from isbe.facts.db import make_session_factory
 
 ARTIFACT_BUCKET = "isbe-artifacts"
+LOCAL_MIRROR_DEFAULT = Path("artifacts")
 
 
 @lru_cache(maxsize=1)
@@ -49,6 +51,12 @@ def save_artifact(
         length=len(body_bytes),
         content_type="text/markdown; charset=utf-8",
     )
+
+    # Local mirror — convenience for human inspection without mc
+    mirror_root = Path(os.getenv("ISBE_ARTIFACT_MIRROR", str(LOCAL_MIRROR_DEFAULT)))
+    local_path = mirror_root / topic_id / period_label / f"{artifact_id}.md"
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    local_path.write_bytes(body_bytes)
 
     Session = make_session_factory()
     with Session() as s:

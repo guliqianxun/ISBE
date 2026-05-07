@@ -83,7 +83,25 @@ def _split_sections(text: str) -> dict[str, str]:
     return sections
 
 
+VALID_TYPE_PREFIXES = {
+    "topics": "topic",
+    "reading": "reading",
+    "feedback": "feedback",
+    "user": "user",
+    "reference": "reference",
+}
+
+
 def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
+    """Parse `- DRAFT[<path>]: <content>` lines into pending drafts.
+
+    Skips lines whose target_path doesn't pass validation:
+      - must start with one of topics/|reading/|feedback/|user/|reference/
+      - must end with .md
+    Invalid lines are printed to stderr (no exception).
+    """
+    import sys
+
     drafts: list[PendingMemoryDraft] = []
     for line in text.splitlines():
         m = DRAFT_LINE_RE.match(line)
@@ -91,10 +109,16 @@ def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
             continue
         target_path = m.group(1).strip()
         content = m.group(2).strip()
-        # "topics" -> "topic"; "reading" stays "reading"
-        target_type = target_path.split("/")[0].rstrip("s")
-        if target_type == "topic":
-            target_type = "topic"
+
+        prefix = target_path.split("/", 1)[0]
+        if prefix not in VALID_TYPE_PREFIXES:
+            print(f"[digester] skip DRAFT (bad prefix '{prefix}'): {target_path}", file=sys.stderr)
+            continue
+        if not target_path.endswith(".md"):
+            print(f"[digester] skip DRAFT (not .md): {target_path}", file=sys.stderr)
+            continue
+        target_type = VALID_TYPE_PREFIXES[prefix]
+
         body = (
             f"---\nname: {Path(target_path).stem}\n"
             f"description: agent draft from digest\n"

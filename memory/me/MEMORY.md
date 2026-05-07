@@ -3,5 +3,5 @@
 
 - [research_digest_style](feedback/research_digest_style.md) — 周报输出风格偏好（每篇 1-2 句、附 SOTA 表、不要长篇综述）
 - [nowcasting](topics/nowcasting.md) — 临近降水预报科研订阅，关注 0-6h 雷达/卫星驱动方法
-- [nowcasting.theses](topics/nowcasting.theses.md) — nowcasting 方向当前持有的研究观点，允许并列与矛盾
+- [nowcasting.theses](topics/nowcasting.theses.md) — bull/bear theses for nowcasting (agent draft from W19 digest)
 - [research_focus](user/research_focus.md) — 用户当前在写关于 lead-time extension 的论文，研究焦点
