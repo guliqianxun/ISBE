@@ -13,6 +13,40 @@ DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 DEFAULT_MODEL = ANTHROPIC_DEFAULT_MODEL
 
 
+# Langfuse decorator — graceful no-op if SDK not installed or keys not set
+def _make_observe_decorator():
+    try:
+        from langfuse.decorators import observe
+
+        return observe(as_type="generation")
+    except ImportError:
+        # langfuse not in deps for some reason — fall through to no-op
+        def _noop(fn):
+            return fn
+
+        return _noop
+
+
+_observe = _make_observe_decorator()
+
+
+def _update_langfuse_observation(
+    *, input_payload, output: str, model: str, input_tokens: int, output_tokens: int
+) -> None:
+    """Best-effort attach details to the current Langfuse observation; silent if no client."""
+    try:
+        from langfuse.decorators import langfuse_context
+
+        langfuse_context.update_current_observation(
+            input=input_payload,
+            output=output,
+            model=model,
+            usage={"input": input_tokens, "output": output_tokens},
+        )
+    except Exception:
+        pass  # langfuse not configured / not authenticated → silent skip
+
+
 @dataclass(frozen=True)
 class LLMResponse:
     text: str
@@ -38,6 +72,13 @@ def _complete_anthropic(
         messages=[{"role": "user", "content": user}],
     )
     text = "".join(block.text for block in msg.content if hasattr(block, "text"))
+    _update_langfuse_observation(
+        input_payload={"system": system, "user": user},
+        output=text,
+        model=model,
+        input_tokens=msg.usage.input_tokens,
+        output_tokens=msg.usage.output_tokens,
+    )
     return LLMResponse(
         text=text,
         message_id=msg.id,
@@ -69,15 +110,26 @@ def _complete_deepseek(
     resp.raise_for_status()
     data = resp.json()
     usage = data.get("usage", {})
+    text = data["choices"][0]["message"]["content"]
+    input_tokens = usage.get("prompt_tokens", 0)
+    output_tokens = usage.get("completion_tokens", 0)
+    _update_langfuse_observation(
+        input_payload={"system": system, "user": user},
+        output=text,
+        model=model,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+    )
     return LLMResponse(
-        text=data["choices"][0]["message"]["content"],
+        text=text,
         message_id=data.get("id", "deepseek-unknown"),
-        input_tokens=usage.get("prompt_tokens", 0),
-        output_tokens=usage.get("completion_tokens", 0),
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
         trace_id=trace_id,
     )
 
 
+@_observe
 def complete(
     *,
     system: str,
@@ -86,7 +138,12 @@ def complete(
     trace_id: str | None = None,
     max_tokens: int = 4096,
 ) -> LLMResponse:
-    """Dispatch to anthropic or deepseek based on ISBE_LLM_PROVIDER env (default anthropic)."""
+    """Dispatch to anthropic or deepseek based on ISBE_LLM_PROVIDER env (default anthropic).
+
+    Decorated with Langfuse @observe — when LANGFUSE_PUBLIC_KEY/SECRET_KEY/HOST are set,
+    the call is traced as a 'generation' observation. Without keys, langfuse SDK warns
+    once and degrades to no-op; this function still returns normally.
+    """
     provider = os.getenv("ISBE_LLM_PROVIDER", "anthropic")
     if provider == "deepseek":
         return _complete_deepseek(
