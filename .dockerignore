@@ -1,0 +1,29 @@
+.venv
+.git
+.gitignore
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+*.pyo
+.env
+.env.local
+.claude
+.vscode
+.idea
+
+# Runtime/state — bind-mounted in compose
+memory/me/.pending
+memory/me/.audit
+papers/
+artifacts/
+data/
+
+# Not needed in image
+docs/
+tests/
+README.md
+LICENSE
+*.md
+.DS_Store
+Thumbs.db
