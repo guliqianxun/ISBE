@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from isbe.facts.artifacts import TopicRun
@@ -19,7 +19,7 @@ def topic_run(topic_id: str, flow_name: str):
     Yields a handle whose .payload dict is persisted to the row's payload column.
     On exception inside the block, status='failed' and error is recorded; exception re-raised.
     """
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     handle = _RunHandle()
     status = "ok"
     err: str | None = None
@@ -30,7 +30,7 @@ def topic_run(topic_id: str, flow_name: str):
         err = f"{type(e).__name__}: {e}"
         raise
     finally:
-        finished = datetime.now(timezone.utc)
+        finished = datetime.now(UTC)
         payload = dict(handle.payload)
         if err:
             payload["error"] = err
