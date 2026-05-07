@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 from isbe.artifacts.store import save_artifact
@@ -19,7 +19,7 @@ def test_save_artifact_writes_minio_and_pg(monkeypatch):
             period_label="2026-W19",
             body_markdown="# Test\nbody",
             fingerprint={"facts": [1, 2], "memory": {"a": 1}, "trace_id": "t1"},
-            generated_at=datetime(2026, 5, 7, tzinfo=timezone.utc),
+            generated_at=datetime(2026, 5, 7, tzinfo=UTC),
         )
     assert artifact_id is not None
     fake_minio.put_object.assert_called_once()

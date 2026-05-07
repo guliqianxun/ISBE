@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from jinja2 import Template
@@ -91,7 +91,8 @@ def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
             continue
         target_path = m.group(1).strip()
         content = m.group(2).strip()
-        target_type = target_path.split("/")[0].rstrip("s")  # "topics"->"topic", "reading"->"reading"
+        # "topics" -> "topic"; "reading" stays "reading"
+        target_type = target_path.split("/")[0].rstrip("s")
         if target_type == "topic":
             target_type = "topic"
         body = (
@@ -116,7 +117,7 @@ def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
 @flow(name="nowcasting-weekly-digester")
 def weekly_digester(period_label: str, today: date | None = None) -> DigestResult:
     today = today or date.today()
-    cutoff = datetime.combine(today - timedelta(days=7), datetime.min.time(), tzinfo=timezone.utc)
+    cutoff = datetime.combine(today - timedelta(days=7), datetime.min.time(), tzinfo=UTC)
 
     Session = make_session_factory()
     with Session() as s:
@@ -151,7 +152,8 @@ def weekly_digester(period_label: str, today: date | None = None) -> DigestResul
         "message_id": resp.message_id,
     }
 
-    template = Template((Path(__file__).parent / "templates" / "weekly.j2").read_text(encoding="utf-8"))
+    tpl_path = Path(__file__).parent / "templates" / "weekly.j2"
+    template = Template(tpl_path.read_text(encoding="utf-8"))
     rendered = template.render(
         period_label=period_label,
         n_papers=len(papers),
@@ -159,7 +161,7 @@ def weekly_digester(period_label: str, today: date | None = None) -> DigestResul
         memory_refs=", ".join(f"{k}@rev{v}" for k, v in memory_index.items()),
         trace_id=resp.trace_id or "(none)",
         digest_body=resp.text,
-        generated_at=datetime.now(timezone.utc).isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
         artifact_id="(filled below)",
     )
 
@@ -169,13 +171,13 @@ def weekly_digester(period_label: str, today: date | None = None) -> DigestResul
         period_label=period_label,
         body_markdown=rendered,
         fingerprint=fingerprint,
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
     )
 
     return DigestResult(
         topic_id=TOPIC_ID,
         period_label=period_label,
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
         sections=sections,
         fingerprint={**fingerprint, "artifact_id": str(artifact_id)},
         pending_drafts=drafts,

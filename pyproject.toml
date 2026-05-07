@@ -49,3 +49,10 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+# UP042: keep `str, Enum` mixin for Pydantic V2 enum serialization compat (StrEnum behaves differently)
+ignore = ["UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+# Integration tests place pytest.mark.integration before from-imports intentionally
+"tests/test_facts_db.py" = ["E402"]
+"tests/test_nowcasting_facts.py" = ["E402"]

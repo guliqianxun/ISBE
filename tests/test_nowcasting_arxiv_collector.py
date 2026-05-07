@@ -1,11 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
 from isbe.topics.nowcasting.collectors.arxiv import (
     parse_atom_entry,
     upsert_papers,
 )
-
 
 SAMPLE_ATOM_ENTRY = {
     "id": "http://arxiv.org/abs/2604.12345v1",
@@ -24,7 +23,7 @@ def test_parse_atom_entry_extracts_fields():
     assert paper.arxiv_id == "2604.12345"
     assert paper.authors == ["Alice", "Bob"]
     assert paper.primary_category == "cs.LG"
-    assert paper.submitted_at == datetime(2026, 4, 30, 12, 0, tzinfo=timezone.utc)
+    assert paper.submitted_at == datetime(2026, 4, 30, 12, 0, tzinfo=UTC)
 
 
 def test_upsert_papers_inserts_new_and_skips_dup():

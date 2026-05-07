@@ -1,8 +1,8 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from isbe.topics.base import DigestResult, PendingMemoryDraft
+from isbe.topics.base import DigestResult
 from isbe.topics.nowcasting.digester import (
     parse_distillation_section,
     weekly_digester,
@@ -48,7 +48,7 @@ keywords: a, b
             abstract="abstract",
             authors=["Alice"],
             primary_category="cs.LG",
-            submitted_at=datetime(2026, 5, 1, tzinfo=timezone.utc),
+            submitted_at=datetime(2026, 5, 1, tzinfo=UTC),
             source_url="https://arxiv.org/abs/2604.12345",
         )
     ]

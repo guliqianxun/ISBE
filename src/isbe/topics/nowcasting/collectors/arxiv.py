@@ -1,6 +1,6 @@
 """arxiv collector — fetches recent papers in target categories."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import feedparser
 import httpx
@@ -19,7 +19,7 @@ ARXIV_QUERY_URL = (
 
 def _parse_iso(s: str) -> datetime:
     # arxiv uses ISO with 'Z'
-    return datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(timezone.utc)
+    return datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(UTC)
 
 
 def parse_atom_entry(entry: dict) -> Paper:
@@ -29,7 +29,10 @@ def parse_atom_entry(entry: dict) -> Paper:
     authors = [a["name"] for a in entry.get("authors", [])]
     tags = entry.get("tags", [])
     primary = tags[0]["term"] if tags else "unknown"
-    alt = next((l["href"] for l in entry.get("links", []) if l.get("rel") == "alternate"), "")
+    alt = next(
+        (link["href"] for link in entry.get("links", []) if link.get("rel") == "alternate"),
+        "",
+    )
     return Paper(
         arxiv_id=arxiv_id,
         title=entry["title"].strip(),

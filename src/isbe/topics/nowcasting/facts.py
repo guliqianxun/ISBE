@@ -37,7 +37,8 @@ class Event(Base):
     __tablename__ = "events"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    type: Mapped[str] = mapped_column(String(32), index=True)  # preprint / repo_update / blog_post / conf_accept
+    # preprint / repo_update / blog_post / conf_accept
+    type: Mapped[str] = mapped_column(String(32), index=True)
     payload: Mapped[dict] = mapped_column(JSONB)
     observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     source: Mapped[str] = mapped_column(String(64))

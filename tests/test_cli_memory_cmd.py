@@ -1,4 +1,3 @@
-from datetime import date
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -6,7 +5,9 @@ from typer.testing import CliRunner
 from isbe.cli.main import app
 
 
-def test_radar_memory_reindex_writes_index(memory_dir: Path, sample_feedback_file: Path, monkeypatch):
+def test_radar_memory_reindex_writes_index(
+    memory_dir: Path, sample_feedback_file: Path, monkeypatch
+):
     monkeypatch.setenv("ISBE_MEMORY_ROOT", str(memory_dir))
     runner = CliRunner()
     result = runner.invoke(app, ["memory", "reindex"])

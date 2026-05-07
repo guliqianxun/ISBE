@@ -3,7 +3,7 @@ import shutil
 from datetime import date, timedelta
 from pathlib import Path
 
-from isbe.memory.loader import EXCLUDED_DIRS, load_index
+from isbe.memory.loader import load_index
 
 ARCHIVE_DIR = ".archive"
 

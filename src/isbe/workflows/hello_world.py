@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from prefect import flow, task
 
@@ -11,7 +11,7 @@ def build_greeting(name: str) -> str:
 @flow(name="hello-world")
 def hello_world_flow(name: str = "world") -> dict:
     greeting = build_greeting(name)
-    return {"greeting": greeting, "timestamp": datetime.now(timezone.utc).isoformat()}
+    return {"greeting": greeting, "timestamp": datetime.now(UTC).isoformat()}
 
 
 if __name__ == "__main__":

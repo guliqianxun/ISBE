@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 from isbe.topics.nowcasting.collectors.github import (
@@ -27,7 +27,7 @@ def test_fetch_repo_meta_parses_response():
         repo = fetch_repo_meta("foo/bar")
     assert isinstance(repo, Repo)
     assert repo.stars == 42
-    assert repo.last_commit_at == datetime(2026, 5, 1, 10, 0, tzinfo=timezone.utc)
+    assert repo.last_commit_at == datetime(2026, 5, 1, 10, 0, tzinfo=UTC)
 
 
 def test_upsert_repo_inserts_or_updates():
@@ -38,7 +38,7 @@ def test_upsert_repo_inserts_or_updates():
         title="bar",
         description=None,
         stars=10,
-        last_commit_at=datetime(2026, 5, 1, tzinfo=timezone.utc),
+        last_commit_at=datetime(2026, 5, 1, tzinfo=UTC),
         last_release_at=None,
         linked_paper_ids=[],
     )

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from isbe.topics.base import (
     DigestResult,
@@ -23,7 +23,7 @@ def test_digest_result_three_sections():
     result = DigestResult(
         topic_id="nowcasting",
         period_label="2026-W19",
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
         sections=sections,
         fingerprint={"facts": [1, 2, 3], "memory": {"nowcasting": 1}},
         pending_drafts=[],

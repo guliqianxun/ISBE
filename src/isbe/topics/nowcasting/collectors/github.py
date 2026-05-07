@@ -1,6 +1,6 @@
 """github collector — tracks a hardcoded list of nowcasting-related repos."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 from prefect import flow, task
@@ -17,7 +17,7 @@ TRACKED_REPOS: list[str] = [
 
 
 def _parse_iso(s: str) -> datetime:
-    return datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(timezone.utc)
+    return datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(UTC)
 
 
 def fetch_repo_meta(owner_repo: str) -> Repo:

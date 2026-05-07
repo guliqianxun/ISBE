@@ -18,7 +18,9 @@ def _memory_root() -> Path:
 
 @review_app.command("memory")
 def review_memory(
-    accept: str = typer.Option(None, "--accept", help="Accept a pending draft (relative path under .pending/)"),
+    accept: str = typer.Option(
+        None, "--accept", help="Accept a pending draft (relative path under .pending/)"
+    ),
     reject: str = typer.Option(None, "--reject", help="Reject a pending draft"),
 ) -> None:
     """Review pending memory drafts; without flags, list all pending."""

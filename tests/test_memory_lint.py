@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from isbe.memory.lint import LintError, lint_file
+from isbe.memory.lint import lint_file
 
 
 def test_valid_file_passes(sample_feedback_file: Path):

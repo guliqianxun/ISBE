@@ -2,12 +2,12 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import inspect, select
 
 from isbe.facts.db import make_engine, make_session_factory
-from isbe.topics.nowcasting.facts import Event, Paper, Repo
+from isbe.topics.nowcasting.facts import Paper
 
 
 def test_tables_created():
@@ -25,8 +25,8 @@ def test_paper_roundtrip():
             authors=["Alice", "Bob"],
             abstract="abstract body",
             primary_category="cs.LG",
-            submitted_at=datetime(2026, 5, 1, tzinfo=timezone.utc),
-            updated_at=datetime(2026, 5, 1, tzinfo=timezone.utc),
+            submitted_at=datetime(2026, 5, 1, tzinfo=UTC),
+            updated_at=datetime(2026, 5, 1, tzinfo=UTC),
             pdf_uri="minio://papers/2604.12345.pdf",
             source_url="https://arxiv.org/abs/2604.12345",
         )
