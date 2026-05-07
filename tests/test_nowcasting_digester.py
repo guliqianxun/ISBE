@@ -68,11 +68,16 @@ PaperX 提了新方法 (memory: nowcasting@1)。
 - DRAFT[topics/nowcasting.theses.md]: 新论点候选
 """, message_id="m1", input_tokens=100, output_tokens=50, trace_id="t1")
 
+    fake_obs_session = MagicMock()
+    fake_obs_session.__enter__ = MagicMock(return_value=fake_obs_session)
+    fake_obs_session.__exit__ = MagicMock(return_value=False)
     with patch("isbe.topics.nowcasting.digester.make_session_factory",
                return_value=lambda: fake_session), \
          patch("isbe.topics.nowcasting.digester.complete", return_value=fake_llm_resp), \
          patch("isbe.topics.nowcasting.digester.save_artifact",
-               return_value="00000000-0000-0000-0000-000000000001"):
+               return_value="00000000-0000-0000-0000-000000000001"), \
+         patch("isbe.observability.runs.make_session_factory",
+               return_value=lambda: fake_obs_session):
         result = weekly_digester(period_label="2026-W19", today=date(2026, 5, 7))
 
     assert isinstance(result, DigestResult)

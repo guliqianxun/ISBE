@@ -15,6 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from isbe.facts.db import make_session_factory
+from isbe.observability.runs import topic_run
 from isbe.topics.nowcasting.facts import Paper
 
 PAPERS_BUCKET = "isbe-papers"
@@ -80,12 +81,15 @@ def fetch_arxiv_atom(max_results: int = 50) -> list[dict]:
 
 @flow(name="arxiv-collector")
 def arxiv_collector(max_results: int = 50) -> int:
-    entries = fetch_arxiv_atom(max_results)
-    papers = [parse_atom_entry(e) for e in entries]
-    Session = make_session_factory()
-    with Session() as s:
-        n = upsert_papers(s, papers)
-    return n
+    with topic_run("nowcasting", "arxiv-collector") as run:
+        entries = fetch_arxiv_atom(max_results)
+        papers = [parse_atom_entry(e) for e in entries]
+        Session = make_session_factory()
+        with Session() as s:
+            n = upsert_papers(s, papers)
+        run.payload["fetched"] = len(entries)
+        run.payload["new_papers"] = n
+        return n
 
 
 @lru_cache(maxsize=1)
@@ -139,23 +143,29 @@ def arxiv_download_pdfs(limit: int = 10) -> int:
 
     Throttled to 1 request / 3s per arXiv Terms of Service. Returns count downloaded.
     """
-    Session = make_session_factory()
-    n = 0
-    with Session() as s:
-        targets = list(
-            s.scalars(select(Paper).where(Paper.pdf_uri.is_(None)).limit(limit)).all()
-        )
-        for p in targets:
-            try:
-                body = fetch_pdf_bytes(p.arxiv_id)
-                p.pdf_uri = store_pdf(p.arxiv_id, body)
-                s.add(p)
-                s.commit()
-                n += 1
-            except httpx.HTTPError as e:
-                print(f"[arxiv-pdfs] skip {p.arxiv_id}: {e}")
-            time.sleep(ARXIV_PDF_RATE_LIMIT_S)
-    return n
+    with topic_run("nowcasting", "arxiv-download-pdfs") as run:
+        Session = make_session_factory()
+        n = 0
+        skipped = 0
+        with Session() as s:
+            targets = list(
+                s.scalars(select(Paper).where(Paper.pdf_uri.is_(None)).limit(limit)).all()
+            )
+            for p in targets:
+                try:
+                    body = fetch_pdf_bytes(p.arxiv_id)
+                    p.pdf_uri = store_pdf(p.arxiv_id, body)
+                    s.add(p)
+                    s.commit()
+                    n += 1
+                except httpx.HTTPError as e:
+                    print(f"[arxiv-pdfs] skip {p.arxiv_id}: {e}")
+                    skipped += 1
+                time.sleep(ARXIV_PDF_RATE_LIMIT_S)
+        run.payload["downloaded"] = n
+        run.payload["skipped"] = skipped
+        run.payload["limit"] = limit
+        return n
 
 
 if __name__ == "__main__":

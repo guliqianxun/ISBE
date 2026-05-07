@@ -7,6 +7,7 @@ from prefect import flow, task
 from sqlalchemy.orm import Session
 
 from isbe.facts.db import make_session_factory
+from isbe.observability.runs import topic_run
 from isbe.topics.nowcasting.facts import Repo
 
 TRACKED_REPOS: list[str] = [
@@ -58,17 +59,23 @@ def fetch_one(owner_repo: str) -> Repo:
 
 @flow(name="github-collector")
 def github_collector() -> int:
-    Session = make_session_factory()
-    n_new = 0
-    with Session() as s:
-        for owner_repo in TRACKED_REPOS:
-            try:
-                r = fetch_one(owner_repo)
-                if upsert_repo(s, r):
-                    n_new += 1
-            except httpx.HTTPError as e:
-                print(f"skip {owner_repo}: {e}")
-    return n_new
+    with topic_run("nowcasting", "github-collector") as run:
+        Session = make_session_factory()
+        n_new = 0
+        skipped = 0
+        with Session() as s:
+            for owner_repo in TRACKED_REPOS:
+                try:
+                    r = fetch_one(owner_repo)
+                    if upsert_repo(s, r):
+                        n_new += 1
+                except httpx.HTTPError as e:
+                    print(f"skip {owner_repo}: {e}")
+                    skipped += 1
+        run.payload["tracked"] = len(TRACKED_REPOS)
+        run.payload["new_repos"] = n_new
+        run.payload["skipped"] = skipped
+        return n_new
 
 
 if __name__ == "__main__":

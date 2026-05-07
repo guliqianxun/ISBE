@@ -13,6 +13,7 @@ from isbe.llm.client import complete
 from isbe.llm.prompts import SYSTEM_PROMPT, build_digest_prompt
 from isbe.memory.loader import load_index
 from isbe.memory.pending import write_pending
+from isbe.observability.runs import topic_run
 from isbe.topics.base import (
     DigestResult,
     DigestSection,
@@ -139,8 +140,16 @@ def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
 
 
 @flow(name="nowcasting-weekly-digester")
-def weekly_digester(period_label: str, today: date | None = None) -> DigestResult:
+def weekly_digester(period_label: str | None = None, today: date | None = None) -> DigestResult:
     today = today or date.today()
+    if period_label is None:
+        year, week, _ = today.isocalendar()
+        period_label = f"{year}-W{week:02d}"
+    with topic_run("nowcasting", "nowcasting-weekly-digester") as run:
+        return _weekly_digester_impl(period_label, today, run)
+
+
+def _weekly_digester_impl(period_label: str, today: date, run) -> DigestResult:
     cutoff = datetime.combine(today - timedelta(days=7), datetime.min.time(), tzinfo=UTC)
 
     Session = make_session_factory()
@@ -197,6 +206,14 @@ def weekly_digester(period_label: str, today: date | None = None) -> DigestResul
         fingerprint=fingerprint,
         generated_at=datetime.now(UTC),
     )
+
+    run.payload["period_label"] = period_label
+    run.payload["n_papers"] = len(papers)
+    run.payload["n_repos"] = len(repos)
+    run.payload["n_drafts"] = len(drafts)
+    run.payload["artifact_id"] = str(artifact_id)
+    run.payload["llm_input_tokens"] = resp.input_tokens
+    run.payload["llm_output_tokens"] = resp.output_tokens
 
     return DigestResult(
         topic_id=TOPIC_ID,
