@@ -96,6 +96,60 @@ services:
       - uptimekumadata:/app/data
     restart: unless-stopped
 
+  # radar-worker: long-lived Prefect worker that fires the cron-scheduled flows.
+  #
+  # PREREQUISITE on Docker Desktop Windows:
+  #   - Enable F: drive (or whichever drive holds this repo) under
+  #     Settings → Resources → File sharing. Otherwise bind mounts silently
+  #     create empty directories and the container fails with "ModuleNotFoundError: isbe".
+  #
+  # Alternative (no docker): run `uv run radar scheduler serve` on host.
+  # That's the same outcome — Prefect deployments register identically.
+  radar-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: isbe/radar:latest
+    container_name: isbe-radar-worker
+    profiles: ["worker"]  # opt-in: `docker compose --profile worker up -d`
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prefect-server:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    environment:
+      # Override host defaults to use compose service names
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-isbe}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-isbe}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-isbe}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-changeme123}
+      PREFECT_API_URL: http://prefect-server:4200/api
+      LANGFUSE_HOST: http://langfuse:3000
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      ISBE_LLM_PROVIDER: ${ISBE_LLM_PROVIDER:-deepseek}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      ISBE_UID: ${ISBE_UID:-me}
+    volumes:
+      # Bind mount user-visible state — host paths == container /app paths
+      - ./memory:/app/memory
+      - ./papers:/app/papers
+      - ./artifacts:/app/artifacts
+      # Bind mount source for live edits (remove for prod-frozen build)
+      # alembic.ini stays as image-baked (single-file mounts are flaky on Docker Desktop Windows)
+      - ./src:/app/src
+      - ./alembic:/app/alembic
+    command: ["scheduler", "serve"]
+    restart: unless-stopped
+
 volumes:
   pgdata:
   qdrantdata:

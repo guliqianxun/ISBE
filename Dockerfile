@@ -17,5 +17,7 @@ COPY alembic.ini ./
 # Install project itself
 RUN uv sync --frozen --all-extras
 
-ENTRYPOINT ["uv", "run", "radar"]
+ENV PATH="/app/.venv/bin:$PATH"
+# Use venv binary directly — avoids `uv run` re-syncing on bind-mounted /app/src
+ENTRYPOINT ["/app/.venv/bin/radar"]
 CMD ["scheduler", "serve"]
