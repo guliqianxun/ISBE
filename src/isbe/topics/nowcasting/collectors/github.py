@@ -1,5 +1,6 @@
 """github collector — tracks a hardcoded list of nowcasting-related repos."""
 
+import os
 from datetime import UTC, datetime
 
 import httpx
@@ -9,6 +10,12 @@ from sqlalchemy.orm import Session
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
 from isbe.topics.nowcasting.facts import Repo
+
+
+def _github_headers() -> dict:
+    """Return Authorization header if GITHUB_TOKEN is set; else empty (60 req/hr)."""
+    token = os.getenv("GITHUB_TOKEN", "")
+    return {"Authorization": f"Bearer {token}"} if token else {}
 
 TRACKED_REPOS: list[str] = [
     # owner/name; expand by editing this list (P3 makes it config)
@@ -27,7 +34,11 @@ def _parse_iso(s: str) -> datetime:
 
 def fetch_repo_meta(owner_repo: str) -> Repo:
     """GET https://api.github.com/repos/<owner>/<name> → Repo (not attached)."""
-    resp = httpx.get(f"https://api.github.com/repos/{owner_repo}", timeout=30.0)
+    resp = httpx.get(
+        f"https://api.github.com/repos/{owner_repo}",
+        headers=_github_headers(),
+        timeout=30.0,
+    )
     resp.raise_for_status()
     data = resp.json()
     return Repo(
