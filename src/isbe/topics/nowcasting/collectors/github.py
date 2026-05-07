@@ -12,8 +12,12 @@ from isbe.topics.nowcasting.facts import Repo
 
 TRACKED_REPOS: list[str] = [
     # owner/name; expand by editing this list (P3 makes it config)
-    "openclimatefix/skillful_nowcasting",
-    "google-research/google-research",  # placeholder; many subdirs
+    "openclimatefix/skillful_nowcasting",  # DGMR DeepMind reproduction
+    "openclimatefix/metnet-pytorch",  # MetNet/MetNet-2 PyTorch
+    "NVIDIA/modulus",  # NVIDIA scientific ML for atmos
+    "google-deepmind/graphcast",  # GraphCast (medium-range NWP)
+    "google-deepmind/weatherbench2",  # weather benchmark suite
+    "microsoft/aurora",  # MS atmospheric foundation model
 ]
 
 
