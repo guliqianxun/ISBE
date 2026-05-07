@@ -20,6 +20,10 @@ def topics_run(
     topic_id: str,
     collect: bool = typer.Option(False, "--collect", help="Run collectors only"),
     digest: bool = typer.Option(False, "--digest", help="Run digester only"),
+    download_pdfs: bool = typer.Option(
+        False, "--download-pdfs", help="Download PDFs for papers without pdf_uri"
+    ),
+    pdf_limit: int = typer.Option(10, "--pdf-limit", help="Max PDFs per --download-pdfs run"),
     period_label: str = typer.Option(None, help="e.g. 2026-W19; defaults to current ISO week"),
 ) -> None:
     topics = {t.id: t for t in discover_topics(default_topics_root())}
@@ -27,8 +31,8 @@ def topics_run(
         typer.echo(f"unknown topic: {topic_id}", err=True)
         raise typer.Exit(code=1)
 
-    if not (collect or digest):
-        typer.echo("specify --collect or --digest (or both)", err=True)
+    if not (collect or digest or download_pdfs):
+        typer.echo("specify --collect / --digest / --download-pdfs", err=True)
         raise typer.Exit(code=1)
 
     if topic_id == "nowcasting":
@@ -38,6 +42,10 @@ def topics_run(
             n1 = arxiv_mod.arxiv_collector()
             n2 = github_mod.github_collector()
             typer.echo(f"arxiv: {n1} new / github: {n2} new")
+        if download_pdfs:
+            arxiv_mod = importlib.import_module("isbe.topics.nowcasting.collectors.arxiv")
+            n = arxiv_mod.arxiv_download_pdfs(limit=pdf_limit)
+            typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
         if digest:
             digester_mod = importlib.import_module("isbe.topics.nowcasting.digester")
             today = date.today()

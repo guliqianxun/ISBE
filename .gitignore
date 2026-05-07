@@ -25,6 +25,9 @@ data/
 # Local artifact mirror (digester output; PG + MinIO are authoritative)
 artifacts/
 
+# Local PDF mirror (collector output; MinIO is authoritative)
+papers/
+
 # OS
 .DS_Store
 Thumbs.db
