@@ -1,0 +1,30 @@
+name: isbe
+
+# Local-dev override: auto-loaded by `docker compose up` when no -f is given.
+# Re-publishes UI/admin ports that are kept internal-only on the server.
+#
+# To run a server-style stack locally (Prefect-only externally), use:
+#   docker compose -f docker-compose.yml up -d
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  qdrant:
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+
+  minio:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  langfuse:
+    ports:
+      - "3000:3000"
+
+  uptime-kuma:
+    ports:
+      - "3001:3001"

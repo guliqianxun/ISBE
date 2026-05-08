@@ -1,5 +1,18 @@
 name: isbe
 
+# Server / prod-like layout: only Prefect :4200 is published to the host.
+# All other services talk over the internal `isbe-net` bridge network.
+#
+# For local dev on Windows that needs MinIO/Langfuse/Qdrant/Uptime-Kuma UIs,
+# `docker-compose.override.yml` re-publishes those ports automatically.
+# Disable the override on the server with:
+#   docker compose -f docker-compose.yml up -d
+# (omitting -f makes Compose auto-merge the override).
+
+networks:
+  isbe-net:
+    driver: bridge
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -8,8 +21,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-isbe}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       POSTGRES_DB: ${POSTGRES_DB:-isbe}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,16 +29,15 @@ services:
       timeout: 5s
       retries: 10
     restart: unless-stopped
+    networks: [isbe-net]
 
   qdrant:
     image: qdrant/qdrant:v1.11.0
     container_name: isbe-qdrant
-    ports:
-      - "6333:6333"
-      - "6334:6334"
     volumes:
       - qdrantdata:/qdrant/storage
     restart: unless-stopped
+    networks: [isbe-net]
 
   minio:
     image: minio/minio:RELEASE.2024-09-13T20-26-02Z
@@ -36,9 +46,6 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-isbe}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-changeme123}
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     volumes:
       - miniodata:/data
     healthcheck:
@@ -47,6 +54,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks: [isbe-net]
 
   langfuse-db:
     image: postgres:16-alpine
@@ -57,22 +65,28 @@ services:
       POSTGRES_DB: langfuse
     volumes:
       - langfusedata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse -d langfuse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
+    networks: [isbe-net]
 
   langfuse:
     image: langfuse/langfuse:2
     container_name: isbe-langfuse
     depends_on:
-      - langfuse-db
+      langfuse-db:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
       NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-changeme-32chars-changeme-32chars}
       SALT: ${LANGFUSE_SALT:-changeme-salt-changeme-salt}
-      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://localhost:3000}
       TELEMETRY_ENABLED: "false"
-    ports:
-      - "3000:3000"
     restart: unless-stopped
+    networks: [isbe-net]
 
   prefect-server:
     image: prefecthq/prefect:3-latest
@@ -84,34 +98,36 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "4200:4200"
+      - "4200:4200"   # only port published to the host
     restart: unless-stopped
+    networks: [isbe-net]
 
   uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: isbe-uptime-kuma
-    ports:
-      - "3001:3001"
     volumes:
       - uptimekumadata:/app/data
     restart: unless-stopped
+    networks: [isbe-net]
 
   # radar-worker: long-lived Prefect worker that fires the cron-scheduled flows.
+  # Opt-in: `docker compose --profile worker up -d`
   #
-  # PREREQUISITE on Docker Desktop Windows:
-  #   - Enable F: drive (or whichever drive holds this repo) under
-  #     Settings → Resources → File sharing. Otherwise bind mounts silently
-  #     create empty directories and the container fails with "ModuleNotFoundError: isbe".
+  # On Linux server: the bind mounts below resolve to ./memory etc relative to
+  # the directory you run `docker compose` from. Make sure that directory holds
+  # the repo (or at least the memory/ papers/ artifacts/ subdirs).
   #
-  # Alternative (no docker): run `uv run radar scheduler serve` on host.
-  # That's the same outcome — Prefect deployments register identically.
+  # On Docker Desktop Windows: enable F: drive (or whichever drive holds this
+  # repo) under Settings -> Resources -> File sharing.
   radar-worker:
     build:
       context: .
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
     image: isbe/radar:latest
     container_name: isbe-radar-worker
-    profiles: ["worker"]  # opt-in: `docker compose --profile worker up -d`
+    profiles: ["worker"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -120,7 +136,6 @@ services:
       minio:
         condition: service_healthy
     environment:
-      # Override host defaults to use compose service names
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
       POSTGRES_USER: ${POSTGRES_USER:-isbe}
@@ -139,16 +154,14 @@ services:
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       ISBE_UID: ${ISBE_UID:-me}
     volumes:
-      # Bind mount user-visible state — host paths == container /app paths
       - ./memory:/app/memory
       - ./papers:/app/papers
       - ./artifacts:/app/artifacts
-      # Bind mount source for live edits (remove for prod-frozen build)
-      # alembic.ini stays as image-baked (single-file mounts are flaky on Docker Desktop Windows)
       - ./src:/app/src
       - ./alembic:/app/alembic
     command: ["scheduler", "serve"]
     restart: unless-stopped
+    networks: [isbe-net]
 
 volumes:
   pgdata:
