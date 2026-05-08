@@ -44,7 +44,7 @@ def topics_run(
             typer.echo(f"arxiv: {n1} new / github: {n2} new")
         if download_pdfs:
             arxiv_mod = importlib.import_module("isbe.topics.nowcasting.collectors.arxiv")
-            n = arxiv_mod.arxiv_download_pdfs(limit=pdf_limit)
+            n = arxiv_mod.arxiv_download_pdfs(limit=pdf_limit, period_label=period_label)
             typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
         if digest:
             digester_mod = importlib.import_module("isbe.topics.nowcasting.digester")

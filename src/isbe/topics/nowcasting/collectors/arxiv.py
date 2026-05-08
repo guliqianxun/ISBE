@@ -3,7 +3,7 @@
 import io
 import os
 import time
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from functools import lru_cache
 from pathlib import Path
 
@@ -18,9 +18,18 @@ from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
 from isbe.topics.nowcasting.facts import Paper
 
-PAPERS_BUCKET = "isbe-papers"
+TOPIC_ID = "nowcasting"
 PAPERS_LOCAL_MIRROR_DEFAULT = Path("papers")
 ARXIV_PDF_RATE_LIMIT_S = 3.0  # arXiv ToS: 1 request per 3s
+
+
+def _papers_bucket(topic_id: str) -> str:
+    return f"papers-{topic_id}"
+
+
+def _current_iso_week() -> str:
+    year, week, _ = date.today().isocalendar()
+    return f"{year}-W{week:02d}"
 
 ARXIV_QUERY_URL = (
     "https://export.arxiv.org/api/query"
@@ -102,9 +111,9 @@ def _get_minio_client() -> Minio:
     )
 
 
-def _ensure_papers_bucket(client: Minio) -> None:
-    if not client.bucket_exists(PAPERS_BUCKET):
-        client.make_bucket(PAPERS_BUCKET)
+def _ensure_papers_bucket(client: Minio, bucket: str) -> None:
+    if not client.bucket_exists(bucket):
+        client.make_bucket(bucket)
 
 
 def fetch_pdf_bytes(arxiv_id: str) -> bytes:
@@ -118,32 +127,46 @@ def fetch_pdf_bytes(arxiv_id: str) -> bytes:
     return resp.content
 
 
-def store_pdf(arxiv_id: str, body: bytes) -> str:
-    """Upload PDF to MinIO + write local mirror. Returns body_uri."""
+def store_pdf(
+    arxiv_id: str,
+    body: bytes,
+    *,
+    topic_id: str = TOPIC_ID,
+    period_label: str,
+) -> str:
+    """Upload PDF to MinIO + write local mirror under topic+period layout.
+
+    Local:  papers/<topic_id>/<period_label>/<arxiv_id>.pdf
+    MinIO:  bucket=papers-<topic_id>, key=<period_label>/<arxiv_id>.pdf
+    Returns body_uri = minio://papers-<topic_id>/<period_label>/<arxiv_id>.pdf
+    """
+    bucket = _papers_bucket(topic_id)
+    object_name = f"{period_label}/{arxiv_id}.pdf"
     client = _get_minio_client()
-    _ensure_papers_bucket(client)
-    object_name = f"{arxiv_id}.pdf"
+    _ensure_papers_bucket(client, bucket)
     client.put_object(
-        PAPERS_BUCKET,
+        bucket,
         object_name,
         io.BytesIO(body),
         length=len(body),
         content_type="application/pdf",
     )
     mirror_root = Path(os.getenv("ISBE_PAPERS_MIRROR", str(PAPERS_LOCAL_MIRROR_DEFAULT)))
-    local_path = mirror_root / object_name
+    local_path = mirror_root / topic_id / period_label / f"{arxiv_id}.pdf"
     local_path.parent.mkdir(parents=True, exist_ok=True)
     local_path.write_bytes(body)
-    return f"minio://{PAPERS_BUCKET}/{object_name}"
+    return f"minio://{bucket}/{object_name}"
 
 
 @flow(name="arxiv-download-pdfs")
-def arxiv_download_pdfs(limit: int = 10) -> int:
+def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int:
     """Download PDFs for papers where pdf_uri IS NULL.
 
     Throttled to 1 request / 3s per arXiv Terms of Service. Returns count downloaded.
+    Files are organized under papers/<topic>/<period>/; period defaults to current ISO week.
     """
-    with topic_run("nowcasting", "arxiv-download-pdfs") as run:
+    period = period_label or _current_iso_week()
+    with topic_run(TOPIC_ID, "arxiv-download-pdfs") as run:
         Session = make_session_factory()
         n = 0
         skipped = 0
@@ -154,7 +177,7 @@ def arxiv_download_pdfs(limit: int = 10) -> int:
             for p in targets:
                 try:
                     body = fetch_pdf_bytes(p.arxiv_id)
-                    p.pdf_uri = store_pdf(p.arxiv_id, body)
+                    p.pdf_uri = store_pdf(p.arxiv_id, body, period_label=period)
                     s.add(p)
                     s.commit()
                     n += 1
@@ -165,6 +188,7 @@ def arxiv_download_pdfs(limit: int = 10) -> int:
         run.payload["downloaded"] = n
         run.payload["skipped"] = skipped
         run.payload["limit"] = limit
+        run.payload["period_label"] = period
         return n
 
 
