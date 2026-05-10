@@ -56,7 +56,8 @@ services:
     networks: [isbe-net]
 
   # Browser-based SQL UI for postgres — no install on the laptop, just open
-  # http://192.168.0.156:8081 from any device on the LAN.
+  # http://192.168.0.156:8083 from any device on the LAN.
+  # (8081 is taken by zotero-webdav on this host; 8082 is homepage.)
   pgweb:
     image: sosedoff/pgweb:latest
     container_name: isbe-pgweb
@@ -66,7 +67,7 @@ services:
     environment:
       PGWEB_DATABASE_URL: postgres://${POSTGRES_USER:-isbe}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-isbe}?sslmode=disable
     ports:
-      - "192.168.0.156:8081:8081"
+      - "192.168.0.156:8083:8081"
     restart: unless-stopped
     networks: [isbe-net]
 

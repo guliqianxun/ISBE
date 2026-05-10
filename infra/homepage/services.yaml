@@ -14,7 +14,7 @@
 
 - Data:
     - pgweb (SQL):
-        href: http://192.168.0.156:8081
+        href: http://192.168.0.156:8083
         description: 查论文 / repo / topic_run / artifact 索引
         icon: postgres.png
         ping: 192.168.0.156
