@@ -47,7 +47,8 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: isbe-homepage
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: 192.168.0.156:8082,localhost:8082
+      # Permissive — LAN-only deployment, no need for strict host check
+      HOMEPAGE_ALLOWED_HOSTS: "*"
     volumes:
       - ./infra/homepage:/app/config:ro
     ports:
