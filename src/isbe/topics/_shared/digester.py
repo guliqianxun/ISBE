@@ -9,8 +9,6 @@ Each digest run:
   5. Writes artifact + .pending memory drafts.
 """
 
-import os
-import re
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -22,31 +20,19 @@ from isbe.artifacts.store import save_artifact
 from isbe.facts.db import make_session_factory
 from isbe.llm.client import complete
 from isbe.llm.prompts import SYSTEM_PROMPT, build_digest_prompt
-from isbe.memory.loader import load_index
 from isbe.memory.pending import write_pending
 from isbe.observability.runs import topic_run
-from isbe.topics.base import DigestResult, DigestSection, PendingMemoryDraft
+from isbe.topics._shared.digester_utils import (
+    build_memory_block,
+    memory_root as _memory_root,
+    parse_distillation_section,  # noqa: F401  — re-exported for back-compat
+    split_sections as _split_sections,
+)
+from isbe.topics.base import DigestResult, DigestSection
 from isbe.topics.nowcasting.facts import Paper, Repo  # shared facts tables
 from isbe.topics.registry import default_topics_root, load_topic_config
 
-DRAFT_LINE_RE = re.compile(r"^\s*-\s*DRAFT\[([^\]]+)\]:\s*(.+)$")
 SHARED_TEMPLATE = Path(__file__).parent / "templates" / "weekly.j2"
-
-VALID_TYPE_PREFIXES = {
-    "topics": "topic",
-    "reading": "reading",
-    "feedback": "feedback",
-    "user": "user",
-    "reference": "reference",
-}
-
-
-def _memory_root() -> Path:
-    raw = os.getenv("ISBE_MEMORY_ROOT")
-    if raw:
-        return Path(raw)
-    uid = os.getenv("ISBE_UID", "me")
-    return Path("memory") / uid
 
 
 def _build_facts_block(papers: list, repos: list | None) -> str:
@@ -60,81 +46,6 @@ def _build_facts_block(papers: list, repos: list | None) -> str:
                 f"- {r.title} stars={r.stars} last_commit={r.last_commit_at} — {r.github_url}"
             )
     return "\n".join(lines)
-
-
-def _build_memory_block(memory_root: Path) -> tuple[str, dict]:
-    index: dict[str, int] = {}
-    chunks: list[str] = []
-    for entry in load_index(memory_root):
-        ftype = entry.frontmatter.type
-        if ftype.value not in ("topic", "feedback", "user"):
-            continue
-        index[entry.frontmatter.name] = entry.frontmatter.revision
-        chunks.append(
-            f"--- {entry.frontmatter.name}@rev{entry.frontmatter.revision} "
-            f"(type={ftype.value}) ---\n{entry.body.strip()}"
-        )
-    return "\n\n".join(chunks), index
-
-
-def _split_sections(text: str) -> dict[str, str]:
-    sections: dict[str, str] = {}
-    current_key = None
-    buf: list[str] = []
-    name_map = {"事实": "facts", "分析": "analysis", "蒸馏": "distillation"}
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("## "):
-            if current_key is not None:
-                sections[current_key] = "\n".join(buf).strip()
-            header = stripped[3:].strip()
-            current_key = name_map.get(header)
-            buf = []
-        else:
-            if current_key is not None:
-                buf.append(line)
-    if current_key is not None:
-        sections[current_key] = "\n".join(buf).strip()
-    return sections
-
-
-def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
-    import sys
-
-    drafts: list[PendingMemoryDraft] = []
-    for line in text.splitlines():
-        m = DRAFT_LINE_RE.match(line)
-        if not m:
-            continue
-        target_path = m.group(1).strip()
-        content = m.group(2).strip()
-
-        prefix = target_path.split("/", 1)[0]
-        if prefix not in VALID_TYPE_PREFIXES:
-            print(f"[digester] skip DRAFT (bad prefix '{prefix}'): {target_path}", file=sys.stderr)
-            continue
-        if not target_path.endswith(".md"):
-            print(f"[digester] skip DRAFT (not .md): {target_path}", file=sys.stderr)
-            continue
-        target_type = VALID_TYPE_PREFIXES[prefix]
-
-        body = (
-            f"---\nname: {Path(target_path).stem}\n"
-            f"description: agent draft from digest\n"
-            f"type: {target_type}\n"
-            f"created: {date.today().isoformat()}\n"
-            f"updated: {date.today().isoformat()}\n"
-            f"source: agent-inferred\n---\n{content}\n"
-        )
-        drafts.append(
-            PendingMemoryDraft(
-                target_type=target_type,
-                target_path=target_path,
-                body=body,
-                rationale="extracted from weekly digest distillation section",
-            )
-        )
-    return drafts
 
 
 def _papers_keyword_filter(keywords: list[str]):
@@ -207,8 +118,8 @@ def _digester_impl(
         repos = list(s.scalars(select(Repo)).all()) if include_repos else None
 
     facts_block = _build_facts_block(papers, repos)
-    memory_root = _memory_root()
-    memory_block, memory_index = _build_memory_block(memory_root)
+    mroot = _memory_root()
+    memory_block, memory_index = build_memory_block(mroot)
 
     user_prompt = build_digest_prompt(
         topic_label=topic_label,
@@ -225,7 +136,7 @@ def _digester_impl(
     ]
     drafts = parse_distillation_section(parts.get("distillation", ""))
     for d in drafts:
-        write_pending(memory_root, d)
+        write_pending(mroot, d)
 
     fingerprint = {
         "facts": {
