@@ -1,16 +1,20 @@
 - Apps:
     - 周报 Artifacts:
-        href: smb://192.168.0.156/isbe/artifacts/nowcasting
-        description: SMB 共享，Obsidian 打开当 vault
-        icon: obsidian.png
+        href: http://192.168.0.156:8084/files/artifacts/nowcasting/
+        description: 浏览器看 markdown / 复盘历史周报
+        icon: mdi-newspaper-variant
     - 待 review 草稿:
-        href: smb://192.168.0.156/isbe/memory/me/.pending
+        href: http://192.168.0.156:8084/files/memory/me/.pending/
         description: digest 蒸馏出的 pending memory
         icon: mdi-clipboard-list
     - PDF 原文:
-        href: smb://192.168.0.156/isbe/papers
-        description: 双击 .pdf 直接打开
+        href: http://192.168.0.156:8084/files/papers/
+        description: 浏览器内嵌 PDF 预览，点开即看
         icon: mdi-file-pdf-box
+    - 全文件库:
+        href: http://192.168.0.156:8084/files/
+        description: filebrowser 总入口（含 memory / artifacts / papers）
+        icon: mdi-folder-multiple
 
 - Data:
     - pgweb (SQL):
