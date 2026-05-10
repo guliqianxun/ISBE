@@ -58,3 +58,6 @@ ignore = ["UP042"]
 # Integration tests place pytest.mark.integration before from-imports intentionally
 "tests/test_facts_db.py" = ["E402"]
 "tests/test_nowcasting_facts.py" = ["E402"]
+# Prompt files contain long Chinese sentences; readability > line-length
+"src/isbe/llm/prompts.py" = ["E501"]
+"src/isbe/llm/finance_prompts.py" = ["E501"]

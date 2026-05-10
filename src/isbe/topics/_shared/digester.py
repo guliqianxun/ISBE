@@ -24,8 +24,12 @@ from isbe.memory.pending import write_pending
 from isbe.observability.runs import topic_run
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
-    memory_root as _memory_root,
     parse_distillation_section,  # noqa: F401  — re-exported for back-compat
+)
+from isbe.topics._shared.digester_utils import (
+    memory_root as _memory_root,
+)
+from isbe.topics._shared.digester_utils import (
     split_sections as _split_sections,
 )
 from isbe.topics.base import DigestResult, DigestSection

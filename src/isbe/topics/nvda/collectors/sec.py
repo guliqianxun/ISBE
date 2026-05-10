@@ -44,7 +44,7 @@ def parse_submissions_response(
     dates = recent.get("filingDate", [])
     docs = recent.get("primaryDocument", [])
     out: list[SecFiling] = []
-    for acc, form, fdate, doc in zip(accs, forms, dates, docs):
+    for acc, form, fdate, doc in zip(accs, forms, dates, docs, strict=False):
         if form not in form_filter:
             continue
         acc_clean = acc.replace("-", "")

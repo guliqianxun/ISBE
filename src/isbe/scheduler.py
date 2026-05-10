@@ -16,7 +16,6 @@ from isbe.topics.nvda.collectors.sec import nvda_sec_collector
 from isbe.topics.nvda.digester import daily_digester
 from isbe.topics.registry import default_topics_root, discover_topics, load_topic_config
 
-
 # schedule_key -> (flow, parameter-template)
 # parameter-template values may use {topic_id} for substitution
 _FLOW_DISPATCH = {
