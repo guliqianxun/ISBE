@@ -56,35 +56,13 @@ services:
     restart: unless-stopped
     networks: [isbe-net]
 
-  langfuse-db:
-    image: postgres:16-alpine
-    container_name: isbe-langfuse-db
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: isbe-phoenix
     environment:
-      POSTGRES_USER: langfuse
-      POSTGRES_PASSWORD: langfuse
-      POSTGRES_DB: langfuse
+      PHOENIX_WORKING_DIR: /mnt/data
     volumes:
-      - langfusedata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U langfuse -d langfuse"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    restart: unless-stopped
-    networks: [isbe-net]
-
-  langfuse:
-    image: langfuse/langfuse:2
-    container_name: isbe-langfuse
-    depends_on:
-      langfuse-db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
-      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-changeme-32chars-changeme-32chars}
-      SALT: ${LANGFUSE_SALT:-changeme-salt-changeme-salt}
-      NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://localhost:3000}
-      TELEMETRY_ENABLED: "false"
+      - phoenixdata:/mnt/data
     restart: unless-stopped
     networks: [isbe-net]
 
@@ -145,9 +123,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-isbe}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-changeme123}
       PREFECT_API_URL: http://prefect-server:4200/api
-      LANGFUSE_HOST: http://langfuse:3000
-      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
-      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      PHOENIX_COLLECTOR_ENDPOINT: ${PHOENIX_COLLECTOR_ENDPOINT:-http://phoenix:6006/v1/traces}
+      PHOENIX_PROJECT_NAME: ${PHOENIX_PROJECT_NAME:-isbe}
       ISBE_LLM_PROVIDER: ${ISBE_LLM_PROVIDER:-deepseek}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
@@ -167,5 +144,5 @@ volumes:
   pgdata:
   qdrantdata:
   miniodata:
-  langfusedata:
+  phoenixdata:
   uptimekumadata:

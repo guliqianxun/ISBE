@@ -4,7 +4,7 @@
 
 ## Status
 
-**P1.6 完成**（tag `p1.6-worker-service`）。基础设施 7 容器跑通，单 topic（nowcasting）端到端 verified，Prefect cron schedule 注册到 server，Langfuse trace 接入（需 UI 配 keys），Docker worker 服务可选。详细复盘看 [`docs/superpowers/PROGRESS.md`](docs/superpowers/PROGRESS.md)。
+**P1.6 完成**（tag `p1.6-worker-service`）。基础设施 6 容器跑通，单 topic（nowcasting）端到端 verified，Prefect cron schedule 注册到 server，Phoenix LLM trace 接入（零登录），Docker worker 服务可选。详细复盘看 [`docs/superpowers/PROGRESS.md`](docs/superpowers/PROGRESS.md)。
 
 下一步：**Plan #2 — NVDA 金融日报域**，验证 Topic 抽象的复用性。
 
@@ -27,11 +27,10 @@ cp .env.example .env
 # 编辑 .env，填:
 #   DEEPSEEK_API_KEY=sk-...    (或 ANTHROPIC_API_KEY，对应 ISBE_LLM_PROVIDER)
 #   GITHUB_TOKEN=ghp-...       (可选，5000 req/hr)
-#   LANGFUSE_PUBLIC_KEY=...    (可选，trace LLM 调用)
-#   LANGFUSE_SECRET_KEY=...
+#   PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006/v1/traces  (可选，trace LLM 调用)
 
 uv sync --all-extras
-docker compose up -d                # 7 服务：postgres/qdrant/minio/langfuse(+db)/prefect-server/uptime-kuma
+docker compose up -d                # 6 服务：postgres/qdrant/minio/phoenix/prefect-server/uptime-kuma
 uv run alembic upgrade head         # 建 facts 表
 uv run pytest                        # 52 tests，应全绿
 ```
@@ -84,7 +83,7 @@ docker logs -f isbe-radar-worker
 | URL | 谁 | 默认登录 |
 |---|---|---|
 | http://localhost:4200 | Prefect (flow runs / deployments) | — |
-| http://localhost:3000 | Langfuse (LLM trace) | 自己注册 |
+| http://localhost:6006 | Phoenix (LLM trace) | — |
 | http://localhost:9001 | MinIO console | isbe / changeme123 |
 | http://localhost:3001 | Uptime Kuma | 自己设置 |
 
@@ -98,7 +97,7 @@ src/isbe/
 │   ├── base.py     # Protocol + dataclasses
 │   ├── registry.py # 扫盘发现 topic.yaml
 │   └── nowcasting/ # 第一个 topic 实现：collectors + digester + 模板
-├── llm/            # anthropic / deepseek 双 provider + Langfuse @observe
+├── llm/            # anthropic / deepseek 双 provider + Phoenix OTel trace
 ├── artifacts/      # MinIO + PG + 本地三写
 ├── observability/  # topic_run context manager
 ├── workflows/      # hello_world (P0 烟雾)

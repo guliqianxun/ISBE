@@ -45,6 +45,6 @@ docker compose -f docker-compose.yml --profile worker up -d
 
 echo
 echo "Done. Prefect UI: http://<server-ip>:4200"
-echo "Other UIs (langfuse, minio, uptime-kuma) are internal-only."
-echo "To reach them, SSH-tunnel:  ssh -L 3000:localhost:3000 user@server"
+echo "Other UIs (phoenix, minio, uptime-kuma) are internal-only."
+echo "To reach them, SSH-tunnel:  ssh -L 6006:localhost:6006 user@server"
 echo "  then forward via:  docker compose exec ... or use socat sidecar"
