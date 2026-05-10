@@ -135,6 +135,8 @@ def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int
     Currently nowcasting-bound for organization (papers/<topic>/<period>/).
     New topics can opt in by adding their own download flow if needed.
     """
+    import sys
+
     period = period_label or _current_iso_week()
     with topic_run(TOPIC_ID, "arxiv-download-pdfs") as run:
         Session = make_session_factory()
@@ -144,15 +146,35 @@ def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int
             targets = list(
                 s.scalars(select(Paper).where(Paper.pdf_uri.is_(None)).limit(limit)).all()
             )
-            for p in targets:
+            total = len(targets)
+            print(
+                f"[arxiv-pdfs] starting: {total} target paper(s), "
+                f"period={period}, mirrors={_arxiv_pdf_base_urls()}",
+                flush=True,
+            )
+            for idx, p in enumerate(targets, 1):
+                t0 = time.time()
+                print(f"[arxiv-pdfs] ({idx}/{total}) -> {p.arxiv_id} fetching...", flush=True)
                 try:
                     body = fetch_pdf_bytes(p.arxiv_id)
                     p.pdf_uri = store_pdf(p.arxiv_id, body, period_label=period)
                     s.add(p)
                     s.commit()
                     n += 1
+                    elapsed = time.time() - t0
+                    print(
+                        f"[arxiv-pdfs] ({idx}/{total}) OK {p.arxiv_id} "
+                        f"{len(body) / 1024:.0f}KB in {elapsed:.1f}s",
+                        flush=True,
+                    )
                 except httpx.HTTPError as e:
-                    print(f"[arxiv-pdfs] skip {p.arxiv_id}: {e}")
+                    elapsed = time.time() - t0
+                    print(
+                        f"[arxiv-pdfs] ({idx}/{total}) SKIP {p.arxiv_id} "
+                        f"after {elapsed:.1f}s: {e}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
                     skipped += 1
                 time.sleep(ARXIV_PDF_RATE_LIMIT_S)
         run.payload["downloaded"] = n
