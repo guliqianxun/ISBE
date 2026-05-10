@@ -1,0 +1,38 @@
+- Apps:
+    - 周报 Artifacts:
+        href: smb://192.168.0.156/isbe/artifacts/nowcasting
+        description: SMB 共享，Obsidian 打开当 vault
+        icon: obsidian.png
+    - 待 review 草稿:
+        href: smb://192.168.0.156/isbe/memory/me/.pending
+        description: digest 蒸馏出的 pending memory
+        icon: mdi-clipboard-list
+    - PDF 原文:
+        href: smb://192.168.0.156/isbe/papers
+        description: 双击 .pdf 直接打开
+        icon: mdi-file-pdf-box
+
+- Data:
+    - pgweb (SQL):
+        href: http://192.168.0.156:8081
+        description: 查论文 / repo / topic_run / artifact 索引
+        icon: postgres.png
+        ping: 192.168.0.156
+    - MinIO (对象存储):
+        href: http://192.168.0.156:9001
+        description: papers + artifacts 镜像（按 .env 凭据登录）
+        icon: minio.png
+
+- Observability:
+    - Phoenix (LLM trace):
+        href: http://192.168.0.156:6006/projects
+        description: 每条 LLM 调用的 prompt / 输出 / token
+        icon: mdi-radar
+    - Prefect (调度):
+        href: http://192.168.0.156:4200
+        description: 4 个 cron deployment + flow run 历史
+        icon: mdi-calendar-clock
+    - Uptime Kuma (监活):
+        href: http://192.168.0.156:3001
+        description: 服务在线状态 / 告警
+        icon: uptime-kuma.png

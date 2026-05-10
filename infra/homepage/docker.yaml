@@ -1,0 +1,2 @@
+# Empty: homepage works without docker socket integration.
+# To enable container status badges, mount /var/run/docker.sock and configure here.

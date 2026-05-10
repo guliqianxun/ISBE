@@ -41,6 +41,20 @@ services:
     ports:
       - "192.168.0.156:3001:3001"
 
+  # Single-page hub linking all ISBE services. Open http://192.168.0.156:8082
+  # as the daily landing page; everything else is one click away.
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: isbe-homepage
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.0.156:8082,localhost:8082
+    volumes:
+      - ./infra/homepage:/app/config:ro
+    ports:
+      - "192.168.0.156:8082:3000"
+    restart: unless-stopped
+    networks: [isbe-net]
+
   # Browser-based SQL UI for postgres — no install on the laptop, just open
   # http://192.168.0.156:8081 from any device on the LAN.
   pgweb:

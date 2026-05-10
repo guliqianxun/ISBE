@@ -1,0 +1,10 @@
+- 外部资源:
+    - arxiv cs.LG:
+        - abbr: AX
+          href: https://arxiv.org/list/cs.LG/recent
+    - GitHub trending nowcasting:
+        - abbr: GH
+          href: https://github.com/search?q=nowcasting&type=repositories&s=updated
+    - DeepSeek 控制台:
+        - abbr: DS
+          href: https://platform.deepseek.com/usage

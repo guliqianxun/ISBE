@@ -1,0 +1,17 @@
+title: ISBE Hub
+headerStyle: clean
+theme: dark
+color: slate
+language: zh-CN
+hideVersion: true
+disableCollapse: true
+layout:
+  Apps:
+    style: row
+    columns: 3
+  Data:
+    style: row
+    columns: 2
+  Files:
+    style: row
+    columns: 2
