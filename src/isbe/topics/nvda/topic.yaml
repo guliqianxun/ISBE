@@ -1,0 +1,45 @@
+id: nvda
+label: NVDA 金融日报
+cadence: daily_after_close
+active: true
+
+prices:
+  # NVDA + peer semis + key hyperscaler customers + benchmarks
+  symbols:
+    - NVDA
+    - TSM
+    - AMD
+    - AVGO
+    - MSFT
+    - GOOG
+    - META
+    - AMZN
+    - "^NDX"     # Nasdaq 100
+    - "^SOX"     # PHLX Semiconductor
+
+news_rss:
+  feeds:
+    - source: yahoo-finance-nvda
+      url: https://feeds.finance.yahoo.com/rss/2.0/headline?s=NVDA&region=US&lang=en-US
+    - source: nasdaq-nvda
+      url: https://www.nasdaq.com/feed/rssoutbound?symbol=NVDA
+
+sec_edgar:
+  companies:
+    - ticker: NVDA
+      cik: 1045810
+  forms: [8-K, 10-Q, 10-K]
+
+digest:
+  flavor: finance_daily
+  facts_window_days: 1
+  news_window_days: 3
+  filings_window_days: 7
+
+# Cron is in UTC. US market closes 16:00 ET = 21:00 UTC (EDT) / 22:00 UTC (EST).
+# We pick 22:30 UTC weekdays for safety and let yfinance/news settle.
+schedules:
+  nvda_prices_collector: "30 22 * * 1-5"
+  nvda_news_collector:   "0,30 * * * *"      # hourly+30 — news pace is faster than prices
+  nvda_sec_collector:    "0 23 * * 1-5"
+  daily_digester:        "30 23 * * 1-5"     # ~7:30 next-day Beijing time
