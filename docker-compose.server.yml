@@ -42,6 +42,10 @@ services:
       - "192.168.0.156:3001:3001"
 
   radar-worker:
+    build:
+      args:
+        # CN-friendly PyPI mirror; override or empty to use upstream
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
     environment:
       PHOENIX_COLLECTOR_ENDPOINT: http://phoenix:6006/v1/traces
     volumes:

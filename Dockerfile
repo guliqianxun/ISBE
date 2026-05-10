@@ -1,5 +1,13 @@
 FROM python:3.12-slim
 
+# Optional PyPI mirror — set via build-arg for networks where files.pythonhosted.org
+# is slow/unreachable (e.g. CN servers). Default is empty (use upstream PyPI).
+#   docker compose build --build-arg PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+ARG PIP_INDEX_URL=""
+ENV PIP_INDEX_URL=${PIP_INDEX_URL}
+ENV UV_INDEX_URL=${PIP_INDEX_URL}
+ENV UV_HTTP_TIMEOUT=120
+
 # uv installer (pin to match host)
 RUN pip install --no-cache-dir uv==0.10.4
 
