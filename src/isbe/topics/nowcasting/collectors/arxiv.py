@@ -67,14 +67,40 @@ def _ensure_papers_bucket(client: Minio, bucket: str) -> None:
         client.make_bucket(bucket)
 
 
-def fetch_pdf_bytes(arxiv_id: str) -> bytes:
-    resp = httpx.get(
-        f"https://arxiv.org/pdf/{arxiv_id}",
-        follow_redirects=True,
-        timeout=120.0,
-    )
-    resp.raise_for_status()
-    return resp.content
+def _arxiv_pdf_base_urls() -> list[str]:
+    """Candidate base URLs in order of preference.
+
+    Override via ARXIV_PDF_BASE_URL (single) or ARXIV_PDF_MIRRORS (comma-separated list).
+    Defaults try arxiv.org then export.arxiv.org which sometimes routes better from CN.
+    """
+    explicit = os.getenv("ARXIV_PDF_BASE_URL", "").strip()
+    if explicit:
+        return [explicit.rstrip("/")]
+    mirrors = os.getenv("ARXIV_PDF_MIRRORS", "").strip()
+    if mirrors:
+        return [m.strip().rstrip("/") for m in mirrors.split(",") if m.strip()]
+    return ["https://arxiv.org", "https://export.arxiv.org"]
+
+
+def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float = 180.0) -> bytes:
+    """Fetch one PDF, trying configured mirrors with retries.
+
+    Raises the LAST exception if all mirrors+retries fail.
+    """
+    last_exc: Exception | None = None
+    for base in _arxiv_pdf_base_urls():
+        url = f"{base}/pdf/{arxiv_id}"
+        for attempt in range(max_retries + 1):
+            try:
+                resp = httpx.get(url, follow_redirects=True, timeout=timeout)
+                resp.raise_for_status()
+                return resp.content
+            except (httpx.TimeoutException, httpx.HTTPError) as e:
+                last_exc = e
+                if attempt < max_retries:
+                    time.sleep(2 * (attempt + 1))  # 2s, 4s backoff
+    assert last_exc is not None
+    raise last_exc
 
 
 def store_pdf(
