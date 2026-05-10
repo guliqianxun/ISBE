@@ -20,10 +20,10 @@ def _github_headers() -> dict:
 TRACKED_REPOS: list[str] = [
     # owner/name; expand by editing this list (P3 makes it config)
     "openclimatefix/skillful_nowcasting",  # DGMR DeepMind reproduction
-    "openclimatefix/metnet-pytorch",  # MetNet/MetNet-2 PyTorch
-    "NVIDIA/modulus",  # NVIDIA scientific ML for atmos
+    "openclimatefix/metnet",  # MetNet/MetNet-2 PyTorch (replaces deleted metnet-pytorch)
+    "NVIDIA/physicsnemo",  # NVIDIA scientific ML for atmos (formerly NVIDIA/modulus, renamed 2025)
     "google-deepmind/graphcast",  # GraphCast (medium-range NWP)
-    "google-deepmind/weatherbench2",  # weather benchmark suite
+    "google-research/weatherbench2",  # weather benchmark suite (moved from google-deepmind)
     "microsoft/aurora",  # MS atmospheric foundation model
 ]
 
@@ -33,11 +33,15 @@ def _parse_iso(s: str) -> datetime:
 
 
 def fetch_repo_meta(owner_repo: str) -> Repo:
-    """GET https://api.github.com/repos/<owner>/<name> → Repo (not attached)."""
+    """GET https://api.github.com/repos/<owner>/<name> → Repo (not attached).
+
+    Follows redirects so renamed repos (GitHub returns 301) keep working.
+    """
     resp = httpx.get(
         f"https://api.github.com/repos/{owner_repo}",
         headers=_github_headers(),
         timeout=30.0,
+        follow_redirects=True,
     )
     resp.raise_for_status()
     data = resp.json()
