@@ -1,0 +1,50 @@
+name: isbe
+
+# Server-side overlay for the LAN deployment on 192.168.0.156.
+# Use INSTEAD OF docker-compose.override.yml (which is for Windows local dev).
+#
+# Layout assumptions:
+#   - Repo cloned to /mnt/nas_iscsi/isbe/
+#   - Docker daemon data-root is already on /mnt/nas_iscsi/docker/, so named
+#     volumes (pgdata / miniodata / phoenixdata / qdrantdata / uptimekumadata)
+#     automatically live on the iSCSI LUN — we only need to bind-mount the
+#     human-visible directories (memory / papers / artifacts) here.
+#   - All UIs are bound to 192.168.0.156 explicitly so they're reachable from
+#     LAN but not from the public internet (assumes server has no public IP).
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.server.yml \
+#     --profile worker up -d --build
+
+services:
+  postgres:
+    ports:
+      - "192.168.0.156:5432:5432"
+
+  qdrant:
+    ports:
+      - "192.168.0.156:6333:6333"
+
+  minio:
+    ports:
+      - "192.168.0.156:9000:9000"
+      - "192.168.0.156:9001:9001"
+
+  phoenix:
+    ports:
+      - "192.168.0.156:6006:6006"
+
+  # prefect-server already publishes 4200:4200 from the base compose file
+  # (default 0.0.0.0) — fine on a LAN-only server with no public IP.
+
+  uptime-kuma:
+    ports:
+      - "192.168.0.156:3001:3001"
+
+  radar-worker:
+    environment:
+      PHOENIX_COLLECTOR_ENDPOINT: http://phoenix:6006/v1/traces
+    volumes:
+      - /mnt/nas_iscsi/isbe/memory:/app/memory
+      - /mnt/nas_iscsi/isbe/papers:/app/papers
+      - /mnt/nas_iscsi/isbe/artifacts:/app/artifacts
