@@ -20,10 +20,10 @@ def topics_run(
     collect: bool = typer.Option(False, "--collect", help="Run collectors only"),
     digest: bool = typer.Option(False, "--digest", help="Run digester only"),
     download_pdfs: bool = typer.Option(
-        False, "--download-pdfs", help="Download PDFs for papers without pdf_uri (nowcasting only)"
+        False, "--download-pdfs", help="Download PDFs (nowcasting only)"
     ),
     pdf_limit: int = typer.Option(10, "--pdf-limit", help="Max PDFs per --download-pdfs run"),
-    period_label: str = typer.Option(None, help="e.g. 2026-W19; defaults to current ISO week"),
+    period_label: str = typer.Option(None, help="e.g. 2026-W19 / 2026-05-10; defaults to current"),
 ) -> None:
     root = default_topics_root()
     topics = {t.id: t for t in discover_topics(root)}
@@ -36,19 +36,24 @@ def topics_run(
         raise typer.Exit(code=1)
 
     cfg = load_topic_config(root, topic_id)
-    has_arxiv = bool(cfg.get("arxiv"))
 
     if collect:
-        from isbe.topics._shared.arxiv import arxiv_collector
-
-        n_arxiv = arxiv_collector(topic_id=topic_id) if has_arxiv else 0
-        # github_collector is nowcasting-only for now
-        n_gh = 0
-        if topic_id == "nowcasting":
-            from isbe.topics.nowcasting.collectors.github import github_collector
-
-            n_gh = github_collector()
-        typer.echo(f"arxiv: {n_arxiv} new / github: {n_gh} new")
+        if topic_id == "nvda":
+            from isbe.topics.nvda.collectors.news import nvda_news_collector
+            from isbe.topics.nvda.collectors.prices import nvda_prices_collector
+            from isbe.topics.nvda.collectors.sec import nvda_sec_collector
+            n_prices = nvda_prices_collector()
+            n_news = nvda_news_collector()
+            n_sec = nvda_sec_collector()
+            typer.echo(f"prices: {n_prices} new / news: {n_news} new / sec: {n_sec} new")
+        else:
+            from isbe.topics._shared.arxiv import arxiv_collector
+            n_arxiv = arxiv_collector(topic_id=topic_id) if cfg.get("arxiv") else 0
+            n_gh = 0
+            if topic_id == "nowcasting":
+                from isbe.topics.nowcasting.collectors.github import github_collector
+                n_gh = github_collector()
+            typer.echo(f"arxiv: {n_arxiv} new / github: {n_gh} new")
 
     if download_pdfs:
         if topic_id != "nowcasting":
@@ -59,15 +64,20 @@ def topics_run(
             )
             raise typer.Exit(code=2)
         from isbe.topics.nowcasting.collectors.arxiv import arxiv_download_pdfs
-
         n = arxiv_download_pdfs(limit=pdf_limit, period_label=period_label)
         typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
 
     if digest:
-        from isbe.topics._shared.digester import weekly_digester
-
-        today = date.today()
-        year, week, _ = today.isocalendar()
-        label = period_label or f"{year}-W{week:02d}"
-        result = weekly_digester(topic_id=topic_id, period_label=label, today=today)
-        typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
+        if topic_id == "nvda":
+            from isbe.topics.nvda.digester import daily_digester
+            today = date.today()
+            label = period_label or today.isoformat()
+            result = daily_digester(period_label=label, today=today)
+            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
+        else:
+            from isbe.topics._shared.digester import weekly_digester
+            today = date.today()
+            year, week, _ = today.isocalendar()
+            label = period_label or f"{year}-W{week:02d}"
+            result = weekly_digester(topic_id=topic_id, period_label=label, today=today)
+            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
