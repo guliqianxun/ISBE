@@ -1,47 +1,83 @@
-"""Prefect scheduler — run as long-lived process to fire flows on cron schedules.
+"""Prefect scheduler — long-lived process registering one set of deployments per active topic.
+
+Drives schedules from each topic's `topic.yaml` `schedules:` block. Each topic
+may declare any subset of:
+  - arxiv_collector
+  - github_collector
+  - arxiv_download_pdfs
+  - weekly_digester
 
 Usage:
     uv run radar scheduler serve
-
-Schedules (local timezone — Prefect server's TZ):
-    arxiv-collector       06:00 daily   (fetch new papers)
-    github-collector      06:30 daily   (refresh repo metadata)
-    arxiv-download-pdfs   07:00 Mon     (download PDFs before digest)
-    weekly-digester       08:00 Mon     (generate weekly report)
 """
 
 from prefect import serve
 
-from isbe.topics.nowcasting.collectors.arxiv import (
-    arxiv_collector,
-    arxiv_download_pdfs,
-)
+from isbe.topics._shared.arxiv import arxiv_collector
+from isbe.topics._shared.digester import weekly_digester
+from isbe.topics.nowcasting.collectors.arxiv import arxiv_download_pdfs
 from isbe.topics.nowcasting.collectors.github import github_collector
-from isbe.topics.nowcasting.digester import weekly_digester
+from isbe.topics.registry import default_topics_root, discover_topics, load_topic_config
 
 
-def serve_nowcasting() -> None:
-    """Long-running: serves 4 deployments with cron schedules. Ctrl-C to stop."""
-    arxiv_daily = arxiv_collector.to_deployment(
-        name="nowcasting-arxiv-daily",
-        cron="0 6 * * *",
-        parameters={"max_results": 50},
-    )
-    github_daily = github_collector.to_deployment(
-        name="nowcasting-github-daily",
-        cron="30 6 * * *",
-    )
-    pdf_weekly = arxiv_download_pdfs.to_deployment(
-        name="nowcasting-pdf-weekly",
-        cron="0 7 * * 1",
-        parameters={"limit": 20},
-    )
-    weekly = weekly_digester.to_deployment(
-        name="nowcasting-weekly-digester",
-        cron="0 8 * * 1",
-    )
-    serve(arxiv_daily, github_daily, pdf_weekly, weekly)
+def _build_deployments():
+    deployments = []
+    root = default_topics_root()
+    for meta in discover_topics(root):
+        if not meta.active:
+            continue
+        cfg = load_topic_config(root, meta.id)
+        schedules = cfg.get("schedules", {}) or {}
+
+        if "arxiv_collector" in schedules and cfg.get("arxiv"):
+            deployments.append(
+                arxiv_collector.to_deployment(
+                    name=f"{meta.id}-arxiv",
+                    cron=schedules["arxiv_collector"],
+                    parameters={"topic_id": meta.id},
+                )
+            )
+
+        if "github_collector" in schedules:
+            # github_collector is nowcasting-bespoke (TRACKED_REPOS hardcoded)
+            deployments.append(
+                github_collector.to_deployment(
+                    name=f"{meta.id}-github",
+                    cron=schedules["github_collector"],
+                )
+            )
+
+        if "arxiv_download_pdfs" in schedules:
+            deployments.append(
+                arxiv_download_pdfs.to_deployment(
+                    name=f"{meta.id}-pdfs",
+                    cron=schedules["arxiv_download_pdfs"],
+                    parameters={"limit": 20},
+                )
+            )
+
+        if "weekly_digester" in schedules:
+            deployments.append(
+                weekly_digester.to_deployment(
+                    name=f"{meta.id}-weekly",
+                    cron=schedules["weekly_digester"],
+                    parameters={"topic_id": meta.id},
+                )
+            )
+    return deployments
+
+
+def serve_topics() -> None:
+    """Long-running: registers one deployment per (topic, scheduled flow). Ctrl-C to stop."""
+    deployments = _build_deployments()
+    if not deployments:
+        raise RuntimeError("no active topics with schedules found under src/isbe/topics/")
+    serve(*deployments)
+
+
+# Backwards-compat alias for any external callers
+serve_nowcasting = serve_topics
 
 
 if __name__ == "__main__":
-    serve_nowcasting()
+    serve_topics()

@@ -71,10 +71,10 @@ PaperX 提了新方法 (memory: nowcasting@1)。
     fake_obs_session = MagicMock()
     fake_obs_session.__enter__ = MagicMock(return_value=fake_obs_session)
     fake_obs_session.__exit__ = MagicMock(return_value=False)
-    with patch("isbe.topics.nowcasting.digester.make_session_factory",
+    with patch("isbe.topics._shared.digester.make_session_factory",
                return_value=lambda: fake_session), \
-         patch("isbe.topics.nowcasting.digester.complete", return_value=fake_llm_resp), \
-         patch("isbe.topics.nowcasting.digester.save_artifact",
+         patch("isbe.topics._shared.digester.complete", return_value=fake_llm_resp), \
+         patch("isbe.topics._shared.digester.save_artifact",
                return_value="00000000-0000-0000-0000-000000000001"), \
          patch("isbe.observability.runs.make_session_factory",
                return_value=lambda: fake_obs_session):

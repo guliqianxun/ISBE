@@ -1,0 +1,24 @@
+id: image-restoration
+label: 低层视觉与图像复原科研订阅
+cadence: weekly
+active: true
+
+arxiv:
+  categories: [cs.CV]
+  include_keywords:
+    - image denoising
+    - image dehazing
+    - image deblurring
+    - super-resolution
+    - image restoration
+    - low-level vision
+  max_results: 50
+
+digest:
+  flavor: weekly
+  facts_window_days: 7
+  include_repos: false
+
+schedules:
+  arxiv_collector: "20 6 * * *"          # 错峰：06:20 daily
+  weekly_digester: "0 9 * * 1"           # 周一 09:00

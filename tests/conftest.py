@@ -1,6 +1,14 @@
 from pathlib import Path
 
 import pytest
+from prefect.testing.utilities import prefect_test_harness
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _prefect_test_db():
+    """Run all unit tests against an ephemeral Prefect DB; no external server needed."""
+    with prefect_test_harness():
+        yield
 
 
 @pytest.fixture

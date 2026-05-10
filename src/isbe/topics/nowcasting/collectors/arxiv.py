@@ -1,21 +1,36 @@
-"""arxiv collector — fetches recent papers in target categories."""
+"""nowcasting-specific arxiv wiring.
+
+Most of the arxiv work is now generic and lives in `isbe.topics._shared.arxiv`.
+This module:
+  - re-exports the generic helpers under their old import path (test compat)
+  - keeps the PDF download flow (still nowcasting-bound; other topics don't
+    download PDFs in the MVP)
+  - exposes a thin `arxiv_collector()` wrapper that drives the generic flow
+    with topic_id='nowcasting'
+"""
 
 import io
 import os
 import time
-from datetime import UTC, date, datetime
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 
-import feedparser
 import httpx
 from minio import Minio
-from prefect import flow, task
+from prefect import flow
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
+from isbe.topics._shared.arxiv import (
+    arxiv_collector as _generic_arxiv_collector,
+)
+from isbe.topics._shared.arxiv import (
+    fetch_arxiv_atom,  # noqa: F401  — re-export for parity
+    parse_atom_entry,  # noqa: F401  — used by tests
+    upsert_papers,  # noqa: F401  — used by tests
+)
 from isbe.topics.nowcasting.facts import Paper
 
 TOPIC_ID = "nowcasting"
@@ -31,74 +46,10 @@ def _current_iso_week() -> str:
     year, week, _ = date.today().isocalendar()
     return f"{year}-W{week:02d}"
 
-ARXIV_QUERY_URL = (
-    "https://export.arxiv.org/api/query"
-    "?search_query=cat:cs.LG+AND+(abs:nowcasting+OR+abs:precipitation+OR+abs:radar)"
-    "&sortBy=submittedDate&sortOrder=descending&max_results={max_results}"
-)
 
-
-def _parse_iso(s: str) -> datetime:
-    # arxiv uses ISO with 'Z'
-    return datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(UTC)
-
-
-def parse_atom_entry(entry: dict) -> Paper:
-    """Parse one feedparser entry dict into a Paper ORM object (not yet attached to session)."""
-    raw_id = entry["id"]  # "http://arxiv.org/abs/2604.12345v1"
-    arxiv_id = raw_id.rsplit("/", 1)[-1].split("v")[0]
-    authors = [a["name"] for a in entry.get("authors", [])]
-    tags = entry.get("tags", [])
-    primary = tags[0]["term"] if tags else "unknown"
-    alt = next(
-        (link["href"] for link in entry.get("links", []) if link.get("rel") == "alternate"),
-        "",
-    )
-    return Paper(
-        arxiv_id=arxiv_id,
-        title=entry["title"].strip(),
-        authors=authors,
-        abstract=entry.get("summary", "").strip(),
-        primary_category=primary,
-        submitted_at=_parse_iso(entry["published"]),
-        updated_at=_parse_iso(entry.get("updated", entry["published"])),
-        pdf_uri=None,  # P1 不下载 PDF
-        source_url=alt or raw_id,
-    )
-
-
-def upsert_papers(session: Session, papers: list[Paper]) -> int:
-    """Insert papers that don't exist yet. Returns count of inserts."""
-    n = 0
-    for p in papers:
-        existing = session.get(Paper, p.arxiv_id)
-        if existing is None:
-            session.add(p)
-            n += 1
-    session.commit()
-    return n
-
-
-@task
-def fetch_arxiv_atom(max_results: int = 50) -> list[dict]:
-    url = ARXIV_QUERY_URL.format(max_results=max_results)
-    resp = httpx.get(url, timeout=30.0)
-    resp.raise_for_status()
-    parsed = feedparser.parse(resp.text)
-    return parsed.entries  # list of dicts
-
-
-@flow(name="arxiv-collector")
 def arxiv_collector(max_results: int = 50) -> int:
-    with topic_run("nowcasting", "arxiv-collector") as run:
-        entries = fetch_arxiv_atom(max_results)
-        papers = [parse_atom_entry(e) for e in entries]
-        Session = make_session_factory()
-        with Session() as s:
-            n = upsert_papers(s, papers)
-        run.payload["fetched"] = len(entries)
-        run.payload["new_papers"] = n
-        return n
+    """Backwards-compat wrapper: runs the generic collector for nowcasting."""
+    return _generic_arxiv_collector(topic_id=TOPIC_ID, max_results=max_results)
 
 
 @lru_cache(maxsize=1)
@@ -117,7 +68,6 @@ def _ensure_papers_bucket(client: Minio, bucket: str) -> None:
 
 
 def fetch_pdf_bytes(arxiv_id: str) -> bytes:
-    """GET https://arxiv.org/pdf/<arxiv_id> → PDF bytes."""
     resp = httpx.get(
         f"https://arxiv.org/pdf/{arxiv_id}",
         follow_redirects=True,
@@ -134,12 +84,6 @@ def store_pdf(
     topic_id: str = TOPIC_ID,
     period_label: str,
 ) -> str:
-    """Upload PDF to MinIO + write local mirror under topic+period layout.
-
-    Local:  papers/<topic_id>/<period_label>/<arxiv_id>.pdf
-    MinIO:  bucket=papers-<topic_id>, key=<period_label>/<arxiv_id>.pdf
-    Returns body_uri = minio://papers-<topic_id>/<period_label>/<arxiv_id>.pdf
-    """
     bucket = _papers_bucket(topic_id)
     object_name = f"{period_label}/{arxiv_id}.pdf"
     client = _get_minio_client()
@@ -160,10 +104,10 @@ def store_pdf(
 
 @flow(name="arxiv-download-pdfs")
 def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int:
-    """Download PDFs for papers where pdf_uri IS NULL.
+    """Download PDFs for papers where pdf_uri IS NULL (rate-limited 1/3s).
 
-    Throttled to 1 request / 3s per arXiv Terms of Service. Returns count downloaded.
-    Files are organized under papers/<topic>/<period>/; period defaults to current ISO week.
+    Currently nowcasting-bound for organization (papers/<topic>/<period>/).
+    New topics can opt in by adding their own download flow if needed.
     """
     period = period_label or _current_iso_week()
     with topic_run(TOPIC_ID, "arxiv-download-pdfs") as run:

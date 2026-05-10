@@ -2,3 +2,23 @@ id: nowcasting
 label: 临近降水预报科研订阅
 cadence: weekly
 active: true
+
+arxiv:
+  categories: [cs.LG]
+  include_keywords:
+    - nowcasting
+    - precipitation
+    - radar
+  max_results: 50
+
+digest:
+  flavor: weekly
+  facts_window_days: 7
+  include_repos: true   # 唯一启用 github repo 跟踪的 topic
+
+# Cron schedules (used by scheduler.py to register Prefect deployments).
+schedules:
+  arxiv_collector: "0 6 * * *"           # 每日 06:00
+  github_collector: "30 6 * * *"         # 每日 06:30 (nowcasting only)
+  arxiv_download_pdfs: "0 7 * * 1"       # 周一 07:00
+  weekly_digester: "0 8 * * 1"           # 周一 08:00

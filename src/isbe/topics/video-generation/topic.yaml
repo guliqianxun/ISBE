@@ -1,0 +1,24 @@
+id: video-generation
+label: 视频生成科研订阅
+cadence: weekly
+active: true
+
+arxiv:
+  categories: [cs.CV]
+  include_keywords:
+    - text-to-video
+    - video diffusion
+    - image-to-video
+    - video generation
+    - world model
+    - video synthesis
+  max_results: 50
+
+digest:
+  flavor: weekly
+  facts_window_days: 7
+  include_repos: false
+
+schedules:
+  arxiv_collector: "10 6 * * *"          # 错峰：06:10 daily
+  weekly_digester: "30 8 * * 1"          # 周一 08:30
