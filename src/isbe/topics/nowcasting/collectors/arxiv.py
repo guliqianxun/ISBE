@@ -71,7 +71,9 @@ def _arxiv_pdf_base_urls() -> list[str]:
     """Candidate base URLs in order of preference.
 
     Override via ARXIV_PDF_BASE_URL (single) or ARXIV_PDF_MIRRORS (comma-separated list).
-    Defaults try arxiv.org then export.arxiv.org which sometimes routes better from CN.
+    Default puts export.arxiv.org FIRST — empirically more reachable from CN/Asia
+    routes than arxiv.org, which often times out entirely. arxiv.org kept as
+    second fallback for non-CN deploys where it might be faster.
     """
     explicit = os.getenv("ARXIV_PDF_BASE_URL", "").strip()
     if explicit:
@@ -79,7 +81,7 @@ def _arxiv_pdf_base_urls() -> list[str]:
     mirrors = os.getenv("ARXIV_PDF_MIRRORS", "").strip()
     if mirrors:
         return [m.strip().rstrip("/") for m in mirrors.split(",") if m.strip()]
-    return ["https://arxiv.org", "https://export.arxiv.org"]
+    return ["https://export.arxiv.org", "https://arxiv.org"]
 
 
 def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float = 180.0) -> bytes:
