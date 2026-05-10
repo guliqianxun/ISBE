@@ -50,7 +50,8 @@ services:
       # Permissive — LAN-only deployment, no need for strict host check
       HOMEPAGE_ALLOWED_HOSTS: "*"
     volumes:
-      - ./infra/homepage:/app/config:ro
+      # Not :ro — homepage needs to mkdir /app/config/logs at startup
+      - ./infra/homepage:/app/config
     ports:
       - "192.168.0.156:8082:3000"
     restart: unless-stopped
