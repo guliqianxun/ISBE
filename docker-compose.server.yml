@@ -41,6 +41,21 @@ services:
     ports:
       - "192.168.0.156:3001:3001"
 
+  # Browser-based SQL UI for postgres — no install on the laptop, just open
+  # http://192.168.0.156:8081 from any device on the LAN.
+  pgweb:
+    image: sosedoff/pgweb:latest
+    container_name: isbe-pgweb
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGWEB_DATABASE_URL: postgres://${POSTGRES_USER:-isbe}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-isbe}?sslmode=disable
+    ports:
+      - "192.168.0.156:8081:8081"
+    restart: unless-stopped
+    networks: [isbe-net]
+
   radar-worker:
     build:
       args:
