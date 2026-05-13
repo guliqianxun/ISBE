@@ -41,6 +41,7 @@ def topics_run(
     cfg = load_topic_config(root, topic_id)
     has_arxiv = bool(cfg.get("arxiv"))
     has_rss = bool(cfg.get("rss"))
+    has_crawl4ai = bool(cfg.get("crawl4ai"))
 
     if collect:
         if topic_id == "nvda":
@@ -51,9 +52,14 @@ def topics_run(
             n_news = nvda_news_collector()
             n_sec = nvda_sec_collector()
             typer.echo(f"prices: {n_prices} new / news: {n_news} new / sec: {n_sec} new")
-        elif has_rss:
-            from isbe.topics._shared.rss import rss_collector
-            n_articles = rss_collector(topic_id=topic_id)
+        elif has_rss or has_crawl4ai:
+            n_articles = 0
+            if has_rss:
+                from isbe.topics._shared.rss import rss_collector
+                n_articles += rss_collector(topic_id=topic_id)
+            if has_crawl4ai:
+                from isbe.topics._shared.crawl4ai_collector import crawl4ai_collector
+                n_articles += crawl4ai_collector(topic_id=topic_id)
             typer.echo(f"articles: {n_articles} new")
         else:
             from isbe.topics._shared.arxiv import arxiv_collector

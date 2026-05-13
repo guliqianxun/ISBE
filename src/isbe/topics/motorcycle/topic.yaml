@@ -45,6 +45,21 @@ rss:
   lookback_days: 14
   lang: en
 
+# Crawl4AI: real Chromium fetch + LLM-driven extraction for JS-rendered /
+# anti-bot sites that RSS can't reach. Uncomment + fill URLs to enable.
+# Cost: ~$0.001-0.003 per page (DeepSeek LLM extraction).
+# Caveat: 知乎 risk control blocks even logged-in headless Chrome on many
+# /topic/ URLs — works for cookies-friendly sites (雪球 / 36 氪 /
+# motorcycle.com / 各国际媒体) without further work.
+# crawl4ai:
+#   pages:
+#     - name: motorcycle_com_news
+#       url: https://www.motorcycle.com/news
+#     - name: xueqiu_motorcycle
+#       url: https://xueqiu.com/k?q=摩托车
+#   lookback_days: 14
+#   lang: zh
+
 digest:
   facts_window_days: 7
 
