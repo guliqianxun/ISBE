@@ -3,7 +3,7 @@
 > 单一来源：哪些任务做完了、当前 phase 是哪个、卡在哪、下一步是什么。
 > 每完成一个 task 更新这里；每开始一个新会话先读这里。
 
-**最后更新**：2026-05-12（v1 scope 纠偏 ADR 落地；下方 v1/v2 边界为准，旧"总览"表保留作历史记录）
+**最后更新**：2026-05-13（v1 ops 收尾 + digest 模板 v2 + 第一个非 arxiv/finance 域 motorcycle 上线 + Crawl4AI 兜底）
 
 ---
 
@@ -15,7 +15,7 @@
 
 **v1 验收**：见 `tests/acceptance/test_v1_smoke.md` —— "30 分钟，朋友新机器，明早 7:00 第一封含其新增 topic 的日报"。
 
-**v1 当前进行中**：持续加域（4 个 active：nowcasting / video-gen / image-restoration / nvda）。下一步候选 = 加用户真想读的第 5 个域。
+**v1 当前进行中**：持续加域（5 个 active：nowcasting / video-gen / image-restoration / nvda / motorcycle）。下一步候选 = 知乎/微博等中文反爬源解决方案 + NVDA 真上线（prices API）。
 
 **v2 候选（冻结实现，保留设计）**：
 
@@ -330,3 +330,37 @@ uv run radar topics run nowcasting --digest
 | `p1-nowcasting-mvp` | P1 单 topic 端到端 |
 | `p1.6-worker-service` | Docker worker 可选服务 |
 | `5d689df` | P2 NVDA MVP 完成（无 tag，可补） |
+| `b90e8a7` | 2026-05-13 一日冲刺收尾：v1 ops 收尾 / digest v2 / motorcycle 上线 / Crawl4AI |
+
+---
+
+## 2026-05-13 一日冲刺复盘
+
+**起点**：v1 spec 跟代码存在断层（spec 承诺 4 件事，code 只交付 1 件），文档对齐 ADR 已落、但用户能拿到的产物太薄、第三个非 arxiv/finance 域没人验过。
+
+**这一天 9 个 commit 干了什么**（按落地时序）：
+
+1. `5e03f1b` v1 ops 收尾 —— 3 个用户能直接体感的特性：`radar status` / artifact rotation+latest.md / SMTP notify；配 v1-scope-correction ADR 把 chat/L3a/draft-review 明确推 v2
+2. `808e414` digest 模板 v2 —— 从"LLM 一坨综述 blob" 变成"TL;DR + 论文卡片 + 仓库表 + 上周对比 + audit footer"；同一份周报从 2.9KB → 9KB，扫读性指数级提升
+3. `233af8b` 把"一键部署镜像"记进 v2 backlog（用户明确说不优先）
+4. `c0cc31f` first-principles review 后清扫：删 hello_world / nowcasting/digester shim / serve_nowcasting alias / review-tools stub / `--download-pdfs` flag / 6→5 段（去掉 `## 事实` 跟 TL;DR 重叠）；status_cmd 从 scheduler dispatch 推导 flow 桶；dedupe papers_keyword_filter
+5. `8bd6d83` NVDA 对齐 v2 + comparison strategy 抽 `_shared/comparison.py` —— 新增任何 fact-bucket 模型自动获得"上期对比"
+6. `581db19` 第一个非 arxiv/finance 域：motorcycle（200cc+ 摩托车周报）；新增通用 `articles` 表 + `_shared/rss.py` collector；真机 e2e 跑通（29 篇收，21 篇 digest，LLM 17s 出 5 段 + 自动品牌聚合 + 引用 memory@rev）
+7. `6965219` rss collector 加 `exclude_url_patterns` —— bikesrepublic 一篇文章 EN+BM 两份的去重
+8. `b38892b` RSSHub 容器 docker-compose 接好；中文源 cookies scaffold（验证：路由能 resolve、`/zhihu/daily` 200，`/zhihu/topic/*` 因 `__zse_ck` JS 反爬 403）
+9. `b90e8a7` Crawl4AI 集成（OS Chrome channel 跳过 chromium 下载，cookies-for-domain 自动注入）；example.com 验过端到端；摩托车 topic.yaml 留 scaffold
+
+**这一天学到 / 验证到的事**：
+
+- **5 段 LLM 契约是显著产品升级**，不是工程美化。同样素材，可读性 / 信息密度都明显抬升。
+- **comparison strategy 在第 2 个域复用**：NVDA 几乎零代码就拿到了"上日对比"。bucket-diff 抽对了。
+- **国际 RSS 直接能跑，国内全是反爬**：知乎 `/topic/` 加了 `__zse_ck` JS 算的 signature，cookies-only 解不了；连真 Chrome（Crawl4AI/Playwright）+ cookies 都被指纹检测。能想到的下一步：(a) RSSHub `chromium-bundled` 镜像（前几次 docker pull EOF），(b) Crawl4AI 加 patchright stealth。明天定方向。
+- **Docker / pip 网络反复 EOF**：这台机器对 docker hub / pypi / playwright CDN 都不稳，至少 5 次 retry pull。是协作的真实摩擦点。
+- **first-principles review 抓了 6 处冗余**：hello_world / shim / 别名 / 死命令 / 重复 filter / 多余的"## 事实"段，删掉 ~150 行，没影响功能。建议每 1-2 周做一次。
+
+**明天的待办**（按优先级）：
+
+1. 决定知乎策略：patchright stealth in crawl4ai vs chromium-bundled RSSHub vs 接受当下不接知乎
+2. 加 1-2 个国内能用的中文源（雪球？36氪？Crawl4AI 实测）让 motorcycle 真有中文内容
+3. NVDA 真上线：决定 prices API 用哪家（Alpha Vantage 免费 / Polygon $9/月 / Yahoo unofficial）
+4. 清掉 `papers/legacy/` 的 5 个旧 PDF（占位用，不再有意义）
