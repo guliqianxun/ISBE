@@ -28,3 +28,7 @@ services:
   uptime-kuma:
     ports:
       - "3001:3001"
+
+  rsshub:
+    ports:
+      - "1200:1200"

@@ -88,6 +88,22 @@ services:
     restart: unless-stopped
     networks: [isbe-net]
 
+  # RSSHub — turns sites without native RSS (知乎/微博/B站/小红书/微信公众号/...)
+  # into RSS feeds the generic rss_collector can ingest.
+  # Routes catalog: https://docs.rsshub.app/
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: isbe-rsshub
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: memory
+      CACHE_EXPIRE: "3600"
+      # KOL routes that need cookies (zhihu/weibo) — populate via .env if needed:
+      ZHIHU_COOKIES: ${ZHIHU_COOKIES:-}
+      WEIBO_COOKIES: ${WEIBO_COOKIES:-}
+    restart: unless-stopped
+    networks: [isbe-net]
+
   # radar-worker: long-lived Prefect worker that fires the cron-scheduled flows.
   # Opt-in: `docker compose --profile worker up -d`
   #

@@ -12,13 +12,25 @@ rss:
       url: https://www.totalmotorcycle.com/feed
     - name: bikesrepublic
       url: https://www.bikesrepublic.com/feed/
-    # TODO (followup): self-host RSSHub container then add 知乎/微博/B站 KOL feeds via
-    #   http://localhost:1200/zhihu/people/answers/<uid>
-    #   http://localhost:1200/weibo/user/<uid>
-    #   http://localhost:1200/bilibili/user/video/<uid>
     # Sources probed but skipped: asphaltandrubber (feed dead since 2025-04),
     # rideapart (/rss/ is HTML index, not feed), cycleworld (TLS handshake fails
     # from this network), motorcycle.com (403), revzilla / gearpatrol (HTML).
+    #
+    # Chinese KOL feeds via local RSSHub (rsshub container in docker-compose).
+    # Uncomment after populating ZHIHU_COOKIES / WEIBO_COOKIES in .env;
+    # routes WITHOUT cookies return 503 from zhihu/weibo/bilibili anti-bot.
+    # Replace <uid> with the target account's numeric ID (visit profile,
+    # the trailing digits in URL are the uid). Use `rsshub:1200` if running
+    # the radar-worker container (docker compose --profile worker), else
+    # `localhost:1200` from host.
+    # - name: zhihu_motorcycle_topic
+    #   url: http://localhost:1200/zhihu/topic/19551770    # 知乎"摩托车"话题
+    # - name: zhihu_kol_<name>
+    #   url: http://localhost:1200/zhihu/people/answers/<uid>
+    # - name: weibo_kol_<name>
+    #   url: http://localhost:1200/weibo/user/<uid>
+    # - name: bilibili_kol_<name>
+    #   url: http://localhost:1200/bilibili/user/video/<uid>
   # No include_keywords — dedicated moto media means every entry is on-topic.
   # LLM does relevance filtering in 文章逐条 evaluation.
   exclude_url_patterns:
