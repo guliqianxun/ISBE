@@ -40,6 +40,7 @@ def topics_run(
 
     cfg = load_topic_config(root, topic_id)
     has_arxiv = bool(cfg.get("arxiv"))
+    has_rss = bool(cfg.get("rss"))
 
     if collect:
         if topic_id == "nvda":
@@ -50,6 +51,10 @@ def topics_run(
             n_news = nvda_news_collector()
             n_sec = nvda_sec_collector()
             typer.echo(f"prices: {n_prices} new / news: {n_news} new / sec: {n_sec} new")
+        elif has_rss:
+            from isbe.topics._shared.rss import rss_collector
+            n_articles = rss_collector(topic_id=topic_id)
+            typer.echo(f"articles: {n_articles} new")
         else:
             from isbe.topics._shared.arxiv import arxiv_collector
             n_arxiv = arxiv_collector(topic_id=topic_id) if has_arxiv else 0
@@ -73,6 +78,12 @@ def topics_run(
             from isbe.topics.nvda.digester import daily_digester
             label = period_label or today.isoformat()
             result = daily_digester(period_label=label, today=today)
+            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
+        elif topic_id == "motorcycle":
+            from isbe.topics.motorcycle.digester import motorcycle_digester
+            year, week, _ = today.isocalendar()
+            label = period_label or f"{year}-W{week:02d}"
+            result = motorcycle_digester(period_label=label, today=today)
             typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
         else:
             from isbe.topics._shared.digester import weekly_digester

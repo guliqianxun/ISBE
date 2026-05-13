@@ -1,0 +1,39 @@
+id: motorcycle
+label: 200cc+ 摩托车周报
+cadence: weekly
+active: true
+
+rss:
+  feeds:
+    # Probed 2026-05-13: these three publish daily and return clean RSS 2.0.
+    - name: ultimatemotorcycling
+      url: https://ultimatemotorcycling.com/feed/
+    - name: totalmotorcycle
+      url: https://www.totalmotorcycle.com/feed
+    - name: bikesrepublic
+      url: https://www.bikesrepublic.com/feed/
+    # TODO (followup): self-host RSSHub container then add 知乎/微博/B站 KOL feeds via
+    #   http://localhost:1200/zhihu/people/answers/<uid>
+    #   http://localhost:1200/weibo/user/<uid>
+    #   http://localhost:1200/bilibili/user/video/<uid>
+    # Sources probed but skipped: asphaltandrubber (feed dead since 2025-04),
+    # rideapart (/rss/ is HTML index, not feed), cycleworld (TLS handshake fails
+    # from this network), motorcycle.com (403), revzilla / gearpatrol (HTML).
+  # No include_keywords — dedicated moto media means every entry is on-topic.
+  # LLM does relevance filtering in 文章逐条 evaluation.
+  exclude_keywords:
+    - "scooter"
+    - "moped"
+    - "50cc"
+    - "125cc"
+    - "e-bike"
+    - "electric kick"
+  lookback_days: 14
+  lang: en
+
+digest:
+  facts_window_days: 7
+
+schedules:
+  rss_collector: "0 6 * * *"           # 每日 06:00（积累一周）
+  motorcycle_digester: "0 8 * * 1"     # 周一 08:00 出周报

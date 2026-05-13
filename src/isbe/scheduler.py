@@ -8,6 +8,8 @@ from prefect import serve
 
 from isbe.topics._shared.arxiv import arxiv_collector
 from isbe.topics._shared.digester import weekly_digester
+from isbe.topics._shared.rss import rss_collector
+from isbe.topics.motorcycle.digester import motorcycle_digester
 from isbe.topics.nowcasting.collectors.arxiv import arxiv_download_pdfs
 from isbe.topics.nowcasting.collectors.github import github_collector
 from isbe.topics.nvda.collectors.news import nvda_news_collector
@@ -27,6 +29,8 @@ _FLOW_DISPATCH = {
     "nvda_news_collector": (nvda_news_collector, {}),
     "nvda_sec_collector": (nvda_sec_collector, {}),
     "daily_digester": (daily_digester, {}),
+    "rss_collector": (rss_collector, {"topic_id": "{topic_id}"}),
+    "motorcycle_digester": (motorcycle_digester, {}),
 }
 
 

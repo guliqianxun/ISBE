@@ -4,10 +4,12 @@ from typing import Literal, Protocol
 
 DigestSectionKind = Literal[
     "tldr", "analysis", "distillation",
-    # arxiv-weekly per-item reviews
+    # arxiv-weekly
     "paper_reviews", "repo_reviews",
-    # nvda-daily per-item reviews (parallel role)
+    # nvda-daily
     "news_reviews", "filing_reviews",
+    # motorcycle-weekly
+    "article_reviews", "brand_notes",
 ]
 
 

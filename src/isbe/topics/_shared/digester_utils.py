@@ -57,12 +57,15 @@ def split_sections(text: str) -> dict[str, str]:
     buf: list[str] = []
     name_map = {
         "TL;DR": "tldr",
-        # arxiv-weekly section names
+        # arxiv-weekly
         "论文逐篇": "paper_reviews",
         "仓库逐条": "repo_reviews",
-        # nvda-daily section names (parallel structure, different domain)
+        # nvda-daily
         "新闻逐条": "news_reviews",
         "SEC 逐条": "filing_reviews",
+        # motorcycle-weekly
+        "文章逐条": "article_reviews",
+        "品牌动态": "brand_notes",
         "分析": "analysis",
         "蒸馏": "distillation",
     }
