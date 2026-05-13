@@ -27,6 +27,7 @@
 - Next.js 看板（原 P5）
 - 多用户实际隔离
 - Task 15-19（hermes 评估 + 集成）
+- **一键部署镜像**：发布预构建 `isbe/radar` 镜像到 ghcr/dockerhub，内置 Postgres + MinIO + Prefect + app；用户一行 `docker run` 启动 + 一个 volume 持久化。要 registry 账号 + 构建流水线 + 镜像测试，单独立项；现阶段开发者自部署足够，部署简化不优先。
 
 **v2 准入闸**：v1 跑稳 **14 天**后，回答 ADR §"v1 → v2 evaluation gate" 中 1-4 题，**未回答前不开 v2 任何工程**。
 
