@@ -4,18 +4,19 @@
 {{ tldr }}
 
 {% if comparison %}
-## 上周对比 (vs {{ comparison.prior_period }})
-
-- 论文：本期 {{ comparison.current_papers_n }} → 上期 {{ comparison.prior_papers_n }} ({{ "+" if comparison.delta_n >= 0 else "" }}{{ comparison.delta_n }})
-{%- if comparison.new_ids %}
-  - 新增（{{ comparison.new_ids | length }}）: {{ comparison.new_ids | join(", ") }}
+## {{ comparison.compare_label }} (vs {{ comparison.prior_period }})
+{% for b in comparison.buckets %}
+- {{ b.label }}：本期 {{ b.current_n }} → 上期 {{ b.prior_n }} ({{ "+" if b.delta_n >= 0 else "" }}{{ b.delta_n }})
+{%- if b.new %}
+  - 新增（{{ b.new | length }}）: {{ b.new | join(", ") }}
 {%- endif %}
-{%- if comparison.carried_ids %}
-  - 延续（{{ comparison.carried_ids | length }}）: {{ comparison.carried_ids | join(", ") }}
+{%- if b.carried %}
+  - 延续（{{ b.carried | length }}）: {{ b.carried | join(", ") }}
 {%- endif %}
-{%- if comparison.dropped_ids %}
-  - 已出窗口（{{ comparison.dropped_ids | length }}）: {{ comparison.dropped_ids | join(", ") }}
+{%- if b.dropped %}
+  - 已出窗口（{{ b.dropped | length }}）: {{ b.dropped | join(", ") }}
 {%- endif %}
+{% endfor %}
 {%- if comparison.active_repos %}
 - 仓库活跃（自 {{ comparison.prior_period }} digest 后有 commit）:
 {%- for r in comparison.active_repos %}
@@ -54,9 +55,6 @@
 
 ## 分析
 {{ analysis }}
-
-## 事实（raw）
-{{ facts_raw }}
 
 {% if distillation -%}
 ## Memory 草稿（待 review）

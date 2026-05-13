@@ -12,21 +12,29 @@ from sqlalchemy import func, select
 
 from isbe.facts.artifacts import Artifact, TopicRun
 from isbe.facts.db import make_session_factory
+from isbe.scheduler import _FLOW_DISPATCH
 from isbe.topics.registry import default_topics_root, discover_topics
 
-# Flow-name buckets (匹配 @flow(name=...) 字面值)
-_COLLECT_FLOWS = {
-    "arxiv-collector",
-    "github-collector",
-    "arxiv-download-pdfs",
-    "nvda-prices-collector",
-    "nvda-news-collector",
-    "nvda-sec-collector",
-}
-_DIGEST_FLOWS = {
-    "weekly-digester",
-    "nvda-daily-digester",
-}
+
+def _classify_flows() -> tuple[set[str], set[str]]:
+    """Derive {collect,digest} flow-name buckets from scheduler._FLOW_DISPATCH.
+
+    Suffix convention from @flow(name=...): `*-collector` / `*-download-pdfs`
+    → collect; `*-digester` → digest. Unknown suffixes silently ignored
+    (no topic surface for them anyway).
+    """
+    collect: set[str] = set()
+    digest: set[str] = set()
+    for flow_fn, _ in _FLOW_DISPATCH.values():
+        name = flow_fn.name
+        if name.endswith("-collector") or name.endswith("-download-pdfs"):
+            collect.add(name)
+        elif name.endswith("-digester"):
+            digest.add(name)
+    return collect, digest
+
+
+_COLLECT_FLOWS, _DIGEST_FLOWS = _classify_flows()
 
 
 def _aware(dt: datetime | None) -> datetime | None:

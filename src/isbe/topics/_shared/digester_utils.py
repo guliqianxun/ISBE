@@ -57,9 +57,12 @@ def split_sections(text: str) -> dict[str, str]:
     buf: list[str] = []
     name_map = {
         "TL;DR": "tldr",
-        "事实": "facts",
+        # arxiv-weekly section names
         "论文逐篇": "paper_reviews",
         "仓库逐条": "repo_reviews",
+        # nvda-daily section names (parallel structure, different domain)
+        "新闻逐条": "news_reviews",
+        "SEC 逐条": "filing_reviews",
         "分析": "analysis",
         "蒸馏": "distillation",
     }
@@ -95,22 +98,19 @@ def parse_paper_reviews(text: str) -> dict[str, str]:
     return out
 
 
-def parse_repo_reviews(text: str) -> dict[str, str]:
-    """Extract `{repo_name: review_text}` from a `## 仓库逐条` block.
+def parse_bracketed_reviews(text: str) -> dict[str, str]:
+    """Extract `{key: review_text}` from any `- [<key>] <text>` block.
 
-    `repo_name` is whatever the LLM wrote between the brackets, matched against
-    Repo.title at lookup time by the template. Skips lines that look like a paper
-    review (numeric-only id) so we don't double-count if sections were misordered.
+    Used for `## 仓库逐条` (key = repo title), `## 新闻逐条` (key = news.id sha1),
+    `## SEC 逐条` (key = accession_no). Caller resolves the key against the
+    relevant DB row.
     """
     out: dict[str, str] = {}
     for line in text.splitlines():
         m = REPO_REVIEW_RE.match(line)
         if not m:
             continue
-        key = m.group(1).strip()
-        if PAPER_REVIEW_RE.match(line):
-            continue  # numeric arxiv-id-shaped, belongs to paper_reviews
-        out[key] = m.group(2).strip()
+        out[m.group(1).strip()] = m.group(2).strip()
     return out
 
 

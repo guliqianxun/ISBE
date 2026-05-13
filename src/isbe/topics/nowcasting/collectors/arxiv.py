@@ -17,7 +17,7 @@ from pathlib import Path
 import httpx
 from minio import Minio
 from prefect import flow
-from sqlalchemy import or_, select
+from sqlalchemy import select
 
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
@@ -26,6 +26,7 @@ from isbe.topics._shared.arxiv import (
 )
 from isbe.topics._shared.arxiv import (
     fetch_arxiv_atom,  # noqa: F401  — re-export for parity
+    papers_keyword_filter,
     parse_atom_entry,  # noqa: F401  — used by tests
     upsert_papers,  # noqa: F401  — used by tests
 )
@@ -130,19 +131,10 @@ def store_pdf(
 
 
 def _topic_keyword_filter(topic_id: str):
-    """Build SQLAlchemy filter matching papers whose title/abstract hits any of
-    the topic's `arxiv:include_keywords`. Returns None if topic has no keywords.
-    """
+    """SQLAlchemy filter scoping papers to the topic's `arxiv:include_keywords`."""
     cfg = load_topic_config(default_topics_root(), topic_id)
     keywords = (cfg.get("arxiv") or {}).get("include_keywords", [])
-    if not keywords:
-        return None
-    clauses = []
-    for kw in keywords:
-        like = f"%{kw}%"
-        clauses.append(Paper.title.ilike(like))
-        clauses.append(Paper.abstract.ilike(like))
-    return or_(*clauses)
+    return papers_keyword_filter(keywords)
 
 
 @flow(name="arxiv-download-pdfs")

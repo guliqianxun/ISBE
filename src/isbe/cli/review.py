@@ -51,7 +51,3 @@ def review_memory(
     typer.echo(f"{len(files)} pending")
 
 
-@review_app.command("tools")
-def review_tools() -> None:
-    """List pending skill drafts (P1 placeholder; wired up in P3)."""
-    typer.echo("(not implemented in P1)")

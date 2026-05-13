@@ -71,9 +71,5 @@ def serve_topics() -> None:
     serve(*deployments)
 
 
-# Backwards-compat alias
-serve_nowcasting = serve_topics
-
-
 if __name__ == "__main__":
     serve_topics()

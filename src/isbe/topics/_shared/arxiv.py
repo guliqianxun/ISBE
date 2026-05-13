@@ -16,11 +16,27 @@ from datetime import UTC, datetime
 import feedparser
 import httpx
 from prefect import flow, task
+from sqlalchemy import or_
 
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
 from isbe.topics.nowcasting.facts import Paper  # shared papers table
 from isbe.topics.registry import default_topics_root, load_topic_config
+
+
+def papers_keyword_filter(keywords: list[str]):
+    """Build a SQLAlchemy OR-condition matching any keyword in `Paper.title|abstract`.
+
+    Returns None when `keywords` is empty (caller should skip applying a filter).
+    """
+    if not keywords:
+        return None
+    clauses = []
+    for kw in keywords:
+        like = f"%{kw}%"
+        clauses.append(Paper.title.ilike(like))
+        clauses.append(Paper.abstract.ilike(like))
+    return or_(*clauses)
 
 
 def _build_query(categories: list[str], keywords: list[str]) -> str:

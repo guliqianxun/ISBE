@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from isbe.topics.base import DigestResult
-from isbe.topics.nowcasting.digester import (
+from isbe.topics._shared.digester import (
     parse_distillation_section,
     weekly_digester,
 )
@@ -64,9 +64,6 @@ keywords: a, b
 - 本期 1 篇 / 1 篇值得读：PaperX
 - 主进展：新方法
 
-## 事实
-当周期 1 篇论文。
-
 ## 论文逐篇
 - [2604.99999] PaperX 强相关，引入了新方法，值得细读。
 
@@ -90,12 +87,12 @@ PaperX 提了新方法 (memory: nowcasting@1)。
                return_value="00000000-0000-0000-0000-000000000001"), \
          patch("isbe.observability.runs.make_session_factory",
                return_value=lambda: fake_obs_session):
-        result = weekly_digester(period_label="2026-W19", today=date(2026, 5, 7))
+        result = weekly_digester(topic_id="nowcasting", period_label="2026-W19", today=date(2026, 5, 7))
 
     assert isinstance(result, DigestResult)
     assert result.topic_id == "nowcasting"
     assert {s.kind for s in result.sections} == {
-        "tldr", "facts", "paper_reviews", "repo_reviews", "analysis", "distillation",
+        "tldr", "paper_reviews", "repo_reviews", "analysis", "distillation",
     }
     assert len(result.pending_drafts) == 1
     pending_root = memory_dir / ".pending"

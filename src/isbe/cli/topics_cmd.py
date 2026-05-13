@@ -17,11 +17,8 @@ def topics_list() -> None:
 @topics_app.command("run")
 def topics_run(
     topic_id: str,
-    collect: bool = typer.Option(False, "--collect", help="Run collectors only"),
+    collect: bool = typer.Option(False, "--collect", help="Run collectors (downloads PDFs by default)"),
     digest: bool = typer.Option(False, "--digest", help="Run digester only"),
-    download_pdfs: bool = typer.Option(
-        False, "--download-pdfs", help="Run PDF download flow only (no collect)"
-    ),
     no_pdfs: bool = typer.Option(
         False, "--no-pdfs", help="Skip the auto-PDF-download chained after --collect"
     ),
@@ -37,8 +34,8 @@ def topics_run(
         typer.echo(f"unknown topic: {topic_id}", err=True)
         raise typer.Exit(code=1)
 
-    if not (collect or digest or download_pdfs):
-        typer.echo("specify --collect / --digest / --download-pdfs", err=True)
+    if not (collect or digest):
+        typer.echo("specify --collect / --digest", err=True)
         raise typer.Exit(code=1)
 
     cfg = load_topic_config(root, topic_id)
@@ -69,19 +66,6 @@ def topics_run(
                 topic_id=topic_id, limit=pdf_limit, period_label=period_label
             )
             typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
-
-    if download_pdfs:
-        if not has_arxiv:
-            typer.echo(
-                f"--download-pdfs requires an `arxiv:` block; topic '{topic_id}' has none",
-                err=True,
-            )
-            raise typer.Exit(code=2)
-        from isbe.topics.nowcasting.collectors.arxiv import arxiv_download_pdfs
-        n = arxiv_download_pdfs(
-            topic_id=topic_id, limit=pdf_limit, period_label=period_label
-        )
-        typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
 
     if digest:
         today = date.fromisoformat(today_str) if today_str else date.today()
