@@ -11,6 +11,7 @@ artifact + .pending memory drafts.
 """
 from __future__ import annotations
 
+import os
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from isbe.facts.db import make_session_factory
 from isbe.llm.client import complete
 from isbe.llm.finance_prompts import FINANCE_SYSTEM_PROMPT, build_finance_prompt
 from isbe.memory.pending import write_pending
+from isbe.notify import send_digest_notification
 from isbe.observability.runs import topic_run
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
@@ -191,6 +193,17 @@ def _impl(
     run.payload["artifact_id"] = str(artifact_id)
     run.payload["llm_input_tokens"] = resp.input_tokens
     run.payload["llm_output_tokens"] = resp.output_tokens
+
+    mirror_root = Path(os.getenv("ISBE_ARTIFACT_MIRROR", "artifacts"))
+    latest = mirror_root / TOPIC_ID / period_label / "latest.md"
+    excerpt = (resp.text or "")[:800]
+    pushed = send_digest_notification(
+        topic_label=f"NVDA 日报 {_session_label(period_label)}",
+        period_label=period_label,
+        artifact_path=latest if latest.exists() else None,
+        excerpt=excerpt,
+    )
+    run.payload["notify_sent"] = pushed
 
     return DigestResult(
         topic_id=TOPIC_ID,

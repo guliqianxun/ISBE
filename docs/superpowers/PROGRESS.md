@@ -3,11 +3,36 @@
 > 单一来源：哪些任务做完了、当前 phase 是哪个、卡在哪、下一步是什么。
 > 每完成一个 task 更新这里；每开始一个新会话先读这里。
 
-**最后更新**：2026-05-11（P2 NVDA MVP 完成；4 个 active topic；多域 + 自成长系统骨架闭环）
+**最后更新**：2026-05-12（v1 scope 纠偏 ADR 落地；下方 v1/v2 边界为准，旧"总览"表保留作历史记录）
 
 ---
 
-## 总览
+## v1 / v2 边界（2026-05-12 ADR 纠偏后，**当下唯一权威**）
+
+依据：`docs/superpowers/specs/2026-05-12-v1-scope-correction.md`。
+
+**v1 交付物**：多域每日情报日报系统（`topics.yaml` + `feedback/*.md` 用户编辑 → Prefect 自动跑 → 推送日报）。
+
+**v1 验收**：见 `tests/acceptance/test_v1_smoke.md` —— "30 分钟，朋友新机器，明早 7:00 第一封含其新增 topic 的日报"。
+
+**v1 当前进行中**：持续加域（4 个 active：nowcasting / video-gen / image-restoration / nvda）。下一步候选 = 加用户真想读的第 5 个域。
+
+**v2 候选（冻结实现，保留设计）**：
+
+- chat agent / hermes runtime
+- L3a 沙箱自扩展（spec §3）
+- agent-written memory + `.pending` 审核流（spec §4.4-4.6）
+- weekly_compact / weekly_insight（spec §4.5 / §6.5 / C3）
+- Qdrant 语义检索（spec §4.7）
+- Next.js 看板（原 P5）
+- 多用户实际隔离
+- Task 15-19（hermes 评估 + 集成）
+
+**v2 准入闸**：v1 跑稳 **14 天**后，回答 ADR §"v1 → v2 evaluation gate" 中 1-4 题，**未回答前不开 v2 任何工程**。
+
+---
+
+## 总览（历史 roadmap，2026-05-12 之后仅作记录；以上面 v1/v2 边界为准）
 
 | Phase | 周期 | 状态 |
 |---|---|---|

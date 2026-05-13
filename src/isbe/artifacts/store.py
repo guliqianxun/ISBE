@@ -52,11 +52,26 @@ def save_artifact(
         content_type="text/markdown; charset=utf-8",
     )
 
-    # Local mirror — convenience for human inspection without mc
+    # Local mirror — convenience for human inspection without mc.
+    # Filenames are now `<period>-<short>.md` (human readable); a `latest.md`
+    # copy always points at the freshest render; older renders for the same
+    # (topic, period) are rotated into `.history/` so each period dir has
+    # exactly one current artifact + one latest.md at top level.
     mirror_root = Path(os.getenv("ISBE_ARTIFACT_MIRROR", str(LOCAL_MIRROR_DEFAULT)))
-    local_path = mirror_root / topic_id / period_label / f"{artifact_id}.md"
-    local_path.parent.mkdir(parents=True, exist_ok=True)
+    period_dir = mirror_root / topic_id / period_label
+    period_dir.mkdir(parents=True, exist_ok=True)
+
+    history_dir = period_dir / ".history"
+    for existing in period_dir.glob("*.md"):
+        if existing.name == "latest.md":
+            continue
+        history_dir.mkdir(exist_ok=True)
+        existing.rename(history_dir / existing.name)
+
+    short = artifact_id.hex[:8]
+    local_path = period_dir / f"{period_label}-{short}.md"
     local_path.write_bytes(body_bytes)
+    (period_dir / "latest.md").write_bytes(body_bytes)
 
     Session = make_session_factory()
     with Session() as s:

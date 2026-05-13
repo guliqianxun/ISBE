@@ -15,9 +15,11 @@
 ## 必读文档（按顺序）
 
 1. **本文件** — 不可改动的约束
-2. `docs/superpowers/specs/2026-05-06-self-growing-info-system-design.md` — 完整设计（500 行；§1.5 红线、§2 phase 切分、§6 内容沉淀必读）
-3. `docs/superpowers/plans/2026-05-06-p0-evaluation-and-skeleton.md` — 当前阶段实施计划（19 任务）
-4. `docs/superpowers/PROGRESS.md` — 当前执行到哪一步
+2. **`docs/superpowers/specs/2026-05-12-v1-scope-correction.md`** — v1 scope 纠偏 ADR（**先读这个**，决定哪些原 spec 章节当下还有效）
+3. `docs/superpowers/specs/2026-05-06-self-growing-info-system-design.md` — 完整设计（带 v2 status banner；§1.5 红线、§2 phase 切分仍生效）
+4. `docs/superpowers/plans/2026-05-06-p0-evaluation-and-skeleton.md` — 当前阶段实施计划（19 任务，Task 15-19 已推 v2）
+5. `docs/superpowers/PROGRESS.md` — 当前执行到哪一步（顶部 v1/v2 边界为准）
+6. `tests/acceptance/test_v1_smoke.md` — v1 唯一验收 checklist
 
 ---
 
@@ -31,6 +33,7 @@
    - **Workflow（确定式）** = 所有 cron 任务，Python flow 写死，LLM 只是带固定模板的步骤
    - **Agent Loop（探索式）** = 仅服务 chat / research / skill self-creation
    - **绝对禁止用 LLM 决策每步的 ReAct 循环跑日报这种重复任务**——这是用户被现有工具坑过的痛点
+   - **v1 阶段 Agent Loop 暂未实现**（chat / L3a 推 v2），整个系统当前只有 Workflow 路径在跑；红线本身仍是 v2 入口前必须遵守的约束。详见 `docs/superpowers/specs/2026-05-12-v1-scope-correction.md`
 6. **人有绝对优先权**：memory 冲突时 LLM 不动手 merge，仅作只读建议；用户改动赢
 7. **可复现性是硬指标**：每次 LLM 调用 trace 全留；改 `templates/*.j2` 必须更新 golden output
 

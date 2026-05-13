@@ -10,9 +10,17 @@
 
 ## 0. 文档导读
 
-本文档是 brainstorm 全过程的固化产物，**6-8 周交付一个能每天产出"行业情报 + 研究进展"日报、可对话、可被 agent 自我扩展、长期记忆可手编辑的本地 AI 系统**。
+> **⚠ 2026-05-12 v1 scope 纠偏（见 `2026-05-12-v1-scope-correction.md` ADR）**：
+>
+> v1 仅交付**多域每日情报日报系统**——`topics.yaml` + `feedback/*.md` 用户编辑 → Prefect 自动跑 → 推送日报。
+>
+> 对话 / L3 自扩展 / 看板 / 语义检索 / agent-written memory / weekly_compact / weekly_insight 全部移入 **v2 候选**，v1 跑稳 14 天后才评审。
+>
+> 本文档 §3 / §4.4-4.7 / §6.5 / §6 C3 章节正文保留（作为设计预存），但都已标 v2 status banner。
 
-阅读路径：先看 §1 架构、§2 phase 切分；再按需读 §3 (L3 自扩展)、§4 (记忆)、§5 (运维)、§6 (内容沉淀与检索)。附录 A 是备选方案 A（自建 Best-of-Breed），P0' 评估失败时启用。
+本文档是 brainstorm 全过程的固化产物，**原承诺**："6-8 周交付一个能每天产出'行业情报 + 研究进展'日报、可对话、可被 agent 自我扩展、长期记忆可手编辑的本地 AI 系统"。**v1 纠偏后**仅保留"日报 + 用户手写偏好"两条；其余推 v2。
+
+阅读路径：先看 §1 架构、§2 phase 切分；再按需读 §3 (L3 自扩展，v2)、§4 (记忆)、§5 (运维)、§6 (内容沉淀与检索)。附录 A 是备选方案 A（自建 Best-of-Breed），P0' 评估失败时启用（v1 实际走的就是这条 lite 版）。
 
 ---
 
@@ -23,11 +31,11 @@
 | 维度 | 决策 |
 |---|---|
 | 主场景 | 行业情报雷达 (B) + 研究助理 (C) |
-| 自我成长方向 | L3 沙箱代码生成 (E) + 长期记忆与个性化 (D) |
+| 自我成长方向 | 长期记忆与个性化 (D，**v1 仅用户手写**)；L3 沙箱代码生成 (E) → **v2 候选** |
 | 部署 | Docker-first，单人起步，可平滑共享 |
 | 交互形态 | 推送 + 对话 + 看板（**MVP 优先推送日报**） |
 | LLM 策略 | 混合，先云端为主，预留本地切换 |
-| 技术路线 | **路径 B**：在 NousResearch hermes-agent 上叠加"情报雷达"领域层 |
+| 技术路线 | ~~**路径 B**：在 NousResearch hermes-agent 上叠加"情报雷达"领域层~~ → **v1 实际路径 = 自建 lite**：自建少量 Python + Prefect + Postgres + MinIO + 文件式 memory，不依赖 hermes（hermes 评估推 v2 入口前） |
 
 ### 1.2 顶层架构
 
@@ -105,6 +113,8 @@
 
 ## 2. MVP 阶段切分（路径 B）
 
+> **⚠ v1 scope（2026-05-12 ADR）**：仅 P0' / P1' 实际承认完成；P2'–P5' 全部 → **v2 候选**。当前 v1 持续做的事 = **加域**（topics.yaml 编辑即可，不写 Python）。下方阶段表为**历史设计**，不再是 roadmap。
+
 | 阶段 | 周期 | 内容 | 完成标志 |
 |---|---|---|---|
 | **P0' 评估 + 骨架** | 1.5 周 | 跑通 hermes demo、回答 §2.1 评估清单、docker-compose 接 Prefect/Langfuse/Qdrant/MinIO/Uptime Kuma | 评估清单中关键项（5/6/7）通过；hello-world flow 跑成功；通过决策点 |
@@ -144,6 +154,8 @@
 ---
 
 ## 3. L3 自扩展机制详细设计
+
+> **⚠ v2 候选** —— 整章设计保留，v1 不实现。详见 `2026-05-12-v1-scope-correction.md`。
 
 ### 3.1 三种自扩展层级
 
@@ -304,6 +316,8 @@ supersedes: []                              # 被合并掉的旧 memory id
 
 ### 4.4 写入流程（.pending → review → 落盘）
 
+> **⚠ v2 候选** —— v1 期 `memory/` **只有用户在写**；agent 写回的审核流推 v2。CLI `radar review memory` 的占位实现保留，但 agent 提议路径不启用。
+
 ```
 agent 决定写一条 memory
      ▼
@@ -332,6 +346,8 @@ reject  → .pending → .audit/rejected/，附 reject 理由
 
 ### 4.5 周度压缩（reading/ 不爆炸）
 
+> **⚠ v2 候选** —— v1 不跑 weekly_compact flow。
+
 ```python
 # workflows/weekly_memory_compact.py
 @flow(schedule=CronSchedule("0 3 * * 1"))   # 每周一凌晨 3 点
@@ -355,6 +371,8 @@ def weekly_memory_compact():
 
 ### 4.6 用户手改 vs agent 提议的并发处理（人有绝对优先权）
 
+> **⚠ v2 候选** —— v1 不存在 agent 写 memory，因此无此冲突场景。
+
 冲突检测：proposal 的 `base_revision` ≠ 当前文件 revision → 冲突状态：
 
 ```
@@ -375,6 +393,8 @@ $ radar review memory
 **LLM 不动手 merge**——这是红线 6 的具体落地。
 
 ### 4.7 性能 & 何时升级
+
+> **⚠ Qdrant 语义检索（200+ 文件阈值）→ v2 候选**。v1 不引入 Qdrant；MEMORY.md 索引 + 按需读文件足够。
 
 | 文件数 | 策略 | 性能预算 |
 |---|---|---|
@@ -547,6 +567,8 @@ new ──processed──► processed ──read──► read ──(12月静�
 | 调试："复现 3 周前某次输出" | blob + chunks + Postgres 三元组 | 走 doc_id |
 
 ### 6.5 Insight 双触发模式（P3+ 启用）
+
+> **⚠ v2 候选** —— C3 提炼洞察（含 weekly_insight 与 chat-triggered 两种触发）整段推 v2。v1 只做 C1（采集去重）+ C2 极简（`documents.read` flag）。
 
 (a) **周度后台扫描** —— `weekly_insight` flow（被动主动推送）  
 (b) **Chat-triggered** —— 用户聊到 + 积累阈值满足时即时提议
