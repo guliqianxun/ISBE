@@ -15,21 +15,22 @@ from pathlib import Path
 
 from jinja2 import Template
 from prefect import flow
-from sqlalchemy import or_, select
+from sqlalchemy import select
 
 from isbe.artifacts.store import save_artifact
-from isbe.facts.artifacts import Artifact
 from isbe.facts.db import make_session_factory
 from isbe.llm.client import complete
 from isbe.llm.prompts import SYSTEM_PROMPT, build_digest_prompt
 from isbe.memory.pending import write_pending
 from isbe.notify import send_digest_notification
 from isbe.observability.runs import topic_run
+from isbe.topics._shared.arxiv import papers_keyword_filter
+from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
     parse_distillation_section,  # noqa: F401  — re-exported for back-compat
+    parse_bracketed_reviews,
     parse_paper_reviews,
-    parse_repo_reviews,
 )
 from isbe.topics._shared.digester_utils import (
     memory_root as _memory_root,
@@ -55,64 +56,6 @@ def _build_facts_block(papers: list, repos: list | None) -> str:
                 f"- {r.title} stars={r.stars} last_commit={r.last_commit_at} — {r.github_url}"
             )
     return "\n".join(lines)
-
-
-def _load_prior_artifact(session, topic_id: str, current_period: str) -> Artifact | None:
-    """Most recent artifact for this topic from an *earlier* period (strict <).
-
-    ISO period labels (`2026-W19`, `2026-05-07`) compare correctly lexicographically.
-    """
-    return session.scalars(
-        select(Artifact)
-        .where(Artifact.topic_id == topic_id, Artifact.period_label < current_period)
-        .order_by(Artifact.period_label.desc())
-        .limit(1)
-    ).first()
-
-
-def _build_comparison(
-    prior: Artifact | None,
-    current_papers: list,
-    repos: list | None,
-) -> dict | None:
-    """Compute paper-set delta + repo-commit-since-prior. Returns None if no prior."""
-    if prior is None:
-        return None
-    prior_papers = set((prior.fingerprint.get("facts") or {}).get("papers") or [])
-    current_ids = {p.arxiv_id for p in current_papers}
-    new_ids = sorted(current_ids - prior_papers)
-    carried_ids = sorted(current_ids & prior_papers)
-    dropped_ids = sorted(prior_papers - current_ids)
-
-    prior_commit_threshold = prior.created_at
-    active_repos = []
-    for r in repos or []:
-        if r.last_commit_at and r.last_commit_at > prior_commit_threshold:
-            active_repos.append(r)
-
-    return {
-        "prior_period": prior.period_label,
-        "prior_artifact_id": str(prior.id),
-        "prior_papers_n": len(prior_papers),
-        "current_papers_n": len(current_ids),
-        "delta_n": len(current_ids) - len(prior_papers),
-        "new_ids": new_ids,
-        "carried_ids": carried_ids,
-        "dropped_ids": dropped_ids,
-        "active_repos": active_repos,
-    }
-
-
-def _papers_keyword_filter(keywords: list[str]):
-    """Build a SQLAlchemy OR-condition matching any keyword in title or abstract."""
-    if not keywords:
-        return None
-    clauses = []
-    for kw in keywords:
-        like = f"%{kw}%"
-        clauses.append(Paper.title.ilike(like))
-        clauses.append(Paper.abstract.ilike(like))
-    return or_(*clauses)
 
 
 @flow(name="weekly-digester")
@@ -166,13 +109,19 @@ def _digester_impl(
     Session = make_session_factory()
     with Session() as s:
         query = select(Paper).where(Paper.submitted_at >= cutoff)
-        kw_filter = _papers_keyword_filter(keywords)
+        kw_filter = papers_keyword_filter(keywords)
         if kw_filter is not None:
             query = query.where(kw_filter)
         papers = list(s.scalars(query).all())
         repos = list(s.scalars(select(Repo)).all()) if include_repos else None
-        prior_artifact = _load_prior_artifact(s, topic_id, period_label)
-        comparison = _build_comparison(prior_artifact, papers, repos)
+        prior_artifact = load_prior_artifact(s, topic_id, period_label)
+        comparison = build_comparison(
+            prior_artifact,
+            {"papers": {p.arxiv_id for p in papers}},
+            bucket_labels={"papers": "论文"},
+            compare_label="上周对比",
+            repos=repos,
+        )
 
     facts_block = _build_facts_block(papers, repos)
     mroot = _memory_root()
@@ -188,7 +137,6 @@ def _digester_impl(
     parts = _split_sections(resp.text)
     sections = [
         DigestSection(kind="tldr", body=parts.get("tldr", "")),
-        DigestSection(kind="facts", body=parts.get("facts", "")),
         DigestSection(kind="paper_reviews", body=parts.get("paper_reviews", "")),
         DigestSection(kind="repo_reviews", body=parts.get("repo_reviews", "")),
         DigestSection(kind="analysis", body=parts.get("analysis", "")),
@@ -196,7 +144,7 @@ def _digester_impl(
     ]
     drafts = parse_distillation_section(parts.get("distillation", ""))
     paper_reviews = parse_paper_reviews(parts.get("paper_reviews", ""))
-    repo_reviews = parse_repo_reviews(parts.get("repo_reviews", ""))
+    repo_reviews = parse_bracketed_reviews(parts.get("repo_reviews", ""))
     for d in drafts:
         write_pending(mroot, d)
 
@@ -216,7 +164,6 @@ def _digester_impl(
         topic_label=topic_label,
         period_label=period_label,
         tldr=parts.get("tldr", "").strip(),
-        facts_raw=parts.get("facts", "").strip(),
         analysis=parts.get("analysis", "").strip(),
         distillation=parts.get("distillation", "").strip(),
         memory_refs=", ".join(f"{k}@rev{v}" for k, v in memory_index.items()),

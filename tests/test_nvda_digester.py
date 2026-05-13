@@ -38,10 +38,18 @@ NVDA scope.
         MagicMock(all=MagicMock(return_value=[fake_price])),
         MagicMock(all=MagicMock(return_value=[fake_news])),
         MagicMock(all=MagicMock(return_value=[fake_filing])),
+        MagicMock(first=MagicMock(return_value=None)),  # no prior artifact
     ]
 
-    fake_llm_resp = MagicMock(text="""## 事实
-NVDA close $1234.56.
+    fake_llm_resp = MagicMock(text="""## TL;DR
+- NVDA 收盘 $1234.56 (+1.2%)
+- 关键事件：无重大新闻
+
+## 新闻逐条
+(本日无新闻)
+
+## SEC 逐条
+(本日无 filing)
 
 ## 分析
 归因：大盘主导 (memory: nvda@1)。
@@ -65,5 +73,7 @@ NVDA close $1234.56.
 
     assert isinstance(result, DigestResult)
     assert result.topic_id == "nvda"
-    assert {s.kind for s in result.sections} == {"facts", "analysis", "distillation"}
+    assert {s.kind for s in result.sections} == {
+        "tldr", "news_reviews", "filing_reviews", "analysis", "distillation",
+    }
     assert len(result.pending_drafts) == 1

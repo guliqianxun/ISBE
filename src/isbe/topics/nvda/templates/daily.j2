@@ -1,11 +1,71 @@
 # NVDA 日报 — {{ period_label }} ({{ session_label }})
 
-（facts: {{ n_prices }} prices / {{ n_news }} news / {{ n_filings }} filings；
- memory: {{ memory_refs }}；
- trace: {{ trace_id }}）
+## TL;DR
+{{ tldr }}
 
-{{ digest_body }}
+{% if comparison %}
+## {{ comparison.compare_label }} (vs {{ comparison.prior_period }})
+{% for b in comparison.buckets %}
+- {{ b.label }}：本期 {{ b.current_n }} → 上期 {{ b.prior_n }} ({{ "+" if b.delta_n >= 0 else "" }}{{ b.delta_n }})
+{%- if b.new %}
+  - 新增（{{ b.new | length }}）: {{ b.new | join(", ") }}
+{%- endif %}
+{%- if b.carried %}
+  - 延续（{{ b.carried | length }}）: {{ b.carried | join(", ") }}
+{%- endif %}
+{% endfor %}
+{% endif %}
+
+{% if prices_by_symbol %}
+## 价格
+
+| Symbol | Close | Δ Day | Volume |
+| --- | ---: | ---: | ---: |
+{% for sym, row in prices_by_symbol.items() -%}
+| {{ sym }} | ${{ "%.2f"|format(row.close) }} | {{ "%+.2f%%"|format(row.chg_pct) if row.chg_pct is not none else "—" }} | {{ "{:,}".format(row.volume) }} |
+{% endfor %}
+{% endif %}
+
+{% if news -%}
+## 新闻（{{ news | length }}）
+
+| 时间 | Source | 标题 | 评价 |
+| --- | --- | --- | --- |
+{% for n in news -%}
+| {{ n.published_at.strftime("%m-%d %H:%M") }} | {{ n.source }} | [{{ n.headline | truncate(90, true, "…") }}]({{ n.url }}) | {{ news_reviews.get(n.id) or "—" }} |
+{% endfor %}
+{% endif %}
+
+{% if filings -%}
+## SEC 文件（{{ filings | length }}）
+
+| Filed | Form | Ticker | 评价 | URL |
+| --- | --- | --- | --- | --- |
+{% for f in filings -%}
+| {{ f.filed_at.strftime("%m-%d") }} | {{ f.form_type }} | {{ f.ticker }} | {{ filing_reviews.get(f.accession_no) or "—" }} | [link]({{ f.body_url }}) |
+{% endfor %}
+{% endif %}
+
+## 分析
+{{ analysis }}
+
+{% if distillation -%}
+## Memory 草稿（待 review）
+
+{{ distillation }}
+{% endif %}
 
 ---
 
-*generated_at: {{ generated_at }}; artifact_id: {{ artifact_id }}*
+<details>
+<summary>Audit & 追溯</summary>
+
+- **generated_at**: {{ generated_at }}
+- **artifact_id**: {{ artifact_id }}
+- **trace_id**: {{ trace_id }}
+- **memory snapshot**: {{ memory_refs }}
+- **news fingerprint**: {{ news | map(attribute='id') | list | join(", ") }}
+- **filings fingerprint**: {{ filings | map(attribute='accession_no') | list | join(", ") }}
+- **prices fingerprint**: {% for sym, row in prices_by_symbol.items() %}{{ sym }}@{{ row.date }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+</details>

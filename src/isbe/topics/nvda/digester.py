@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from types import SimpleNamespace
 
 from jinja2 import Template
 from prefect import flow
@@ -26,9 +27,11 @@ from isbe.llm.finance_prompts import FINANCE_SYSTEM_PROMPT, build_finance_prompt
 from isbe.memory.pending import write_pending
 from isbe.notify import send_digest_notification
 from isbe.observability.runs import topic_run
+from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
     memory_root,
+    parse_bracketed_reviews,
     parse_distillation_section,
     split_sections,
 )
@@ -63,11 +66,16 @@ def _build_facts_block(
 
     lines.append(f"\n=== News ({len(news)}) ===")
     for n in news[:20]:  # cap to keep prompt size sane
-        lines.append(f"- [{n.source}] {n.published_at:%Y-%m-%d %H:%M} {n.headline}")
+        lines.append(
+            f"- [id={n.id}] [{n.source}] {n.published_at:%Y-%m-%d %H:%M} {n.headline}"
+        )
 
     lines.append(f"\n=== SEC filings ({len(filings)}) ===")
     for f in filings[:10]:
-        lines.append(f"- {f.form_type} ({f.ticker}) filed {f.filed_at:%Y-%m-%d}: {f.body_url}")
+        lines.append(
+            f"- [accession={f.accession_no}] {f.form_type} ({f.ticker}) "
+            f"filed {f.filed_at:%Y-%m-%d}: {f.body_url}"
+        )
 
     return "\n".join(lines)
 
@@ -130,6 +138,16 @@ def _impl(
         filings = list(s.scalars(
             select(SecFiling).where(SecFiling.filed_at >= filings_cutoff)
         ).all())
+        prior_artifact = load_prior_artifact(s, TOPIC_ID, period_label)
+        comparison = build_comparison(
+            prior_artifact,
+            {
+                "news": {n.id for n in news},
+                "filings": {f.accession_no for f in filings},
+            },
+            bucket_labels={"news": "新闻", "filings": "SEC 文件"},
+            compare_label="上日对比",
+        )
 
     facts_block = _build_facts_block(prices, news, filings, today)
     mroot = memory_root()
@@ -143,11 +161,15 @@ def _impl(
     resp = complete(system=FINANCE_SYSTEM_PROMPT, user=user_prompt)
     parts = split_sections(resp.text)
     sections = [
-        DigestSection(kind="facts", body=parts.get("facts", "")),
+        DigestSection(kind="tldr", body=parts.get("tldr", "")),
+        DigestSection(kind="news_reviews", body=parts.get("news_reviews", "")),
+        DigestSection(kind="filing_reviews", body=parts.get("filing_reviews", "")),
         DigestSection(kind="analysis", body=parts.get("analysis", "")),
         DigestSection(kind="distillation", body=parts.get("distillation", "")),
     ]
     drafts = parse_distillation_section(parts.get("distillation", ""))
+    news_reviews = parse_bracketed_reviews(parts.get("news_reviews", ""))
+    filing_reviews = parse_bracketed_reviews(parts.get("filing_reviews", ""))
     for d in drafts:
         write_pending(mroot, d)
 
@@ -162,16 +184,35 @@ def _impl(
         "message_id": resp.message_id,
     }
 
+    # Compose prices_by_symbol = latest row + day-over-day delta — shaped for template.
+    prices_by_symbol: dict = {}
+    by_sym: dict[str, list] = {}
+    for p in prices:
+        by_sym.setdefault(p.symbol, []).append(p)
+    for sym, rows in by_sym.items():
+        rows.sort(key=lambda r: r.trade_date)
+        latest = rows[-1]
+        prev = rows[-2] if len(rows) >= 2 else None
+        chg_pct = ((latest.close - prev.close) / prev.close * 100) if prev else None
+        prices_by_symbol[sym] = SimpleNamespace(
+            close=latest.close, volume=latest.volume, chg_pct=chg_pct, date=str(latest.trade_date),
+        )
+
     template = Template(TEMPLATE_PATH.read_text(encoding="utf-8"))
     rendered = template.render(
         period_label=period_label,
         session_label=_session_label(period_label),
-        n_prices=len(prices),
-        n_news=len(news),
-        n_filings=len(filings),
+        tldr=parts.get("tldr", "").strip(),
+        analysis=parts.get("analysis", "").strip(),
+        distillation=parts.get("distillation", "").strip(),
+        prices_by_symbol=prices_by_symbol,
+        news=news,
+        news_reviews=news_reviews,
+        filings=filings,
+        filing_reviews=filing_reviews,
+        comparison=comparison,
         memory_refs=", ".join(f"{k}@rev{v}" for k, v in memory_index.items()),
         trace_id=resp.trace_id or "(none)",
-        digest_body=resp.text,
         generated_at=datetime.now(UTC).isoformat(),
         artifact_id="(filled below)",
     )
