@@ -109,6 +109,7 @@ def rss_collector(topic_id: str) -> int:
         raise ValueError(f"topic {topic_id}: no `rss.feeds:` configured")
     include = rcfg.get("include_keywords") or []
     exclude = rcfg.get("exclude_keywords") or []
+    exclude_url_patterns = rcfg.get("exclude_url_patterns") or []
     lookback_days = int(rcfg.get("lookback_days", _DEFAULT_LOOKBACK_DAYS))
     lang = rcfg.get("lang", "en")
     cutoff = datetime.now(UTC) - timedelta(days=lookback_days)
@@ -132,6 +133,8 @@ def rss_collector(topic_id: str) -> int:
                 if art is None:
                     continue
                 if art.published_at < cutoff:
+                    continue
+                if exclude_url_patterns and any(p in art.url for p in exclude_url_patterns):
                     continue
                 if not _matches_filters(f"{art.headline}\n{art.summary or ''}", include, exclude):
                     continue

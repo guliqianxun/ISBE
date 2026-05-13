@@ -21,6 +21,8 @@ rss:
     # from this network), motorcycle.com (403), revzilla / gearpatrol (HTML).
   # No include_keywords — dedicated moto media means every entry is on-topic.
   # LLM does relevance filtering in 文章逐条 evaluation.
+  exclude_url_patterns:
+    - "/bm/"   # bikesrepublic publishes EN + Bahasa Malaysia versions; keep EN only
   exclude_keywords:
     - "scooter"
     - "moped"
