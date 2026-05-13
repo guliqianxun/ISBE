@@ -46,12 +46,23 @@ def build_memory_block(memory_root_path: Path) -> tuple[str, dict]:
     return "\n\n".join(chunks), index
 
 
+PAPER_REVIEW_RE = re.compile(r"^\s*-\s*\[([0-9.]+(?:v\d+)?)\]\s*:?\s*(.+)$")
+REPO_REVIEW_RE = re.compile(r"^\s*-\s*\[([^\]]+)\]\s*:?\s*(.+)$")
+
+
 def split_sections(text: str) -> dict[str, str]:
-    """Split LLM output by '## 事实' / '## 分析' / '## 蒸馏' headers."""
+    """Split LLM output by markdown level-2 headers into the six known section keys."""
     sections: dict[str, str] = {}
     current_key = None
     buf: list[str] = []
-    name_map = {"事实": "facts", "分析": "analysis", "蒸馏": "distillation"}
+    name_map = {
+        "TL;DR": "tldr",
+        "事实": "facts",
+        "论文逐篇": "paper_reviews",
+        "仓库逐条": "repo_reviews",
+        "分析": "analysis",
+        "蒸馏": "distillation",
+    }
     for line in text.splitlines():
         stripped = line.strip()
         if stripped.startswith("## "):
@@ -66,6 +77,41 @@ def split_sections(text: str) -> dict[str, str]:
     if current_key is not None:
         sections[current_key] = "\n".join(buf).strip()
     return sections
+
+
+def parse_paper_reviews(text: str) -> dict[str, str]:
+    """Extract `{arxiv_id: review_text}` from a `## 论文逐篇` block.
+
+    Tolerates either `- [2605.10046] body` or `- [2605.10046]: body`.
+    Strips trailing `vN` version suffix to match the bare `arxiv_id` used in DB.
+    """
+    out: dict[str, str] = {}
+    for line in text.splitlines():
+        m = PAPER_REVIEW_RE.match(line)
+        if not m:
+            continue
+        aid = m.group(1).split("v")[0]
+        out[aid] = m.group(2).strip()
+    return out
+
+
+def parse_repo_reviews(text: str) -> dict[str, str]:
+    """Extract `{repo_name: review_text}` from a `## 仓库逐条` block.
+
+    `repo_name` is whatever the LLM wrote between the brackets, matched against
+    Repo.title at lookup time by the template. Skips lines that look like a paper
+    review (numeric-only id) so we don't double-count if sections were misordered.
+    """
+    out: dict[str, str] = {}
+    for line in text.splitlines():
+        m = REPO_REVIEW_RE.match(line)
+        if not m:
+            continue
+        key = m.group(1).strip()
+        if PAPER_REVIEW_RE.match(line):
+            continue  # numeric arxiv-id-shaped, belongs to paper_reviews
+        out[key] = m.group(2).strip()
+    return out
 
 
 def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:

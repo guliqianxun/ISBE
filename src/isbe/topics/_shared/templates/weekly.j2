@@ -1,11 +1,79 @@
 # {{ topic_label }} — {{ period_label }}
 
-（facts: {{ n_papers }} papers{% if n_repos %} / {{ n_repos }} repos{% endif %}；
- memory: {{ memory_refs }}；
- trace: {{ trace_id }}）
+## TL;DR
+{{ tldr }}
 
-{{ digest_body }}
+{% if comparison %}
+## 上周对比 (vs {{ comparison.prior_period }})
+
+- 论文：本期 {{ comparison.current_papers_n }} → 上期 {{ comparison.prior_papers_n }} ({{ "+" if comparison.delta_n >= 0 else "" }}{{ comparison.delta_n }})
+{%- if comparison.new_ids %}
+  - 新增（{{ comparison.new_ids | length }}）: {{ comparison.new_ids | join(", ") }}
+{%- endif %}
+{%- if comparison.carried_ids %}
+  - 延续（{{ comparison.carried_ids | length }}）: {{ comparison.carried_ids | join(", ") }}
+{%- endif %}
+{%- if comparison.dropped_ids %}
+  - 已出窗口（{{ comparison.dropped_ids | length }}）: {{ comparison.dropped_ids | join(", ") }}
+{%- endif %}
+{%- if comparison.active_repos %}
+- 仓库活跃（自 {{ comparison.prior_period }} digest 后有 commit）:
+{%- for r in comparison.active_repos %}
+  - [{{ r.title }}]({{ r.github_url }}) — {{ r.last_commit_at.strftime("%Y-%m-%d") }}
+{%- endfor %}
+{%- endif %}
+{% endif %}
+{% if papers -%}
+## 重点论文（{{ papers | length }}）
+{% for p in papers %}
+### [{{ p.arxiv_id }}] {{ p.title }}
+
+- **作者**: {{ p.authors | join(", ") }}
+- **分类**: {{ p.primary_category }}
+- **提交**: {{ p.submitted_at.strftime("%Y-%m-%d") }}
+- **arXiv**: {{ p.source_url }}{% if p.pdf_uri %} · 本地 `papers/{{ topic_id }}/{{ period_label }}/{{ p.arxiv_id }}.pdf`{% endif %}
+{% if paper_reviews.get(p.arxiv_id) %}
+> **本期评价**：{{ paper_reviews[p.arxiv_id] }}
+{% endif %}
+
+**摘要**：
+
+{{ p.abstract | truncate(800, true, "...") }}
+
+{% endfor %}
+{% endif %}
+{%- if repos -%}
+## 仓库活跃度（{{ repos | length }}）
+
+| Repo | Stars | 最近提交 | 评价 |
+| --- | ---: | --- | --- |
+{% for r in repos -%}
+| [{{ r.title }}]({{ r.github_url }}) | {{ r.stars }} | {{ r.last_commit_at.strftime("%Y-%m-%d") if r.last_commit_at else "—" }} | {{ repo_reviews.get(r.title) or "—" }} |
+{% endfor %}
+{% endif %}
+
+## 分析
+{{ analysis }}
+
+## 事实（raw）
+{{ facts_raw }}
+
+{% if distillation -%}
+## Memory 草稿（待 review）
+
+{{ distillation }}
+{% endif %}
 
 ---
 
-*generated_at: {{ generated_at }}; artifact_id: {{ artifact_id }}*
+<details>
+<summary>Audit & 追溯</summary>
+
+- **generated_at**: {{ generated_at }}
+- **artifact_id**: {{ artifact_id }}
+- **trace_id**: {{ trace_id }}
+- **memory snapshot**: {{ memory_refs }}
+{% if papers %}- **papers fingerprint**: {{ papers | map(attribute='arxiv_id') | list | join(", ") }}
+{% endif %}{% if repos %}- **repos fingerprint**: {{ repos | map(attribute='github_url') | list | join(", ") }}
+{% endif %}
+</details>

@@ -2,7 +2,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal, Protocol
 
-DigestSectionKind = Literal["facts", "analysis", "distillation"]
+DigestSectionKind = Literal[
+    "tldr", "facts", "paper_reviews", "repo_reviews", "analysis", "distillation"
+]
 
 
 @dataclass(frozen=True)

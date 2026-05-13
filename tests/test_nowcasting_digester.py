@@ -57,9 +57,21 @@ keywords: a, b
     fake_session.__enter__ = MagicMock(return_value=fake_session)
     fake_session.__exit__ = MagicMock(return_value=False)
     fake_session.scalars.return_value.all.return_value = fake_papers
+    # No prior artifact in this test — comparison should be None.
+    fake_session.scalars.return_value.first.return_value = None
 
-    fake_llm_resp = MagicMock(text="""## 事实
+    fake_llm_resp = MagicMock(text="""## TL;DR
+- 本期 1 篇 / 1 篇值得读：PaperX
+- 主进展：新方法
+
+## 事实
 当周期 1 篇论文。
+
+## 论文逐篇
+- [2604.99999] PaperX 强相关，引入了新方法，值得细读。
+
+## 仓库逐条
+(本期无仓库)
 
 ## 分析
 PaperX 提了新方法 (memory: nowcasting@1)。
@@ -82,7 +94,9 @@ PaperX 提了新方法 (memory: nowcasting@1)。
 
     assert isinstance(result, DigestResult)
     assert result.topic_id == "nowcasting"
-    assert {s.kind for s in result.sections} == {"facts", "analysis", "distillation"}
+    assert {s.kind for s in result.sections} == {
+        "tldr", "facts", "paper_reviews", "repo_reviews", "analysis", "distillation",
+    }
     assert len(result.pending_drafts) == 1
     pending_root = memory_dir / ".pending"
     assert any(p.suffix == ".md" for p in pending_root.rglob("*"))

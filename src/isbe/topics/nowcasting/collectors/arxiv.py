@@ -1,12 +1,10 @@
-"""nowcasting-specific arxiv wiring.
+"""arxiv PDF download — topic-agnostic.
 
-Most of the arxiv work is now generic and lives in `isbe.topics._shared.arxiv`.
-This module:
-  - re-exports the generic helpers under their old import path (test compat)
-  - keeps the PDF download flow (still nowcasting-bound; other topics don't
-    download PDFs in the MVP)
-  - exposes a thin `arxiv_collector()` wrapper that drives the generic flow
-    with topic_id='nowcasting'
+The historical home of this module was nowcasting-specific; it now serves
+any topic with an `arxiv:` block in `topic.yaml`. PDFs are organized on
+disk as `papers/<topic_id>/<period>/<arxiv_id>.pdf`. A paper is stored
+under the topic that *first* downloads it (paper rows are shared across
+topics; `pdf_uri` is single-valued).
 """
 
 import io
@@ -19,7 +17,7 @@ from pathlib import Path
 import httpx
 from minio import Minio
 from prefect import flow
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
@@ -32,6 +30,7 @@ from isbe.topics._shared.arxiv import (
     upsert_papers,  # noqa: F401  — used by tests
 )
 from isbe.topics.nowcasting.facts import Paper
+from isbe.topics.registry import default_topics_root, load_topic_config
 
 TOPIC_ID = "nowcasting"
 PAPERS_LOCAL_MIRROR_DEFAULT = Path("papers")
@@ -130,24 +129,49 @@ def store_pdf(
     return f"minio://{bucket}/{object_name}"
 
 
-@flow(name="arxiv-download-pdfs")
-def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int:
-    """Download PDFs for papers where pdf_uri IS NULL (rate-limited 1/3s).
+def _topic_keyword_filter(topic_id: str):
+    """Build SQLAlchemy filter matching papers whose title/abstract hits any of
+    the topic's `arxiv:include_keywords`. Returns None if topic has no keywords.
+    """
+    cfg = load_topic_config(default_topics_root(), topic_id)
+    keywords = (cfg.get("arxiv") or {}).get("include_keywords", [])
+    if not keywords:
+        return None
+    clauses = []
+    for kw in keywords:
+        like = f"%{kw}%"
+        clauses.append(Paper.title.ilike(like))
+        clauses.append(Paper.abstract.ilike(like))
+    return or_(*clauses)
 
-    Currently nowcasting-bound for organization (papers/<topic>/<period>/).
-    New topics can opt in by adding their own download flow if needed.
+
+@flow(name="arxiv-download-pdfs")
+def arxiv_download_pdfs(
+    topic_id: str = TOPIC_ID,
+    limit: int = 0,
+    period_label: str | None = None,
+) -> int:
+    """Download PDFs of papers matching `topic_id`'s keywords (rate-limited 1/3s).
+
+    `limit=0` means no cap; PDFs land in `papers/<topic_id>/<period>/`.
+    Papers whose `pdf_uri` is already set are skipped (a paper can only have
+    one download location; first topic to claim it wins).
     """
     import sys
 
     period = period_label or _current_iso_week()
-    with topic_run(TOPIC_ID, "arxiv-download-pdfs") as run:
+    with topic_run(topic_id, "arxiv-download-pdfs") as run:
         Session = make_session_factory()
         n = 0
         skipped = 0
         with Session() as s:
-            targets = list(
-                s.scalars(select(Paper).where(Paper.pdf_uri.is_(None)).limit(limit)).all()
-            )
+            stmt = select(Paper).where(Paper.pdf_uri.is_(None))
+            kw_filter = _topic_keyword_filter(topic_id)
+            if kw_filter is not None:
+                stmt = stmt.where(kw_filter)
+            if limit and limit > 0:
+                stmt = stmt.limit(limit)
+            targets = list(s.scalars(stmt).all())
             total = len(targets)
             print(
                 f"[arxiv-pdfs] starting: {total} target paper(s), "
@@ -159,7 +183,9 @@ def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int
                 print(f"[arxiv-pdfs] ({idx}/{total}) -> {p.arxiv_id} fetching...", flush=True)
                 try:
                     body = fetch_pdf_bytes(p.arxiv_id)
-                    p.pdf_uri = store_pdf(p.arxiv_id, body, period_label=period)
+                    p.pdf_uri = store_pdf(
+                        p.arxiv_id, body, topic_id=topic_id, period_label=period
+                    )
                     s.add(p)
                     s.commit()
                     n += 1
@@ -183,6 +209,7 @@ def arxiv_download_pdfs(limit: int = 10, period_label: str | None = None) -> int
         run.payload["skipped"] = skipped
         run.payload["limit"] = limit
         run.payload["period_label"] = period
+        run.payload["topic_id"] = topic_id
         return n
 
 

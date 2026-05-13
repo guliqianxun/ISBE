@@ -9,6 +9,7 @@ Each digest run:
   5. Writes artifact + .pending memory drafts.
 """
 
+import os
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -17,14 +18,18 @@ from prefect import flow
 from sqlalchemy import or_, select
 
 from isbe.artifacts.store import save_artifact
+from isbe.facts.artifacts import Artifact
 from isbe.facts.db import make_session_factory
 from isbe.llm.client import complete
 from isbe.llm.prompts import SYSTEM_PROMPT, build_digest_prompt
 from isbe.memory.pending import write_pending
+from isbe.notify import send_digest_notification
 from isbe.observability.runs import topic_run
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
     parse_distillation_section,  # noqa: F401  — re-exported for back-compat
+    parse_paper_reviews,
+    parse_repo_reviews,
 )
 from isbe.topics._shared.digester_utils import (
     memory_root as _memory_root,
@@ -50,6 +55,52 @@ def _build_facts_block(papers: list, repos: list | None) -> str:
                 f"- {r.title} stars={r.stars} last_commit={r.last_commit_at} — {r.github_url}"
             )
     return "\n".join(lines)
+
+
+def _load_prior_artifact(session, topic_id: str, current_period: str) -> Artifact | None:
+    """Most recent artifact for this topic from an *earlier* period (strict <).
+
+    ISO period labels (`2026-W19`, `2026-05-07`) compare correctly lexicographically.
+    """
+    return session.scalars(
+        select(Artifact)
+        .where(Artifact.topic_id == topic_id, Artifact.period_label < current_period)
+        .order_by(Artifact.period_label.desc())
+        .limit(1)
+    ).first()
+
+
+def _build_comparison(
+    prior: Artifact | None,
+    current_papers: list,
+    repos: list | None,
+) -> dict | None:
+    """Compute paper-set delta + repo-commit-since-prior. Returns None if no prior."""
+    if prior is None:
+        return None
+    prior_papers = set((prior.fingerprint.get("facts") or {}).get("papers") or [])
+    current_ids = {p.arxiv_id for p in current_papers}
+    new_ids = sorted(current_ids - prior_papers)
+    carried_ids = sorted(current_ids & prior_papers)
+    dropped_ids = sorted(prior_papers - current_ids)
+
+    prior_commit_threshold = prior.created_at
+    active_repos = []
+    for r in repos or []:
+        if r.last_commit_at and r.last_commit_at > prior_commit_threshold:
+            active_repos.append(r)
+
+    return {
+        "prior_period": prior.period_label,
+        "prior_artifact_id": str(prior.id),
+        "prior_papers_n": len(prior_papers),
+        "current_papers_n": len(current_ids),
+        "delta_n": len(current_ids) - len(prior_papers),
+        "new_ids": new_ids,
+        "carried_ids": carried_ids,
+        "dropped_ids": dropped_ids,
+        "active_repos": active_repos,
+    }
 
 
 def _papers_keyword_filter(keywords: list[str]):
@@ -120,6 +171,8 @@ def _digester_impl(
             query = query.where(kw_filter)
         papers = list(s.scalars(query).all())
         repos = list(s.scalars(select(Repo)).all()) if include_repos else None
+        prior_artifact = _load_prior_artifact(s, topic_id, period_label)
+        comparison = _build_comparison(prior_artifact, papers, repos)
 
     facts_block = _build_facts_block(papers, repos)
     mroot = _memory_root()
@@ -134,11 +187,16 @@ def _digester_impl(
     resp = complete(system=SYSTEM_PROMPT, user=user_prompt)
     parts = _split_sections(resp.text)
     sections = [
+        DigestSection(kind="tldr", body=parts.get("tldr", "")),
         DigestSection(kind="facts", body=parts.get("facts", "")),
+        DigestSection(kind="paper_reviews", body=parts.get("paper_reviews", "")),
+        DigestSection(kind="repo_reviews", body=parts.get("repo_reviews", "")),
         DigestSection(kind="analysis", body=parts.get("analysis", "")),
         DigestSection(kind="distillation", body=parts.get("distillation", "")),
     ]
     drafts = parse_distillation_section(parts.get("distillation", ""))
+    paper_reviews = parse_paper_reviews(parts.get("paper_reviews", ""))
+    repo_reviews = parse_repo_reviews(parts.get("repo_reviews", ""))
     for d in drafts:
         write_pending(mroot, d)
 
@@ -154,13 +212,20 @@ def _digester_impl(
 
     template = Template(SHARED_TEMPLATE.read_text(encoding="utf-8"))
     rendered = template.render(
+        topic_id=topic_id,
         topic_label=topic_label,
         period_label=period_label,
-        n_papers=len(papers),
-        n_repos=len(repos) if repos is not None else 0,
+        tldr=parts.get("tldr", "").strip(),
+        facts_raw=parts.get("facts", "").strip(),
+        analysis=parts.get("analysis", "").strip(),
+        distillation=parts.get("distillation", "").strip(),
         memory_refs=", ".join(f"{k}@rev{v}" for k, v in memory_index.items()),
         trace_id=resp.trace_id or "(none)",
-        digest_body=resp.text,
+        papers=papers,
+        paper_reviews=paper_reviews,
+        repos=repos or [],
+        repo_reviews=repo_reviews,
+        comparison=comparison,
         generated_at=datetime.now(UTC).isoformat(),
         artifact_id="(filled below)",
     )
@@ -181,6 +246,17 @@ def _digester_impl(
     run.payload["artifact_id"] = str(artifact_id)
     run.payload["llm_input_tokens"] = resp.input_tokens
     run.payload["llm_output_tokens"] = resp.output_tokens
+
+    mirror_root = Path(os.getenv("ISBE_ARTIFACT_MIRROR", "artifacts"))
+    latest = mirror_root / topic_id / period_label / "latest.md"
+    excerpt = (resp.text or "")[:800]
+    pushed = send_digest_notification(
+        topic_label=topic_label,
+        period_label=period_label,
+        artifact_path=latest if latest.exists() else None,
+        excerpt=excerpt,
+    )
+    run.payload["notify_sent"] = pushed
 
     return DigestResult(
         topic_id=topic_id,
