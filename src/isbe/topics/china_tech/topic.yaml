@@ -10,15 +10,17 @@ rss:
     - name: 36kr
       url: https://36kr.com/feed
   # Note: 36 氪 feed 只滚 28 小时，每日 cron 才能覆盖一周窗口。
-    # 知乎专栏 / 话题 / 大 V 回答 —— 需要 ZHIHU_COOKIES 含 `d_c0=...; z_c0=...`，
-    # 详见 docs/howto/zhihu-cookies.md。粘贴 cookies 后 docker compose up -d --force-recreate rsshub，
-    # 跑 `uv run python scripts/probe_zhihu_routes.py` 全部 200 即可解开下面 3 行：
-    # - name: zhihu_zhuanlan_<column>
-    #   url: http://localhost:1200/zhihu/zhuanlan/<column-slug>
-    # - name: zhihu_topic_<topic_label>
-    #   url: http://localhost:1200/zhihu/topic/<topic-id>/top-answers
-    # - name: zhihu_user_<urlToken>
-    #   url: http://localhost:1200/zhihu/people/answers/<urlToken>
+
+    # 知乎专栏（通过 morerssplz 无需 cookies）—— 验证 2026-05-15
+    # 路由形如 `/zhihuzhuanlan/<slug>`（中间无斜杠）。每次 20 items。
+    # morerssplz 只覆盖 /zhuanlan；topic/people 仍需 RSSHub + 完整 cookie jar
+    # （见 docs/howto/zhihu-cookies.md）。新增专栏先用
+    # `uv run python scripts/probe_morerssplz.py` 试一下，注意 pubDate
+    # 要近 14 天内，否则被 lookback_days 过滤掉（如停更的 `aiera`）。
+    - name: zhihu_jiqizhixin
+      url: http://localhost:1201/zhihuzhuanlan/jiqizhixin   # 机器之心 — research summaries
+    - name: zhihu_qbitai
+      url: http://localhost:1201/zhihuzhuanlan/qbitai       # 量子位 — applied AI / products
   exclude_keywords:
     # 招商引资类硬广 / 平台运营帖：留干净的资讯
     - "招商"

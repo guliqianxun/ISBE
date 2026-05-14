@@ -1,4 +1,18 @@
-# 接入知乎数据源 — 获取 `d_c0` cookie
+# 接入知乎数据源
+
+知乎有两条路径，按需求挑：
+
+| 路径                       | 覆盖                            | 是否要 cookies | 适用场景                          |
+|----------------------------|---------------------------------|----------------|-----------------------------------|
+| **morerssplz**（推荐）     | 只 `/zhuanlan/<slug>`（专栏）   | 不要           | 想拉头部 AI / 科技专栏 RSS        |
+| **RSSHub + cookies**       | `/topic`/`/people`/`/zhuanlan`  | 要完整 jar     | 想拉话题 / 大 V 回答              |
+
+如果你只想拉**专栏**，跳到下面的 [morerssplz 章节](#备选-morerssplz无 cookies专栏抓取)。
+要拉**话题 / 大 V** 才走下面的 RSSHub + 完整 cookie jar 路径。
+
+---
+
+## RSSHub 路径 — 获取 `d_c0` cookie
 
 知乎所有 `/api/v4/topics/*`、`/api/v4/columns/*`、`/api/v4/members/*/answers` 都用 `x-zse-96` 签名头守门。
 RSSHub 2026-03-07 以后可以自己算签名 + 自动取 `__zse_ck`，但**前提是 `ZHIHU_COOKIES` 里同时包含 `d_c0` 和 `z_c0`**：
@@ -72,3 +86,64 @@ uv run python scripts/probe_zhihu_routes.py
 
 - 2026-05-13: 接入 RSSHub 容器；只塞 `z_c0` → topic/zhuanlan/people 全 403
 - 2026-05-14: 调研报告（[[oss-survey-first]]）发现需要 `d_c0`；准备脚手架，等用户粘贴
+- 2026-05-15: 即便 `d_c0+z_c0` 齐齐塞进去 RSSHub 还是 403（疑似缺 `KLBRSID`/`_xsrf` 等
+  风控字段）。**改走 morerssplz 兜底专栏，无 cookies**——见下一节。
+
+---
+
+## 备选：morerssplz（无 cookies，专栏抓取）
+
+[lilydjwg/morerssplz](https://github.com/lilydjwg/morerssplz) 直接爬专栏页面 HTML
+输出 RSS 2.0，**绕开签名问题**。代价是只覆盖 `/zhuanlan`，**没有** `/topic`、
+`/people/answers`、`/question`。
+
+### 拓扑
+
+- 容器：`isbe-morerssplz`（compose service `morerssplz`，build from upstream git）
+- 内部端口 :8000，本机映射 :1201（`docker-compose.override.yml`）
+- 路由：`GET /zhihuzhuanlan/<column-slug>` —— 注意 `zhihu` 和 `zhuanlan` **中间无斜杠**
+- 内网间访问用 `http://morerssplz:8000`，本机访问用 `http://localhost:1201`
+
+### 操作步骤
+
+1. 启动容器：
+
+   ```powershell
+   docker compose up -d morerssplz
+   ```
+
+2. 跑 smoke test：
+
+   ```powershell
+   uv run python scripts/probe_morerssplz.py
+   ```
+
+3. 加新专栏前，先用 `curl` 验证两件事：
+
+   ```bash
+   # 是否 200
+   curl -sI http://localhost:1201/zhihuzhuanlan/<slug> | head -1
+   # 是否近期还在更新（否则会被 lookback_days 过滤掉）
+   curl -s http://localhost:1201/zhihuzhuanlan/<slug> | grep -oE '<pubDate>[^<]+' | head -3
+   ```
+
+4. 通过后把 `<slug>` 加进 `src/isbe/topics/china_tech/topic.yaml` 的 `rss.feeds` 列表，
+   重新跑 `radar topics run china-tech --collect` 入库。
+
+### 已知的"活栏目"种子（2026-05-15 验过）
+
+- `jiqizhixin` —— 机器之心 / 研究综述
+- `qbitai` —— 量子位 / AI 应用 + 产品
+
+### 已知**不能用**
+
+- `aiera`、`xinzhiyuan` 等：返回 200 但最新 pubDate 在 2025-10 / 更早，等于停更
+- 单 V 用户 (`/zhihu/<id>`)、话题 (`/zhihu_topic/<id>`)、合集 (`/zhihu_collection/<id>`)：
+  morerssplz 列了路由但目前 0.4 版本对 web 改版后的 `/api/v4` 反爬不太稳，PoC 之前别上线
+
+### 失败排查
+
+- **HTTP 404**：slug 拼错了，确认浏览器里 `zhuanlan.zhihu.com/<slug>` 能打开
+- **HTTP 502 / 504**：上游知乎临时不稳，等几分钟重试
+- **200 但 collector 0 入库**：feed 里 pubDate 都早于 `lookback_days`（默认 14 天）
+- **容器死循环重启**：看 `docker logs isbe-morerssplz`，常见是 PyPI 拉包超时，重 build 即可
