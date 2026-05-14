@@ -10,6 +10,15 @@ rss:
     - name: 36kr
       url: https://36kr.com/feed
   # Note: 36 氪 feed 只滚 28 小时，每日 cron 才能覆盖一周窗口。
+    # 知乎专栏 / 话题 / 大 V 回答 —— 需要 ZHIHU_COOKIES 含 `d_c0=...; z_c0=...`，
+    # 详见 docs/howto/zhihu-cookies.md。粘贴 cookies 后 docker compose up -d --force-recreate rsshub，
+    # 跑 `uv run python scripts/probe_zhihu_routes.py` 全部 200 即可解开下面 3 行：
+    # - name: zhihu_zhuanlan_<column>
+    #   url: http://localhost:1200/zhihu/zhuanlan/<column-slug>
+    # - name: zhihu_topic_<topic_label>
+    #   url: http://localhost:1200/zhihu/topic/<topic-id>/top-answers
+    # - name: zhihu_user_<urlToken>
+    #   url: http://localhost:1200/zhihu/people/answers/<urlToken>
   exclude_keywords:
     # 招商引资类硬广 / 平台运营帖：留干净的资讯
     - "招商"
