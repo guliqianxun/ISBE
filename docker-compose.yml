@@ -104,6 +104,17 @@ services:
     restart: unless-stopped
     networks: [isbe-net]
 
+  # morerssplz — lilydjwg/morerssplz, zero-cookie Zhihu 专栏 (/zhuanlan) feeds.
+  # Used as a no-auth fallback for `/zhihu/zhuanlan/<slug>` when RSSHub gets
+  # 403'd by Zhihu risk-control. Does NOT cover /topic or /people routes.
+  # Route shape: GET /zhihuzhuanlan/<column-slug>  (note: no slash between
+  # "zhihu" and "zhuanlan"). Upstream listens on :8000.
+  morerssplz:
+    build: https://github.com/lilydjwg/morerssplz.git
+    container_name: isbe-morerssplz
+    restart: unless-stopped
+    networks: [isbe-net]
+
   # radar-worker: long-lived Prefect worker that fires the cron-scheduled flows.
   # Opt-in: `docker compose --profile worker up -d`
   #
