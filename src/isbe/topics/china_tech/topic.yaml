@@ -1,0 +1,35 @@
+id: china-tech
+label: 国内科技 / 创投周报
+cadence: weekly
+active: true
+
+rss:
+  feeds:
+    # 36 氪官方 RSS — 验证 2026-05-14 ：HTTP 200，单次返回 30 items，
+    # 覆盖 ~28 小时；混合长文章（/p/<id>）+ 快讯（/newsflashes/<id>）。
+    - name: 36kr
+      url: https://36kr.com/feed
+  # Note: 36 氪 feed 只滚 28 小时，每日 cron 才能覆盖一周窗口。
+  exclude_keywords:
+    # 招商引资类硬广 / 平台运营帖：留干净的资讯
+    - "招商"
+    - "入驻"
+    - "广告"
+    - "VClub"
+  lookback_days: 14
+  lang: zh
+
+# Crawl4AI scaffold（暂不启用）：留给后面接 雪球 / 虎嗅 / 少数派 等无 RSS 站。
+# crawl4ai:
+#   pages:
+#     - name: xueqiu_7x24
+#       url: https://xueqiu.com/today
+#   lookback_days: 7
+#   lang: zh
+
+digest:
+  facts_window_days: 7
+
+schedules:
+  rss_collector: "0 6 * * *"             # 每日 06:00（积累一周）
+  china_tech_digester: "0 9 * * 1"       # 周一 09:00 出周报

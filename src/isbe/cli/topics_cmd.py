@@ -91,6 +91,12 @@ def topics_run(
             label = period_label or f"{year}-W{week:02d}"
             result = motorcycle_digester(period_label=label, today=today)
             typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
+        elif topic_id == "china-tech":
+            from isbe.topics.china_tech.digester import china_tech_digester
+            year, week, _ = today.isocalendar()
+            label = period_label or f"{year}-W{week:02d}"
+            result = china_tech_digester(period_label=label, today=today)
+            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
         else:
             from isbe.topics._shared.digester import weekly_digester
             year, week, _ = today.isocalendar()

@@ -1,0 +1,54 @@
+# {{ topic_label }} — {{ period_label }}
+
+## TL;DR
+{{ tldr }}
+
+{% if comparison %}
+## {{ comparison.compare_label }} (vs {{ comparison.prior_period }})
+{% for b in comparison.buckets %}
+- {{ b.label }}：本期 {{ b.current_n }} → 上期 {{ b.prior_n }} ({{ "+" if b.delta_n >= 0 else "" }}{{ b.delta_n }})
+{%- if b.new %}
+  - 新增（{{ b.new | length }}）: {{ b.new | length }} 篇
+{%- endif %}
+{%- if b.carried %}
+  - 延续（{{ b.carried | length }}）: {{ b.carried | length }} 篇
+{%- endif %}
+{% endfor %}
+{% endif %}
+
+{% if articles -%}
+## 重点文章（{{ articles | length }}）
+
+| 时间 | 来源 | 标题 | 评价 |
+| --- | --- | --- | --- |
+{% for a in articles -%}
+| {{ a.published_at.strftime("%m-%d") }} | {{ a.source }} | [{{ a.headline | truncate(100, true, "…") }}]({{ a.url }}) | {{ article_reviews.get(a.id) or "—" }} |
+{% endfor %}
+{% endif %}
+
+{% if company_notes -%}
+## 公司动态
+{{ company_notes }}
+{% endif %}
+
+## 分析
+{{ analysis }}
+
+{% if distillation -%}
+## Memory 草稿（待 review）
+
+{{ distillation }}
+{% endif %}
+
+---
+
+<details>
+<summary>Audit & 追溯</summary>
+
+- **generated_at**: {{ generated_at }}
+- **artifact_id**: {{ artifact_id }}
+- **trace_id**: {{ trace_id }}
+- **memory snapshot**: {{ memory_refs }}
+{% if articles %}- **articles fingerprint**: {{ articles | map(attribute='id') | list | join(", ") }}
+{% endif %}
+</details>

@@ -10,6 +10,7 @@ from isbe.topics._shared.arxiv import arxiv_collector
 from isbe.topics._shared.digester import weekly_digester
 from isbe.topics._shared.crawl4ai_collector import crawl4ai_collector
 from isbe.topics._shared.rss import rss_collector
+from isbe.topics.china_tech.digester import china_tech_digester
 from isbe.topics.motorcycle.digester import motorcycle_digester
 from isbe.topics.nowcasting.collectors.arxiv import arxiv_download_pdfs
 from isbe.topics.nowcasting.collectors.github import github_collector
@@ -33,6 +34,7 @@ _FLOW_DISPATCH = {
     "rss_collector": (rss_collector, {"topic_id": "{topic_id}"}),
     "crawl4ai_collector": (crawl4ai_collector, {"topic_id": "{topic_id}"}),
     "motorcycle_digester": (motorcycle_digester, {}),
+    "china_tech_digester": (china_tech_digester, {}),
 }
 
 

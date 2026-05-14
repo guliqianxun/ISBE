@@ -10,6 +10,8 @@ DigestSectionKind = Literal[
     "news_reviews", "filing_reviews",
     # motorcycle-weekly
     "article_reviews", "brand_notes",
+    # china-tech-weekly
+    "company_notes",
 ]
 
 

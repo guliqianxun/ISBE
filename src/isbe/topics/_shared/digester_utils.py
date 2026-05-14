@@ -63,9 +63,11 @@ def split_sections(text: str) -> dict[str, str]:
         # nvda-daily
         "新闻逐条": "news_reviews",
         "SEC 逐条": "filing_reviews",
-        # motorcycle-weekly
+        # motorcycle-weekly / china-tech-weekly
         "文章逐条": "article_reviews",
         "品牌动态": "brand_notes",
+        # china-tech-weekly
+        "公司动态": "company_notes",
         "分析": "analysis",
         "蒸馏": "distillation",
     }
