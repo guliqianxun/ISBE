@@ -28,6 +28,11 @@ artifacts/
 # Local PDF mirror (collector output; MinIO is authoritative)
 papers/
 
+# Local logs / debug artifacts (dev convenience; not authoritative)
+*.log
+llm_raw_response.md
+.prefect/
+
 # OS
 .DS_Store
 Thumbs.db
