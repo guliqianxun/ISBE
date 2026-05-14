@@ -38,6 +38,23 @@ uv run python scripts/probe_zhihu_routes.py
 
    全部 200 + items > 0 即通过。
 
+## 升级路径：粘"完整 cookie 字符串"（建议）
+
+最稳的姿势是把整个 cookie jar 一次贴进去 —— 知乎的风控不只看 `d_c0` 一项，
+完整 jar 含 `KLBRSID`、`_xsrf`、`q_c1`、`tst` 等会显著降低 403 概率。
+
+获取步骤：
+
+1. 登录 https://www.zhihu.com
+2. F12 → **Network** 标签 → 刷新页面
+3. 在请求列表里找一个对 `www.zhihu.com` 自己的请求（通常是文档请求或 `/api/v4/...`）
+4. 右键 → **Copy** → **Copy as cURL (bash)**
+5. 在粘出来的 curl 命令里找 `-H 'cookie: ...'` 那一行
+6. 把单引号内的所有 cookie 内容复制出来，整段贴成 `.env` 的 `ZHIHU_COOKIES=...`
+
+如果你 paranoid 想精简，至少保留：`d_c0 / z_c0 / KLBRSID / _xsrf / q_c1 / tst`
+六项。完整 jar 也可以全留，知乎只看自己关心的那几个。
+
 ## 失败排查
 
 - **全 503 + 上游 403**：cookies 过期（知乎 web cookie 大概 60 天滚动），重做步骤 4。
