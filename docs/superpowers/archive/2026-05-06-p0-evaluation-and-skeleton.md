@@ -1,5 +1,11 @@
 # ISBE P0' — Evaluation + Skeleton Implementation Plan
 
+> **ARCHIVED 2026-05-15.** P0 infra delivered (tag `p0-infra-skeleton`, 7 containers).
+> Tasks 15-19 (hermes-agent evaluation + integration / fallback) were
+> **permanently deferred to v2** by the 2026-05-12 ADR
+> (`specs/2026-05-12-v1-scope-correction.md`) after we picked the "self-built"
+> path A and shipped P1+ on top of it. Kept for history; not actionable.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 在 1.5 周内交付一个 path-B-ready 的项目骨架（Python 工程 + 文件式 memory 加载器 + CLI 占位 + 完整 docker-compose 基础设施），并对 NousResearch hermes-agent 完成 §2.1 评估清单——若关键项 5/6/7 通过则把 hermes 集成进 compose 并通过 RPC 跑通 hello-world 流程；若不通过则触发回退到附录 A。

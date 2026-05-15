@@ -1,5 +1,9 @@
 # P1 — Nowcasting Topic MVP Implementation Plan
 
+> **ARCHIVED 2026-05-15. COMPLETED** — all 11 tasks delivered, tag
+> `p1-nowcasting-mvp`. First end-to-end domain (arxiv + github → DeepSeek
+> digest → MinIO artifact). Kept for history.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 端到端跑通 ISBE 的第一个 topic — 临近降水科研订阅 — 验证 spec 中通用 Topic 抽象 / Digester 三段 / review 流 / memory lifecycle 在真实场景下能落地。NVDA 域放 Plan #2 复用同一抽象。
