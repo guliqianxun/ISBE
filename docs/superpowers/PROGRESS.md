@@ -3,7 +3,7 @@
 > 单一来源：哪些任务做完了、当前 phase 是哪个、卡在哪、下一步是什么。
 > 每完成一个 task 更新这里；每开始一个新会话先读这里。
 
-**最后更新**：2026-05-13（v1 ops 收尾 + digest 模板 v2 + 第一个非 arxiv/finance 域 motorcycle 上线 + Crawl4AI 兜底）
+**最后更新**：2026-05-15（china-tech topic 上线 + 知乎 morerssplz 兜底；旧 plans 全部归档；新增 2 个 ADR 沉淀 v1 期决策）
 
 ---
 
@@ -15,7 +15,7 @@
 
 **v1 验收**：见 `tests/acceptance/test_v1_smoke.md` —— "30 分钟，朋友新机器，明早 7:00 第一封含其新增 topic 的日报"。
 
-**v1 当前进行中**：持续加域（5 个 active：nowcasting / video-gen / image-restoration / nvda / motorcycle）。下一步候选 = 知乎/微博等中文反爬源解决方案 + NVDA 真上线（prices API）。
+**v1 当前进行中**：持续加域（**6 个 active**：nowcasting / video-gen / image-restoration / nvda / motorcycle / **china-tech**）。下一步候选 = NVDA 真上线（prices API）/ 知乎 /topic+/people 路径（无成熟 OSS，需要 cookie jar 实验或暂搁）/ 清 papers/legacy/。
 
 **v2 候选（冻结实现，保留设计）**：
 
@@ -364,3 +364,75 @@ uv run radar topics run nowcasting --digest
 2. 加 1-2 个国内能用的中文源（雪球？36氪？Crawl4AI 实测）让 motorcycle 真有中文内容
 3. NVDA 真上线：决定 prices API 用哪家（Alpha Vantage 免费 / Polygon $9/月 / Yahoo unofficial）
 4. 清掉 `papers/legacy/` 的 5 个旧 PDF（占位用，不再有意义）
+
+---
+
+## 2026-05-14 复盘（中文源 OSS 调研 + china-tech 上线）
+
+**起点**：5-13 末提到的 #1 知乎策略 + #2 中文源——两件事其实是一件事，缺合适的中文资讯源把 motorcycle/科技/创投 等域真正喂饱。
+
+**这一天做的事**：
+
+1. `f463860` **china-tech topic via 36kr RSS**：新 topic（国内科技/创投周报），用 36 氪官方 RSS（验证 200，单次 30 条，覆盖 ~28h）；prompt 单独立 `CHINA_TECH_SYSTEM_PROMPT` 突出"AI/半导体/机器人/出海/政策"主线；company_notes 作为第 2 桶（类比 NVDA 的 brand_notes）。
+2. `b8a5db0` **httpx[socks]**：本机 NO_PROXY 复杂导致 socksio 缺失，依赖补齐。
+3. **OSS 调研 win**（用户 5-14 显式提"网上应该有开源方案，没必要自己重头死磕"）：知乎反爬本来 5-13 拍板要硬刚 (`x-zse-96` 自实现 / patchright stealth)，调研后发现 RSSHub master 2026-03-07 起自带签名实现 + 自动取 `__zse_ck`。**直接砍掉了至少 2 周自建工作**。
+4. `4f753ff` **zhihu 脚手架 + howto**：RSSHub :latest 镜像 + cookies 文档 + smoke test 脚本 (`probe_zhihu_routes.py`)，等待 d_c0 粘贴。
+5. `38ed03a` **full cookie jar fallback path**：用户粘 d_c0+z_c0 后仍 403，更新文档加 Copy-as-cURL 升级路径。
+
+**新原则沉淀**（写入 [`specs/2026-05-14-oss-survey-first.md`](specs/2026-05-14-oss-survey-first.md)）：
+
+> 对硬基础设施问题（反爬、签名、协议适配）—— 先调研 OSS，再决定是否自己写。
+
+理由：知乎签名问题本来要 2 周自建，调研后 1 天 + 一次 cookie 粘贴的方案就近闭环。
+
+---
+
+## 2026-05-15 复盘（morerssplz 兜底 + 文档审计）
+
+**起点**：5-14 留的"A 知乎死磕 vs B 放弃换方向"二选一。早上选 B1（morerssplz 兜底专栏，快速复用）。
+
+**这一天做的事**：
+
+1. `385c6b1` **morerssplz docker service**：lilydjwg/morerssplz 起到 compose 里（build from git，端口 :1201），路由 `/zhihuzhuanlan/<slug>` 无 cookies；smoke test 脚本 `probe_morerssplz.py`。
+2. `6ca836c` **china-tech 接入知乎专栏**：2 个验过活跃的 AI 专栏（jiqizhixin / qbitai），collector 实测入库 61 篇（36kr 48 + 量子位 20 + 机器之心 20，去重后 61）。**首次"零 cookies 接入知乎"端到端 work**。
+3. **README 重写**（PM 视角）：从 dev-status 转成 "周一早上你打开邮箱看到一份周报" 的产品叙述；6 个 topic 矩阵；7 套 collector 套餐清单；更准确的 Layout 树 + 已知短板。
+4. `c660df8` **归档 5 个完成的 plan**：P0/P1/P1.5/P1.6/P2 从 `plans/` 搬到 `archive/`，每个加 COMPLETED 抬头，`plans/` 留给未来计划。
+
+**这一天学到 / 验证到的事**：
+
+- **morerssplz vs RSSHub 的边界**：RSSHub 的签名实现没问题（验过），知乎挡 RSSHub 的是 risk-control（KLBRSID/_xsrf/q_c1/tst 等额外字段）。morerssplz 走 HTML 抓取绕开 API 签名整条线，但**只覆盖 /zhuanlan**，专栏外（/topic、/people）暂无可靠 OSS 路径。
+- **HTTP 200 ≠ 能用**：`aiera` 路由 200 返回 20 条，但最新 pubDate 在 2025-10，被 lookback_days=14 全过滤掉。新增专栏前要 spot-check pubDate。
+- **第二次 OSS-survey-first 落地**：morerssplz 选型也是先 OSS 后自建——直接复用 upstream Dockerfile (`build: https://github.com/lilydjwg/morerssplz.git`) 30 分钟从想法到入库。
+
+**新 ADR**：[`specs/2026-05-13-digest-contract-v1.md`](specs/2026-05-13-digest-contract-v1.md) 把 5 段周报契约从隐式（散在 `_shared/templates/`）固化成显式契约。
+
+**当前栈状态**：
+
+| 域 | 信源 | 节奏 | 健康度 |
+|---|---|---|---|
+| nowcasting | arxiv + github | 周 | green |
+| video-generation | arxiv | 周 | green |
+| image-restoration | arxiv | 周 | green |
+| nvda | yfinance + RSS + SEC | 日 | green（但 prices API 仍 stub） |
+| motorcycle | 国外 RSS + 可选 Crawl4AI | 周 | green |
+| **china-tech** | **36kr + 知乎专栏 ×2** | **周** | **green（新）** |
+
+| 基础设施 | 端口 | 状态 |
+|---|---|---|
+| postgres | 5432 | healthy |
+| minio | 9000/9001 | healthy |
+| qdrant | 6333 | up（未启用） |
+| phoenix | 6006 | up |
+| prefect-server | 4200 | up（本机用 sqlite ephemeral 兜底，docker 镜像 pull 反复 EOF） |
+| rsshub | 1200 | up |
+| **morerssplz** | **1201** | **up（新）** |
+| uptime-kuma | 3001 | up |
+
+**测试**：73 全绿（之前 docs 标 52，已校正）。
+
+**明天的待办**（重排）：
+
+1. NVDA 真上线：决定 prices API 用哪家
+2. 清掉 `papers/legacy/` 5 个旧 PDF
+3. （可选）china-tech 加更多专栏：搜罗"创投/金融/产业"向活跃 slug，目前只有 AI 两个
+4. （可选）知乎 /topic + /people：用 Copy-as-cURL 完整 cookie jar 再试一次，A 不成立刻退
