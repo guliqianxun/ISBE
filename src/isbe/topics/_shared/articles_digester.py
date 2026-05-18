@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 from jinja2 import Template
@@ -35,6 +35,7 @@ from isbe.observability.runs import topic_run
 from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
+    facts_window,
     memory_root,
     parse_bracketed_reviews,
     parse_distillation_section,
@@ -85,7 +86,7 @@ def make_articles_digester(
             period_local = period_label
 
         cfg = load_topic_config_typed(default_topics_root(), topic_id)
-        facts_window = cfg.digest.facts_window_days
+        facts_window_days = cfg.digest.facts_window_days
         topic_label = cfg.label
 
         with topic_run(topic_id, flow_name) as run:
@@ -94,7 +95,7 @@ def make_articles_digester(
                 topic_label=topic_label,
                 period_label=period_local,
                 today=today_local,
-                facts_window=facts_window,
+                facts_window_days=facts_window_days,
                 system_prompt=system_prompt,
                 prompt_builder=prompt_builder,
                 second_bucket_kind=second_bucket_kind,
@@ -113,23 +114,25 @@ def _run_impl(
     topic_label: str,
     period_label: str,
     today: date,
-    facts_window: int,
+    facts_window_days: int,
     system_prompt: str,
     prompt_builder: Callable[..., str],
     second_bucket_kind: str,
     template_path: Path,
     run,
 ) -> DigestResult:
-    cutoff = datetime.combine(
-        today - timedelta(days=facts_window), datetime.min.time(), tzinfo=UTC
-    )
+    cutoff_low, cutoff_high = facts_window(today, lookback_days=facts_window_days)
 
     Session = make_session_factory()
     with Session() as s:
         articles = list(
             s.scalars(
                 select(Article)
-                .where(Article.topic_id == topic_id, Article.published_at >= cutoff)
+                .where(
+                    Article.topic_id == topic_id,
+                    Article.published_at >= cutoff_low,
+                    Article.published_at <= cutoff_high,
+                )
                 .order_by(Article.published_at.desc())
             ).all()
         )

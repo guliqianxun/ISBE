@@ -30,6 +30,7 @@ from isbe.observability.runs import topic_run
 from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
+    facts_window,
     memory_root,
     parse_bracketed_reviews,
     parse_distillation_section,
@@ -98,7 +99,7 @@ def daily_digester(
 
     cfg = load_topic_config(default_topics_root(), TOPIC_ID)
     dcfg = cfg.get("digest", {}) or {}
-    facts_window = int(dcfg.get("facts_window_days", 1))
+    facts_window_days = int(dcfg.get("facts_window_days", 1))
     news_window = int(dcfg.get("news_window_days", 3))
     filings_window = int(dcfg.get("filings_window_days", 7))
 
@@ -106,7 +107,7 @@ def daily_digester(
         return _impl(
             today=today,
             period_label=period_label,
-            facts_window=facts_window,
+            facts_window_days=facts_window_days,
             news_window=news_window,
             filings_window=filings_window,
             run=run,
@@ -117,29 +118,36 @@ def _impl(
     *,
     today: date,
     period_label: str,
-    facts_window: int,
+    facts_window_days: int,
     news_window: int,
     filings_window: int,
     run,
 ) -> DigestResult:
-    price_cutoff = today - timedelta(days=facts_window + 5)  # extra for prev-close lookup
-    news_cutoff = datetime.combine(
-        today - timedelta(days=news_window), datetime.min.time(), tzinfo=UTC
-    )
-    filings_cutoff = datetime.combine(
-        today - timedelta(days=filings_window), datetime.min.time(), tzinfo=UTC
-    )
+    # Prices: window extends back further so prev-close lookups have data; upper
+    # bound is today (date column) so future-dated rows can't leak in.
+    price_cutoff_low = today - timedelta(days=facts_window_days + 5)
+    news_low, news_high = facts_window(today, lookback_days=news_window)
+    filings_low, filings_high = facts_window(today, lookback_days=filings_window)
 
     Session = make_session_factory()
     with Session() as s:
         prices = list(s.scalars(
-            select(PriceDaily).where(PriceDaily.trade_date >= price_cutoff)
+            select(PriceDaily).where(
+                PriceDaily.trade_date >= price_cutoff_low,
+                PriceDaily.trade_date <= today,
+            )
         ).all())
         news = list(s.scalars(
-            select(NewsItem).where(NewsItem.published_at >= news_cutoff)
+            select(NewsItem).where(
+                NewsItem.published_at >= news_low,
+                NewsItem.published_at <= news_high,
+            )
         ).all())
         filings = list(s.scalars(
-            select(SecFiling).where(SecFiling.filed_at >= filings_cutoff)
+            select(SecFiling).where(
+                SecFiling.filed_at >= filings_low,
+                SecFiling.filed_at <= filings_high,
+            )
         ).all())
         prior_artifact = load_prior_artifact(s, TOPIC_ID, period_label)
         comparison = build_comparison(

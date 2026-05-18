@@ -10,7 +10,7 @@ Each digest run:
 """
 
 import os
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 from jinja2 import Template
@@ -28,8 +28,9 @@ from isbe.topics._shared.arxiv import papers_keyword_filter
 from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
-    parse_distillation_section,  # noqa: F401  — re-exported for back-compat
+    facts_window,
     parse_bracketed_reviews,
+    parse_distillation_section,  # noqa: F401  — re-exported for back-compat
     parse_paper_reviews,
 )
 from isbe.topics._shared.digester_utils import (
@@ -102,13 +103,13 @@ def _digester_impl(
     include_repos: bool,
     run,
 ) -> DigestResult:
-    cutoff = datetime.combine(
-        today - timedelta(days=facts_window_days), datetime.min.time(), tzinfo=UTC
-    )
+    cutoff_low, cutoff_high = facts_window(today, lookback_days=facts_window_days)
 
     Session = make_session_factory()
     with Session() as s:
-        query = select(Paper).where(Paper.submitted_at >= cutoff)
+        query = select(Paper).where(
+            Paper.submitted_at >= cutoff_low, Paper.submitted_at <= cutoff_high
+        )
         kw_filter = papers_keyword_filter(keywords)
         if kw_filter is not None:
             query = query.where(kw_filter)

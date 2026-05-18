@@ -5,11 +5,24 @@ and memory loading utilities.
 """
 import os
 import re
-from datetime import date
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
 from isbe.memory.loader import load_index
 from isbe.topics.base import PendingMemoryDraft
+
+
+def facts_window(today: date, *, lookback_days: int) -> tuple[datetime, datetime]:
+    """Compute the [low, high] datetime range used to filter facts in a digest.
+
+    Returned pair is intended for `col >= low AND col <= high`. The upper
+    bound is end-of-day on `today` (23:59:59.999999 UTC) so same-day items
+    are included; without it, items submitted after `today` but before the
+    digest actually ran would leak into the report.
+    """
+    low = datetime.combine(today - timedelta(days=lookback_days), time.min, tzinfo=UTC)
+    high = datetime.combine(today, time.max, tzinfo=UTC)
+    return low, high
 
 DRAFT_LINE_RE = re.compile(r"^\s*-\s*DRAFT\[([^\]]+)\]:\s*(.+)$")
 
