@@ -1,9 +1,51 @@
 import os
+import time
 from dataclasses import dataclass
 from functools import lru_cache
 
+import anthropic
 import httpx
 from anthropic import Anthropic
+from tenacity import (
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
+
+_RETRYABLE_HTTP_STATUSES = frozenset({429, 500, 502, 503, 504})
+_RETRYABLE_HTTPX_EXC = (
+    httpx.TimeoutException,
+    httpx.RemoteProtocolError,
+    httpx.ConnectError,
+)
+
+
+def _is_retryable_llm_error(exc: BaseException) -> bool:
+    if isinstance(exc, _RETRYABLE_HTTPX_EXC):
+        return True
+    if isinstance(exc, httpx.HTTPStatusError):
+        return exc.response.status_code in _RETRYABLE_HTTP_STATUSES
+    # anthropic SDK exceptions
+    if isinstance(exc, (anthropic.APIConnectionError, anthropic.APITimeoutError)):
+        return True
+    if isinstance(exc, anthropic.APIStatusError):
+        return exc.status_code in _RETRYABLE_HTTP_STATUSES
+    return False
+
+
+def _sleep_between_attempts(seconds: float) -> None:
+    """Test seam for tenacity's sleep callback."""
+    time.sleep(seconds)
+
+
+_LLM_RETRY_DECORATOR = retry(
+    retry=retry_if_exception(_is_retryable_llm_error),
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=2, min=2, max=30),
+    sleep=_sleep_between_attempts,
+    reraise=True,
+)
 
 ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-4-6"
 DEEPSEEK_DEFAULT_MODEL = "deepseek-chat"
@@ -93,6 +135,7 @@ def _get_anthropic_client() -> Anthropic:
     return Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY", ""))
 
 
+@_LLM_RETRY_DECORATOR
 def _complete_anthropic(
     system: str, user: str, model: str, max_tokens: int, trace_id: str | None
 ) -> LLMResponse:
@@ -113,6 +156,7 @@ def _complete_anthropic(
     )
 
 
+@_LLM_RETRY_DECORATOR
 def _complete_deepseek(
     system: str, user: str, model: str, max_tokens: int, trace_id: str | None
 ) -> LLMResponse:

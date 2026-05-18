@@ -21,6 +21,7 @@ dependencies = [
     "feedparser>=6.0",
     "yfinance>=0.2.40",
     "crawl4ai>=0.8.6",
+    "tenacity>=9.0",
 ]
 
 [project.optional-dependencies]

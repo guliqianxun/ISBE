@@ -11,17 +11,42 @@ Schema expected in topic.yaml:
       max_results: 50                  # default per fetch
 """
 
+import time
 from datetime import UTC, datetime
 
 import feedparser
 import httpx
 from prefect import flow, task
 from sqlalchemy import or_
+from tenacity import (
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
 from isbe.topics.nowcasting.facts import Paper  # shared papers table
 from isbe.topics.registry import default_topics_root, load_topic_config
+
+# arxiv has explicit "1 req per 3 sec" ToS + soft WAF on top. Retry on the
+# transient signals (429, 5xx, connect/read timeouts) with exponential backoff.
+_RETRYABLE_STATUSES = frozenset({429, 500, 502, 503, 504})
+_RETRYABLE_EXC = (httpx.TimeoutException, httpx.RemoteProtocolError, httpx.ConnectError)
+
+
+def _is_retryable_http_error(exc: BaseException) -> bool:
+    if isinstance(exc, _RETRYABLE_EXC):
+        return True
+    if isinstance(exc, httpx.HTTPStatusError):
+        return exc.response.status_code in _RETRYABLE_STATUSES
+    return False
+
+
+def _sleep_between_attempts(seconds: float) -> None:
+    """Indirection so tests can patch the sleep out without slowing the suite."""
+    time.sleep(seconds)
 
 
 def papers_keyword_filter(keywords: list[str]):
@@ -91,6 +116,13 @@ def upsert_papers(session, papers: list[Paper]) -> int:
 
 
 @task
+@retry(
+    retry=retry_if_exception(_is_retryable_http_error),
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=2, min=2, max=30),
+    sleep=_sleep_between_attempts,
+    reraise=True,
+)
 def fetch_arxiv_atom(categories: list[str], keywords: list[str], max_results: int) -> list[dict]:
     url = _arxiv_url(categories, keywords, max_results)
     resp = httpx.get(url, timeout=30.0)
