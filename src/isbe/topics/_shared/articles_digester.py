@@ -32,6 +32,7 @@ from isbe.llm.client import complete
 from isbe.memory.pending import write_pending
 from isbe.notify import send_digest_notification
 from isbe.observability.runs import topic_run
+from isbe.topics._shared.article_reviews import collect_article_reviews
 from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
     build_memory_block,
@@ -45,9 +46,19 @@ from isbe.topics.base import DigestResult, DigestSection
 from isbe.topics.registry import default_topics_root, load_topic_config_typed
 
 
-def _build_facts_block(articles: list) -> str:
+def _build_facts_block(
+    articles: list,
+    reviews: dict[str, str] | None = None,
+) -> str:
+    """Render the article list into the facts block.
+
+    If `reviews` is given (output of the fast-tier pre-pass), each article
+    line is followed by a `review:` line so the smart LLM sees them and
+    can synthesize without redoing per-article evaluation.
+    """
     if not articles:
         return "(本周无文章)"
+    reviews = reviews or {}
     lines = [f"=== Articles ({len(articles)}) ==="]
     for a in articles:
         snippet = (a.summary or "").replace("\n", " ")[:280]
@@ -55,6 +66,8 @@ def _build_facts_block(articles: list) -> str:
             f"- [id={a.id[:12]}] [{a.source}] {a.published_at:%Y-%m-%d} "
             f"{a.headline}\n  {snippet}"
         )
+        if (rev := reviews.get(a.id)):
+            lines.append(f"  review: {rev}")
     return "\n".join(lines)
 
 
@@ -144,7 +157,15 @@ def _run_impl(
             compare_label="上周对比",
         )
 
-    facts_block = _build_facts_block(articles)
+    # Pre-pass: fast tier produces per-article reviews in batches of 25.
+    # Synthesis (smart tier) gets them inlined into facts_block and rarely
+    # needs to redo the per-item work — fixes the "评价 all —" failure mode
+    # that hits when article count blows past what one smart LLM call handles.
+    pre_reviews = collect_article_reviews(
+        articles, topic_label=topic_label, complete_fn=complete
+    )
+
+    facts_block = _build_facts_block(articles, reviews=pre_reviews)
     mroot = memory_root()
     memory_block, memory_index = build_memory_block(mroot, topic_id=topic_id)
 
@@ -154,7 +175,7 @@ def _run_impl(
         facts_block=facts_block,
         memory_block=memory_block,
     )
-    resp = complete(system=system_prompt, user=user_prompt)
+    resp = complete(system=system_prompt, user=user_prompt, tier="smart")
     parts = split_sections(resp.text)
 
     sections = [
@@ -169,12 +190,13 @@ def _run_impl(
     for d in drafts:
         write_pending(mroot, d)
 
-    # LLM keys reviews on id[:12]; template needs full id → reuse 12-prefix dict.
+    # Merge: pre-pass first (high coverage), then anything new the synthesis
+    # LLM happened to write into the ## 文章逐条 section. Pre-pass wins ties.
     reviews_raw = parse_bracketed_reviews(parts.get("article_reviews", ""))
-    article_reviews: dict[str, str] = {}
+    article_reviews: dict[str, str] = dict(pre_reviews)
     for a in articles:
         key12 = a.id[:12]
-        if key12 in reviews_raw:
+        if a.id not in article_reviews and key12 in reviews_raw:
             article_reviews[a.id] = reviews_raw[key12]
 
     fingerprint = {

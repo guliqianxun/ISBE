@@ -141,15 +141,21 @@ def parse_bracketed_reviews(text: str) -> dict[str, str]:
     """Extract `{key: review_text}` from any `- [<key>] <text>` block.
 
     Used for `## 仓库逐条` (key = repo title), `## 新闻逐条` (key = news.id sha1),
-    `## SEC 逐条` (key = accession_no). Caller resolves the key against the
-    relevant DB row.
+    `## SEC 逐条` (key = accession_no), `## 文章逐条` (key = article.id[:12]).
+
+    Normalizes a leading `id=` prefix so both `[id=abc123]:` and `[abc123]:`
+    map to the same key — the LLM oscillates between the two and getting
+    bitten by the former is the root cause of "评价 all —" in article reports.
     """
     out: dict[str, str] = {}
     for line in text.splitlines():
         m = REPO_REVIEW_RE.match(line)
         if not m:
             continue
-        out[m.group(1).strip()] = m.group(2).strip()
+        key = m.group(1).strip()
+        if key.startswith("id="):
+            key = key[3:]
+        out[key] = m.group(2).strip()
     return out
 
 

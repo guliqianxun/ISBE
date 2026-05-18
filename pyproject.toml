@@ -62,3 +62,4 @@ ignore = ["UP042"]
 # Prompt files contain long Chinese sentences; readability > line-length
 "src/isbe/llm/prompts.py" = ["E501"]
 "src/isbe/llm/finance_prompts.py" = ["E501"]
+"src/isbe/topics/_shared/article_reviews.py" = ["E501"]

@@ -12,6 +12,30 @@ DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 # Backward-compat alias (T13 spec name)
 DEFAULT_MODEL = ANTHROPIC_DEFAULT_MODEL
 
+# Tier defaults per provider. Override at runtime with ISBE_LLM_MODEL_FAST /
+# ISBE_LLM_MODEL_SMART. DeepSeek has no smaller variant; both tiers fall back
+# to deepseek-chat and the throughput win comes from batching, not model swap.
+_TIER_DEFAULTS = {
+    "anthropic": {
+        "fast": "claude-haiku-4-5-20251001",
+        "smart": ANTHROPIC_DEFAULT_MODEL,
+    },
+    "deepseek": {
+        "fast": DEEPSEEK_DEFAULT_MODEL,
+        "smart": DEEPSEEK_DEFAULT_MODEL,
+    },
+}
+
+
+def _resolve_tier_model(provider: str, tier: str) -> str:
+    if tier not in ("fast", "smart"):
+        raise ValueError(f"tier must be 'fast' or 'smart', got {tier!r}")
+    env_key = f"ISBE_LLM_MODEL_{tier.upper()}"
+    override = os.getenv(env_key, "").strip()
+    if override:
+        return override
+    return _TIER_DEFAULTS.get(provider, _TIER_DEFAULTS["anthropic"])[tier]
+
 
 # Phoenix / OpenTelemetry tracer — best-effort init, no-op if collector unreachable
 # or arize-phoenix-otel not installed. Controlled by PHOENIX_COLLECTOR_ENDPOINT env.
@@ -126,18 +150,21 @@ def complete(
     system: str,
     user: str,
     model: str | None = None,
+    tier: str = "smart",
     trace_id: str | None = None,
     max_tokens: int = 4096,
 ) -> LLMResponse:
     """Dispatch to anthropic or deepseek based on ISBE_LLM_PROVIDER env (default anthropic).
 
+    `tier` selects the model class: "smart" for synthesis / heavy reasoning,
+    "fast" for high-volume cheap calls (per-article reviews, batched extraction).
+    Explicit `model=` always wins for back-compat with callers that pin a model.
+
     When PHOENIX_COLLECTOR_ENDPOINT is set, each call is emitted as an OpenInference-flavored
     LLM span to Phoenix. Without it, tracer is no-op and the call returns normally.
     """
     provider = os.getenv("ISBE_LLM_PROVIDER", "anthropic")
-    resolved_model = model or (
-        DEEPSEEK_DEFAULT_MODEL if provider == "deepseek" else ANTHROPIC_DEFAULT_MODEL
-    )
+    resolved_model = model or _resolve_tier_model(provider, tier)
 
     tracer = _get_tracer()
     if tracer is None:
