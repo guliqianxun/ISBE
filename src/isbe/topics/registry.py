@@ -1,8 +1,10 @@
 from pathlib import Path
 
 import yaml
+from pydantic import ValidationError
 
 from isbe.topics.base import TopicMetadata
+from isbe.topics.config import TopicConfig
 
 
 def _topic_dirs(root: Path):
@@ -14,30 +16,44 @@ def _topic_dirs(root: Path):
             yield sub
 
 
+def _validated(path: Path) -> TopicConfig:
+    """Parse + validate one topic.yaml, attaching file context to errors."""
+    try:
+        return TopicConfig.from_yaml_file(path)
+    except ValidationError as e:
+        raise ValueError(f"invalid topic config at {path}:\n{e}") from e
+
+
 def discover_topics(root: Path) -> list[TopicMetadata]:
-    """Scan root for <id>/topic.yaml files."""
+    """Scan root for <id>/topic.yaml files. Raises on any malformed yaml."""
     if not root.exists():
         return []
     out: list[TopicMetadata] = []
     for sub in _topic_dirs(root):
-        raw = yaml.safe_load((sub / "topic.yaml").read_text(encoding="utf-8")) or {}
+        cfg = _validated(sub / "topic.yaml")
         out.append(
-            TopicMetadata(
-                id=raw["id"],
-                label=raw["label"],
-                cadence=raw["cadence"],
-                active=bool(raw.get("active", True)),
-            )
+            TopicMetadata(id=cfg.id, label=cfg.label, cadence=cfg.cadence, active=cfg.active)
         )
     return out
 
 
 def load_topic_config(root: Path, topic_id: str) -> dict:
-    """Return the full topic.yaml content as a dict for the given topic_id."""
+    """Return the full topic.yaml content as a dict for the given topic_id.
+
+    Kept dict-shaped for backwards compatibility with existing call sites;
+    validation still runs so a malformed yaml fails at load time.
+    Prefer load_topic_config_typed() for new code.
+    """
+    return load_topic_config_typed(root, topic_id).model_dump(exclude_none=True)
+
+
+def load_topic_config_typed(root: Path, topic_id: str) -> TopicConfig:
+    """Typed access to a topic's config. Raises if topic_id is unknown or yaml invalid."""
     for sub in _topic_dirs(root):
+        # Avoid full pydantic parse just to filter by id: cheap yaml read first.
         raw = yaml.safe_load((sub / "topic.yaml").read_text(encoding="utf-8")) or {}
         if raw.get("id") == topic_id:
-            return raw
+            return _validated(sub / "topic.yaml")
     raise KeyError(f"topic {topic_id} not found under {root}")
 
 
