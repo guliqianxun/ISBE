@@ -78,6 +78,23 @@ services:
     ports:
       - "4200:4200"   # only port published to the host
     restart: unless-stopped
+    healthcheck:
+      # Prefect 3's image ships Python + httpx; curl is not installed. Probes
+      # the API's own readiness endpoint — if it goes silent the container is
+      # marked unhealthy and dependents (worker) react.
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - >-
+          import urllib.request, sys;
+          sys.exit(0 if urllib.request.urlopen(
+              'http://localhost:4200/api/health', timeout=5).status == 200
+          else 1)
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     networks: [isbe-net]
 
   uptime-kuma:
@@ -137,7 +154,7 @@ services:
       postgres:
         condition: service_healthy
       prefect-server:
-        condition: service_started
+        condition: service_healthy
       minio:
         condition: service_healthy
     environment:
