@@ -97,3 +97,63 @@ def test_send_returns_false_on_transport_error(monkeypatch):
             excerpt="",
         )
     assert ok is False
+
+
+def test_starttls_rejected_refuses_plaintext_by_default(monkeypatch, capsys):
+    """Security: when STARTTLS fails on port 587, do NOT silently send
+    credentials in cleartext. Return False and warn to stderr."""
+    _set_env(monkeypatch, ISBE_SMTP_USER="u", ISBE_SMTP_PASS="p")
+    fake_srv = MagicMock()
+    fake_srv.starttls.side_effect = __import__("smtplib").SMTPException("no STARTTLS")
+    fake_smtp = MagicMock()
+    fake_smtp.__enter__ = MagicMock(return_value=fake_srv)
+    fake_smtp.__exit__ = MagicMock(return_value=False)
+    with patch("isbe.notify.smtplib.SMTP", return_value=fake_smtp):
+        ok = send_digest_notification(
+            topic_label="x",
+            period_label="2026-W19",
+            artifact_path=None,
+            excerpt="",
+        )
+    assert ok is False
+    fake_srv.send_message.assert_not_called()  # never sent in plaintext
+    fake_srv.login.assert_not_called()         # creds never exposed
+    err = capsys.readouterr().err
+    assert "STARTTLS rejected" in err
+
+
+def test_starttls_rejected_with_explicit_opt_in_sends_plaintext(monkeypatch, capsys):
+    """If the operator explicitly opts in via ISBE_SMTP_ALLOW_PLAINTEXT=1
+    (e.g. trusted localhost relay), plaintext is allowed but warned about."""
+    _set_env(monkeypatch, ISBE_SMTP_ALLOW_PLAINTEXT="1")
+    fake_srv = MagicMock()
+    fake_srv.starttls.side_effect = __import__("smtplib").SMTPException("no STARTTLS")
+    fake_smtp = MagicMock()
+    fake_smtp.__enter__ = MagicMock(return_value=fake_srv)
+    fake_smtp.__exit__ = MagicMock(return_value=False)
+    with patch("isbe.notify.smtplib.SMTP", return_value=fake_smtp):
+        ok = send_digest_notification(
+            topic_label="x",
+            period_label="2026-W19",
+            artifact_path=None,
+            excerpt="",
+        )
+    assert ok is True
+    fake_srv.send_message.assert_called_once()
+    err = capsys.readouterr().err
+    assert "PLAINTEXT" in err  # the warn fires even on opt-in
+
+
+def test_failure_message_goes_to_stderr(monkeypatch, capsys):
+    """Surface failures on stderr — stdout is reserved for ordinary flow logs."""
+    _set_env(monkeypatch)
+    with patch("isbe.notify.smtplib.SMTP", side_effect=OSError("boom")):
+        send_digest_notification(
+            topic_label="x",
+            period_label="2026-W19",
+            artifact_path=None,
+            excerpt="",
+        )
+    captured = capsys.readouterr()
+    assert "boom" in captured.err
+    assert "boom" not in captured.out

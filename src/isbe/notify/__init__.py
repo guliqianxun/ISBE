@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import smtplib
+import sys
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -17,6 +18,12 @@ def is_configured() -> bool:
         os.getenv(k)
         for k in ("ISBE_SMTP_HOST", "ISBE_SMTP_FROM", "ISBE_SMTP_TO")
     )
+
+
+def _warn(msg: str) -> None:
+    """Surface notify failures on stderr so they don't disappear into
+    stdout next to ordinary flow logs."""
+    print(f"[notify] WARN: {msg}", file=sys.stderr)
 
 
 def send_digest_notification(
@@ -64,6 +71,8 @@ def send_digest_notification(
     ]
     msg.set_content("\n".join(body))
 
+    allow_plaintext = os.getenv("ISBE_SMTP_ALLOW_PLAINTEXT", "").strip() == "1"
+
     try:
         if port == 465:
             with smtplib.SMTP_SSL(host, port, timeout=20) as srv:
@@ -76,12 +85,21 @@ def send_digest_notification(
                 try:
                     srv.starttls()
                     srv.ehlo()
-                except smtplib.SMTPException:
-                    pass  # server doesn't support STARTTLS, proceed plain
+                except smtplib.SMTPException as e:
+                    # Refuse to send creds + content over plaintext unless the
+                    # operator explicitly opted in (e.g. localhost relay).
+                    if not allow_plaintext:
+                        _warn(
+                            f"STARTTLS rejected by {host}:{port} ({e}); "
+                            "refusing plaintext send. Set ISBE_SMTP_ALLOW_PLAINTEXT=1 "
+                            "to explicitly allow plaintext (e.g. trusted local relay)."
+                        )
+                        return False
+                    _warn(f"sending over PLAINTEXT to {host}:{port} (opted in)")
                 if user:
                     srv.login(user, password)
                 srv.send_message(msg)
     except Exception as e:  # noqa: BLE001 — notify must never raise
-        print(f"[notify] email send failed: {e}")
+        _warn(f"email send to {host}:{port} failed: {e}")
         return False
     return True
