@@ -162,7 +162,7 @@ def _impl(
 
     facts_block = _build_facts_block(prices, news, filings, today)
     mroot = memory_root()
-    memory_block, memory_index = build_memory_block(mroot)
+    memory_block, memory_index = build_memory_block(mroot, topic_id=TOPIC_ID)
 
     user_prompt = build_finance_prompt(
         period_label=period_label,

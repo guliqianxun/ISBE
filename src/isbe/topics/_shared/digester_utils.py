@@ -43,14 +43,35 @@ def memory_root() -> Path:
     return Path("memory") / uid
 
 
-def build_memory_block(memory_root_path: Path) -> tuple[str, dict]:
-    """Returns (text_block, {name: revision} index) for relevant memory entries."""
+def build_memory_block(
+    memory_root_path: Path,
+    *,
+    topic_id: str | None = None,
+) -> tuple[str, dict]:
+    """Returns (text_block, {name: revision} index) for relevant memory entries.
+
+    When `topic_id` is given, type=topic entries are filtered to those whose
+    `name` equals the topic_id or starts with `<topic_id>.` (sub-document
+    convention, e.g. `nowcasting.theses`). Other topics' notes never enter
+    the prompt — that's the bug this fixes: cross-topic pollution where a
+    video-generation digest sees nowcasting.theses and writes drafts to it.
+
+    type=feedback and type=user are global preferences and always included,
+    regardless of topic_id.
+
+    When `topic_id` is None, behavior is the legacy "load all" — kept so
+    older test fixtures and any non-digester caller don't break silently.
+    """
     index: dict[str, int] = {}
     chunks: list[str] = []
     for entry in load_index(memory_root_path):
         ftype = entry.frontmatter.type
         if ftype.value not in ("topic", "feedback", "user"):
             continue
+        if ftype.value == "topic" and topic_id is not None:
+            name = entry.frontmatter.name
+            if name != topic_id and not name.startswith(f"{topic_id}."):
+                continue
         index[entry.frontmatter.name] = entry.frontmatter.revision
         chunks.append(
             f"--- {entry.frontmatter.name}@rev{entry.frontmatter.revision} "

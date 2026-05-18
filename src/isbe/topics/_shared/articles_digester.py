@@ -146,7 +146,7 @@ def _run_impl(
 
     facts_block = _build_facts_block(articles)
     mroot = memory_root()
-    memory_block, memory_index = build_memory_block(mroot)
+    memory_block, memory_index = build_memory_block(mroot, topic_id=topic_id)
 
     user_prompt = prompt_builder(
         topic_label=topic_label,

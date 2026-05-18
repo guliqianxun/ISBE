@@ -126,7 +126,7 @@ def _digester_impl(
 
     facts_block = _build_facts_block(papers, repos)
     mroot = _memory_root()
-    memory_block, memory_index = build_memory_block(mroot)
+    memory_block, memory_index = build_memory_block(mroot, topic_id=topic_id)
 
     user_prompt = build_digest_prompt(
         topic_label=topic_label,
