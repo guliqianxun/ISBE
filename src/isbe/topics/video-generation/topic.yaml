@@ -21,4 +21,4 @@ digest:
 
 schedules:
   arxiv_collector: "10 6 * * *"          # 错峰：06:10 daily
-  weekly_digester: "30 8 * * 1"          # 周一 08:30
+  digester: "30 8 * * 1"                 # 周一 08:30

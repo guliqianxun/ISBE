@@ -12,25 +12,19 @@ from sqlalchemy import func, select
 
 from isbe.facts.artifacts import Artifact, TopicRun
 from isbe.facts.db import make_session_factory
-from isbe.scheduler import _FLOW_DISPATCH
+from isbe.topics.dispatch import collect_flow_names, digest_flow_names
 from isbe.topics.registry import default_topics_root, discover_topics
 
 
 def _classify_flows() -> tuple[set[str], set[str]]:
-    """Derive {collect,digest} flow-name buckets from scheduler._FLOW_DISPATCH.
-
-    Suffix convention from @flow(name=...): `*-collector` / `*-download-pdfs`
-    → collect; `*-digester` → digest. Unknown suffixes silently ignored
-    (no topic surface for them anyway).
+    """Buckets of {collect, digest} Prefect flow names, discovered from the
+    filesystem registry (per-topic + shared). Also includes the legacy
+    `*-download-pdfs` shape, which lives under topics/<id>/collectors/.
     """
-    collect: set[str] = set()
-    digest: set[str] = set()
-    for flow_fn, _ in _FLOW_DISPATCH.values():
-        name = flow_fn.name
-        if name.endswith("-collector") or name.endswith("-download-pdfs"):
-            collect.add(name)
-        elif name.endswith("-digester"):
-            digest.add(name)
+    collect = collect_flow_names()
+    digest = digest_flow_names()
+    # arxiv-download-pdfs is a collector-class flow but doesn't end in
+    # `-collector`; collect_flow_names already picks it up via dir walk.
     return collect, digest
 
 

@@ -65,4 +65,4 @@ digest:
 
 schedules:
   rss_collector: "0 6 * * *"           # 每日 06:00（积累一周）
-  motorcycle_digester: "0 8 * * 1"     # 周一 08:00 出周报
+  digester: "0 8 * * 1"                # 周一 08:00 出周报

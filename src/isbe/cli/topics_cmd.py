@@ -2,7 +2,8 @@ from datetime import date
 
 import typer
 
-from isbe.topics.registry import default_topics_root, discover_topics, load_topic_config
+from isbe.topics.dispatch import DIGESTER_KEY, DispatchError, resolve_flow
+from isbe.topics.registry import default_topics_root, discover_topics, load_topic_config_typed
 
 topics_app = typer.Typer(help="Topic 管理与执行。")
 
@@ -14,11 +15,41 @@ def topics_list() -> None:
         typer.echo(f"{t.id}\t{t.cadence}\t{marker}\t{t.label}")
 
 
+def _period_label_for(topic_id: str, today: date, override: str | None) -> str:
+    if override:
+        return override
+    # NVDA / any daily topic: ISO date. Weekly topics: ISO year-week.
+    cfg = load_topic_config_typed(default_topics_root(), topic_id)
+    if cfg.cadence.startswith("daily"):
+        return today.isoformat()
+    year, week, _ = today.isocalendar()
+    return f"{year}-W{week:02d}"
+
+
+def _digester_params(topic_id: str, period_label: str, today: date) -> dict:
+    """Build the kwargs a digester flow expects given its signature.
+
+    The dispatch module returns the flow + a base param set (with topic_id
+    only if the signature accepts it). The CLI additionally passes period_label
+    and today when the flow accepts them.
+    """
+    import inspect
+
+    flow_fn, params = resolve_flow(topic_id, DIGESTER_KEY)
+    sig_params = inspect.signature(flow_fn).parameters
+    extras: dict = {}
+    if "period_label" in sig_params:
+        extras["period_label"] = period_label
+    if "today" in sig_params:
+        extras["today"] = today
+    return flow_fn, {**params, **extras}
+
+
 @topics_app.command("run")
 def topics_run(
     topic_id: str,
-    collect: bool = typer.Option(False, "--collect", help="Run collectors (downloads PDFs by default)"),
-    digest: bool = typer.Option(False, "--digest", help="Run digester only"),
+    collect: bool = typer.Option(False, "--collect", help="Run collectors"),
+    digest: bool = typer.Option(False, "--digest", help="Run digester"),
     no_pdfs: bool = typer.Option(
         False, "--no-pdfs", help="Skip the auto-PDF-download chained after --collect"
     ),
@@ -38,68 +69,46 @@ def topics_run(
         typer.echo("specify --collect / --digest", err=True)
         raise typer.Exit(code=1)
 
-    cfg = load_topic_config(root, topic_id)
-    has_arxiv = bool(cfg.get("arxiv"))
-    has_rss = bool(cfg.get("rss"))
-    has_crawl4ai = bool(cfg.get("crawl4ai"))
+    cfg = load_topic_config_typed(root, topic_id)
 
     if collect:
-        if topic_id == "nvda":
-            from isbe.topics.nvda.collectors.news import nvda_news_collector
-            from isbe.topics.nvda.collectors.prices import nvda_prices_collector
-            from isbe.topics.nvda.collectors.sec import nvda_sec_collector
-            n_prices = nvda_prices_collector()
-            n_news = nvda_news_collector()
-            n_sec = nvda_sec_collector()
-            typer.echo(f"prices: {n_prices} new / news: {n_news} new / sec: {n_sec} new")
-        elif has_rss or has_crawl4ai:
-            n_articles = 0
-            if has_rss:
-                from isbe.topics._shared.rss import rss_collector
-                n_articles += rss_collector(topic_id=topic_id)
-            if has_crawl4ai:
-                from isbe.topics._shared.crawl4ai_collector import crawl4ai_collector
-                n_articles += crawl4ai_collector(topic_id=topic_id)
-            typer.echo(f"articles: {n_articles} new")
-        else:
-            from isbe.topics._shared.arxiv import arxiv_collector
-            n_arxiv = arxiv_collector(topic_id=topic_id) if has_arxiv else 0
-            n_gh = 0
-            if topic_id == "nowcasting":
-                from isbe.topics.nowcasting.collectors.github import github_collector
-                n_gh = github_collector()
-            typer.echo(f"arxiv: {n_arxiv} new / github: {n_gh} new")
+        # Every schedule_key in yaml that isn't the digester is treated as a
+        # collector. Run each one; report row counts.
+        counts: list[str] = []
+        for key in cfg.schedules:
+            if key == DIGESTER_KEY or key == "arxiv_download_pdfs":
+                continue
+            try:
+                flow_fn, params = resolve_flow(topic_id, key)
+            except DispatchError as e:
+                typer.echo(f"WARN {key}: {e}", err=True)
+                continue
+            n = flow_fn(**params)
+            counts.append(f"{key}: {n} new")
+        if counts:
+            typer.echo(" / ".join(counts))
 
-        # Chain PDF download for arxiv-backed topics by default (--no-pdfs to skip).
-        if has_arxiv and not no_pdfs:
-            from isbe.topics.nowcasting.collectors.arxiv import arxiv_download_pdfs
-            n = arxiv_download_pdfs(
-                topic_id=topic_id, limit=pdf_limit, period_label=period_label
-            )
+        # arXiv PDF chain: only if the topic has an arxiv block AND yaml
+        # declares the download schedule (single source of truth).
+        if (
+            cfg.arxiv is not None
+            and "arxiv_download_pdfs" in cfg.schedules
+            and not no_pdfs
+        ):
+            flow_fn, base = resolve_flow(topic_id, "arxiv_download_pdfs")
+            extra = {}
+            import inspect
+            sig = inspect.signature(flow_fn).parameters
+            if "limit" in sig:
+                extra["limit"] = pdf_limit
+            if "period_label" in sig:
+                extra["period_label"] = period_label
+            n = flow_fn(**{**base, **extra})
             typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
 
     if digest:
         today = date.fromisoformat(today_str) if today_str else date.today()
-        if topic_id == "nvda":
-            from isbe.topics.nvda.digester import daily_digester
-            label = period_label or today.isoformat()
-            result = daily_digester(period_label=label, today=today)
-            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
-        elif topic_id == "motorcycle":
-            from isbe.topics.motorcycle.digester import motorcycle_digester
-            year, week, _ = today.isocalendar()
-            label = period_label or f"{year}-W{week:02d}"
-            result = motorcycle_digester(period_label=label, today=today)
-            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
-        elif topic_id == "china-tech":
-            from isbe.topics.china_tech.digester import china_tech_digester
-            year, week, _ = today.isocalendar()
-            label = period_label or f"{year}-W{week:02d}"
-            result = china_tech_digester(period_label=label, today=today)
-            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
-        else:
-            from isbe.topics._shared.digester import weekly_digester
-            year, week, _ = today.isocalendar()
-            label = period_label or f"{year}-W{week:02d}"
-            result = weekly_digester(topic_id=topic_id, period_label=label, today=today)
-            typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
+        label = _period_label_for(topic_id, today, period_label)
+        flow_fn, params = _digester_params(topic_id, label, today)
+        result = flow_fn(**params)
+        typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")

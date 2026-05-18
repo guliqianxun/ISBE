@@ -42,4 +42,4 @@ schedules:
   nvda_prices_collector: "30 22 * * 1-5"
   nvda_news_collector:   "0,30 * * * *"      # hourly+30 — news pace is faster than prices
   nvda_sec_collector:    "0 23 * * 1-5"
-  daily_digester:        "30 23 * * 1-5"     # ~7:30 next-day Beijing time
+  digester:              "30 23 * * 1-5"     # ~7:30 next-day Beijing time

@@ -35,6 +35,8 @@ from isbe.topics.registry import default_topics_root, load_topic_config
 TOPIC_ID = "motorcycle"
 TEMPLATE_PATH = Path(__file__).parent / "templates" / "weekly.j2"
 
+# Canonical entry point picked up by topics.dispatch — assigned below.
+
 
 def _build_facts_block(articles: list) -> str:
     if not articles:
@@ -193,3 +195,6 @@ def _impl(
         fingerprint={**fingerprint, "artifact_id": str(artifact_id)},
         pending_drafts=drafts,
     )
+
+
+digest = motorcycle_digester

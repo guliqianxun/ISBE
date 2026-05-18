@@ -42,6 +42,9 @@ from isbe.topics.registry import default_topics_root, load_topic_config
 TOPIC_ID = "nvda"
 TEMPLATE_PATH = Path(__file__).parent / "templates" / "daily.j2"
 
+# Canonical entry point picked up by topics.dispatch (see PR #1). Assigned at
+# the bottom of this module after daily_digester is defined.
+
 
 def _build_facts_block(
     prices: list, news: list, filings: list, today: date
@@ -254,3 +257,6 @@ def _impl(
         fingerprint={**fingerprint, "artifact_id": str(artifact_id)},
         pending_drafts=drafts,
     )
+
+
+digest = daily_digester

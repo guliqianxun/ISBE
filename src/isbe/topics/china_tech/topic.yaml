@@ -43,4 +43,4 @@ digest:
 
 schedules:
   rss_collector: "0 6 * * *"             # 每日 06:00（积累一周）
-  china_tech_digester: "0 9 * * 1"       # 周一 09:00 出周报
+  digester: "0 9 * * 1"                  # 周一 09:00 出周报
