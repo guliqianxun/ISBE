@@ -18,7 +18,10 @@ updated_at: 2026-05-20
   分支 `feat/email-digest-delivery`，2 commit，11/11 notify 测试通过。
 - **Notify**: `.env.example` 新增 7 项 `ISBE_SMTP_*`；邮件正文从「路径+excerpt」升级为承载 digest 全文。
 - **Dispatch**: 新建 [dsp-003](communications/dsp-003-server-smtp-live-test.md) —— 用户在 server 上配 SMTP `.env` + 触发 nvda digest + 验收落箱。
-- **PM 内部经验**: 派遣 executor 时应显式要求在结束前打印分支 + 全部 commit SHA，避免中间步骤掉链（首个 agent 漏了第二个 commit）。
+- **Hotfix**: [dsp-004](communications/dsp-004-compose-smtp-env-passthrough.md) → ✅ ——
+  server 实测发现 `.env` 改完 `up -d` 容器内仍无 `ISBE_SMTP_*`，根因是 `docker-compose.yml`
+  的 `radar-worker.environment:` 块漏了透传。补 7 行后修复（[rpt-004](communications/rpt-004-compose-fix-report.md)）。
+- **PM 内部经验**: 派遣 executor 时应显式要求在结束前打印分支 + 全部 commit SHA + diff + 验证命令输出，避免中间步骤掉链。该约束本次（dsp-004）有效，agent 一次性收尾。
 
 ## 2026-05-22
 

@@ -1,7 +1,7 @@
 {
   "project": {
     "name": "ISBE",
-    "generated_at": "2026-05-23T07:10:18Z",
+    "generated_at": "2026-05-23T09:40:52Z",
     "pm_root": "docs/pm"
   },
   "documents": [
@@ -40,12 +40,12 @@
         {
           "title": "2026-05-22",
           "level": 2,
-          "line": 23
+          "line": 26
         },
         {
           "title": "2026-05-20",
           "level": 2,
-          "line": 31
+          "line": 34
         }
       ],
       "task_count": 0,
@@ -340,6 +340,67 @@
       "open_tasks": 4
     },
     {
+      "id": "dsp-004",
+      "type": "dispatch",
+      "title": "任务: 修复 docker-compose 未透传 `ISBE_SMTP_*` 到 radar-worker",
+      "status": "completed",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "ops",
+      "action": "fix",
+      "feature": "ft-001",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/dsp-004-compose-smtp-env-passthrough.md",
+      "frontmatter_line_end": 12,
+      "headings": [
+        {
+          "title": "任务: 修复 docker-compose 未透传 `ISBE_SMTP_*` 到 radar-worker",
+          "level": 1,
+          "line": 14
+        },
+        {
+          "title": "背景",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "title": "要求",
+          "level": 2,
+          "line": 30
+        },
+        {
+          "title": "不做",
+          "level": 2,
+          "line": 49
+        },
+        {
+          "title": "验收标准",
+          "level": 2,
+          "line": 56
+        },
+        {
+          "title": "参考",
+          "level": 2,
+          "line": 63
+        },
+        {
+          "title": "结果（2026-05-23）✅ completed",
+          "level": 2,
+          "line": 69
+        }
+      ],
+      "task_count": 3,
+      "open_tasks": 0
+    },
+    {
       "id": "rpt-001",
       "type": "report",
       "title": "报告: 服务器更新至最新代码并重启 — 完成",
@@ -466,6 +527,62 @@
           "title": "办法 B：清理 worktree 后再切分支",
           "level": 1,
           "line": 79
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "rpt-004",
+      "type": "report",
+      "title": "报告: docker-compose `ISBE_SMTP_*` 透传修复 — 完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "ft-001",
+      "dispatch_ref": "dsp-004",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/rpt-004-compose-fix-report.md",
+      "frontmatter_line_end": 9,
+      "headings": [
+        {
+          "title": "报告: docker-compose `ISBE_SMTP_*` 透传修复 — 完成",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "title": "摘要",
+          "level": 2,
+          "line": 13
+        },
+        {
+          "title": "交付",
+          "level": 2,
+          "line": 20
+        },
+        {
+          "title": "派遣过程小记（PM 留档）",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "title": "根因复盘",
+          "level": 2,
+          "line": 47
+        },
+        {
+          "title": "用户下一步（自动续上 dsp-003）",
+          "level": 2,
+          "line": 53
         }
       ],
       "task_count": 0,
@@ -676,6 +793,20 @@
       "line": 12
     },
     {
+      "id": "dsp-004",
+      "type": "dispatch",
+      "title": "任务: 修复 docker-compose 未透传 `ISBE_SMTP_*` 到 radar-worker",
+      "status": "completed",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "ops",
+      "feature": "ft-001",
+      "file": "communications/dsp-004-compose-smtp-env-passthrough.md",
+      "line": 13
+    },
+    {
       "id": "rpt-001",
       "type": "report",
       "title": "报告: 服务器更新至最新代码并重启 — 完成",
@@ -701,6 +832,20 @@
       "target": "",
       "feature": "ft-001",
       "file": "communications/rpt-002-email-mvp-report.md",
+      "line": 10
+    },
+    {
+      "id": "rpt-004",
+      "type": "report",
+      "title": "报告: docker-compose `ISBE_SMTP_*` 透传修复 — 完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "",
+      "feature": "ft-001",
+      "file": "communications/rpt-004-compose-fix-report.md",
       "line": 10
     },
     {
