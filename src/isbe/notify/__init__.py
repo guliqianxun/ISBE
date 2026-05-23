@@ -11,6 +11,8 @@ import sys
 from email.message import EmailMessage
 from pathlib import Path
 
+from isbe.notify.render import render_html  # noqa: F401 — re-exported for patching in tests
+
 
 def is_configured() -> bool:
     """True iff the three required env vars are set: HOST + FROM + TO."""
@@ -86,10 +88,24 @@ def send_digest_notification(
             _warn(f"failed to read artifact {artifact_path}: {e}; falling back to excerpt")
             full_text = None
     if full_text is not None:
-        body = header + ["--- digest ---", full_text]
+        plaintext_body = "\n".join(header + ["--- digest ---", full_text])
     else:
-        body = header + ["--- excerpt ---", excerpt]
-    msg.set_content("\n".join(body))
+        plaintext_body = "\n".join(header + ["--- excerpt ---", excerpt])
+    msg.set_content(plaintext_body)
+
+    # When artifact is readable, attempt to add an HTML alternative (multipart).
+    # HTML rendering failure → warn + continue with plaintext-only. Never raises.
+    if full_text is not None:
+        try:
+            html_body = render_html(
+                topic_label=topic_label,
+                period_label=period_label,
+                artifact_md=full_text,
+                artifact_path=artifact_path,
+            )
+            msg.add_alternative(html_body, subtype="html")
+        except Exception as e:  # noqa: BLE001 — notify must never raise
+            _warn(f"HTML render failed; sending plaintext only: {e}")
 
     allow_plaintext = os.getenv("ISBE_SMTP_ALLOW_PLAINTEXT", "").strip() == "1"
 
