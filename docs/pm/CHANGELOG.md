@@ -11,6 +11,16 @@ updated_at: 2026-05-20
 > 项目级聚合历史。逐次迭代/特性的状态变更汇总于此。
 > 更早的工程进度见 `docs/superpowers/PROGRESS.md` 与 `docs/superpowers/archive/`。
 
+## 2026-05-23 (晚-2)
+
+- **Milestone**: 新开 **v1.2「邮件订阅体验升级」🚧 WIP**。
+- **Brand**: ISBE 首次定义视觉品牌 —— **学术墨色** (Academic Ink)。完整规范写入
+  [ft-002](features/ft-002-email-html-rendering.md)，后续凡视觉产物（邮件 / 未来 dashboard）回引。
+- **Feature**: 新建 [ft-002 邮件 HTML 渲染](features/ft-002-email-html-rendering.md)，
+  接 ft-001 用户反馈（raw markdown 在邮件客户端可读性差）。
+- **Dispatch**: [dsp-005](communications/dsp-005-email-html-mvp.md) 派 executor agent
+  在 worktree 实现（markdown + premailer + jinja2 + multipart/alternative + 学术墨色模板）。
+
 ## 2026-05-23 (晚)
 
 - **Milestone**: **v1.1「投递与运维」🚀 Shipped** —— 唯一计划特性 ft-001 闭环。

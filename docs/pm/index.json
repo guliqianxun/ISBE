@@ -1,7 +1,7 @@
 {
   "project": {
     "name": "ISBE",
-    "generated_at": "2026-05-23T09:52:55Z",
+    "generated_at": "2026-05-23T10:18:02Z",
     "pm_root": "docs/pm"
   },
   "documents": [
@@ -33,24 +33,29 @@
           "line": 9
         },
         {
-          "title": "2026-05-23 (晚)",
+          "title": "2026-05-23 (晚-2)",
           "level": 2,
           "line": 14
         },
         {
+          "title": "2026-05-23 (晚)",
+          "level": 2,
+          "line": 24
+        },
+        {
           "title": "2026-05-23",
           "level": 2,
-          "line": 22
+          "line": 32
         },
         {
           "title": "2026-05-22",
           "level": 2,
-          "line": 34
+          "line": 44
         },
         {
           "title": "2026-05-20",
           "level": 2,
-          "line": 42
+          "line": 52
         }
       ],
       "task_count": 0,
@@ -411,6 +416,87 @@
       "open_tasks": 0
     },
     {
+      "id": "dsp-005",
+      "type": "dispatch",
+      "title": "任务: 邮件 HTML 渲染 MVP —— 学术墨色",
+      "status": "pending",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "notify",
+      "action": "develop",
+      "feature": "ft-002",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/dsp-005-email-html-mvp.md",
+      "frontmatter_line_end": 11,
+      "headings": [
+        {
+          "title": "任务: 邮件 HTML 渲染 MVP —— 学术墨色",
+          "level": 1,
+          "line": 13
+        },
+        {
+          "title": "背景",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "title": "要求",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "title": "1. 新增依赖",
+          "level": 3,
+          "line": 23
+        },
+        {
+          "title": "2. 渲染模块 `src/isbe/notify/render.py`（新文件）",
+          "level": 3,
+          "line": 34
+        },
+        {
+          "title": "3. 修改 `src/isbe/notify/__init__.py`",
+          "level": 3,
+          "line": 59
+        },
+        {
+          "title": "4. 测试 `tests/test_notify_email.py`（扩充）",
+          "level": 3,
+          "line": 76
+        },
+        {
+          "title": "5. 分支 + commit",
+          "level": 3,
+          "line": 93
+        },
+        {
+          "title": "严格不做",
+          "level": 2,
+          "line": 106
+        },
+        {
+          "title": "验收标准（你 PM 验收）",
+          "level": 2,
+          "line": 115
+        },
+        {
+          "title": "参考",
+          "level": 2,
+          "line": 131
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
       "id": "rpt-001",
       "type": "report",
       "title": "报告: 服务器更新至最新代码并重启 — 完成",
@@ -698,6 +784,131 @@
       "open_tasks": 0
     },
     {
+      "id": "ft-002",
+      "type": "feature",
+      "title": "邮件 HTML 渲染（学术墨色 brand）",
+      "status": "planned",
+      "priority": "P1",
+      "milestone": "v1.2",
+      "parent": "ep-delivery",
+      "project": "",
+      "domain": [
+        "notify"
+      ],
+      "depends_on": [
+        "ft-001"
+      ],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "features/ft-002-email-html-rendering.md",
+      "frontmatter_line_end": 17,
+      "headings": [
+        {
+          "title": "邮件 HTML 渲染（学术墨色 brand）",
+          "level": 1,
+          "line": 19
+        },
+        {
+          "title": "概述",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "title": "品牌规范（学术墨色 / Academic Ink）",
+          "level": 2,
+          "line": 35
+        },
+        {
+          "title": "调色板",
+          "level": 3,
+          "line": 39
+        },
+        {
+          "title": "字体栈",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "title": "排版",
+          "level": 3,
+          "line": 63
+        },
+        {
+          "title": "信封（envelope）",
+          "level": 3,
+          "line": 75
+        },
+        {
+          "title": "范围",
+          "level": 2,
+          "line": 91
+        },
+        {
+          "title": "MVP",
+          "level": 3,
+          "line": 93
+        },
+        {
+          "title": "拉伸目标（不在本期）",
+          "level": 3,
+          "line": 104
+        },
+        {
+          "title": "不做",
+          "level": 3,
+          "line": 111
+        },
+        {
+          "title": "需求",
+          "level": 2,
+          "line": 119
+        },
+        {
+          "title": "功能需求",
+          "level": 3,
+          "line": 121
+        },
+        {
+          "title": "非功能需求",
+          "level": 3,
+          "line": 127
+        },
+        {
+          "title": "验收标准",
+          "level": 2,
+          "line": 132
+        },
+        {
+          "title": "任务分工",
+          "level": 2,
+          "line": 141
+        },
+        {
+          "title": "依赖关系",
+          "level": 2,
+          "line": 148
+        },
+        {
+          "title": "变更记录",
+          "level": 2,
+          "line": 153
+        },
+        {
+          "title": "备注",
+          "level": 2,
+          "line": 159
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
       "id": "roadmap-main",
       "type": "roadmap",
       "title": "ISBE — Roadmap",
@@ -745,14 +956,24 @@
           "line": 53
         },
         {
-          "title": "Backlog（待规划）",
+          "title": "v1.2 — 邮件订阅体验升级（🚧 WIP）",
           "level": 2,
           "line": 61
         },
         {
+          "title": "Epic: 主动投递（Delivery）",
+          "level": 3,
+          "line": 67
+        },
+        {
+          "title": "Backlog（待规划）",
+          "level": 2,
+          "line": 75
+        },
+        {
           "title": "版本概览",
           "level": 2,
-          "line": 76
+          "line": 90
         }
       ],
       "task_count": 0,
@@ -817,6 +1038,20 @@
       "line": 13
     },
     {
+      "id": "dsp-005",
+      "type": "dispatch",
+      "title": "任务: 邮件 HTML 渲染 MVP —— 学术墨色",
+      "status": "pending",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "notify",
+      "feature": "ft-002",
+      "file": "communications/dsp-005-email-html-mvp.md",
+      "line": 12
+    },
+    {
       "id": "rpt-001",
       "type": "report",
       "title": "报告: 服务器更新至最新代码并重启 — 完成",
@@ -874,6 +1109,22 @@
       "feature": "",
       "file": "features/ft-001-email-digest-delivery.md",
       "line": 19
+    },
+    {
+      "id": "ft-002",
+      "type": "feature",
+      "title": "邮件 HTML 渲染（学术墨色 brand）",
+      "status": "planned",
+      "priority": "P1",
+      "milestone": "v1.2",
+      "parent": "ep-delivery",
+      "domain": [
+        "notify"
+      ],
+      "target": "",
+      "feature": "",
+      "file": "features/ft-002-email-html-rendering.md",
+      "line": 18
     }
   ],
   "errors": []
