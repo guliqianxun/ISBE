@@ -39,13 +39,19 @@ def send_digest_notification(
     configuration miss or transport failure. **Never raises** —
     digester pipelines must not fail because of notify side-effects.
 
+    Body: if ``artifact_path`` exists and is readable, the full file
+    contents (typically the rendered ``latest.md``) are embedded after a
+    short header. Otherwise the body falls back to the ``excerpt`` line,
+    so notify still delivers something even when the artifact is missing.
+
     Env contract:
-      ISBE_SMTP_HOST     (required)
-      ISBE_SMTP_FROM     (required)
-      ISBE_SMTP_TO       (required, single recipient — comma-list TBD)
-      ISBE_SMTP_PORT     (default 587 → STARTTLS; 465 → SMTP_SSL)
-      ISBE_SMTP_USER     (optional — login if set)
-      ISBE_SMTP_PASS     (optional)
+      ISBE_SMTP_HOST            (required)
+      ISBE_SMTP_FROM            (required)
+      ISBE_SMTP_TO              (required, single recipient — comma-list TBD)
+      ISBE_SMTP_PORT            (default 587 → STARTTLS; 465 → SMTP_SSL)
+      ISBE_SMTP_USER            (optional — login if set)
+      ISBE_SMTP_PASS            (optional)
+      ISBE_SMTP_ALLOW_PLAINTEXT (=1 to allow plaintext when STARTTLS rejected)
     """
     if not is_configured():
         return False
@@ -61,14 +67,28 @@ def send_digest_notification(
     msg["Subject"] = f"[ISBE] {topic_label} — {period_label}"
     msg["From"] = sender
     msg["To"] = recipient
-    body = [
+    header = [
         f"Topic:    {topic_label}",
         f"Period:   {period_label}",
         f"Artifact: {artifact_path if artifact_path else '(no local mirror)'}",
         "",
-        "--- excerpt ---",
-        excerpt,
     ]
+    # Prefer embedding the full digest (e.g. latest.md) so recipients can read
+    # the digest without server-side file access. Fall back to excerpt if the
+    # artifact is missing or unreadable. Reads MUST NOT raise — notify contract.
+    full_text: str | None = None
+    if artifact_path is not None:
+        try:
+            p = Path(artifact_path)
+            if p.is_file():
+                full_text = p.read_text(encoding="utf-8")
+        except Exception as e:  # noqa: BLE001 — notify must never raise
+            _warn(f"failed to read artifact {artifact_path}: {e}; falling back to excerpt")
+            full_text = None
+    if full_text is not None:
+        body = header + ["--- digest ---", full_text]
+    else:
+        body = header + ["--- excerpt ---", excerpt]
     msg.set_content("\n".join(body))
 
     allow_plaintext = os.getenv("ISBE_SMTP_ALLOW_PLAINTEXT", "").strip() == "1"
