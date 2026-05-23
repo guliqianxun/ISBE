@@ -1,0 +1,725 @@
+{
+  "project": {
+    "name": "ISBE",
+    "generated_at": "2026-05-23T07:10:18Z",
+    "pm_root": "docs/pm"
+  },
+  "documents": [
+    {
+      "id": "changelog-main",
+      "type": "changelog",
+      "title": "ISBE — Changelog",
+      "status": "",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "project": "ISBE",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "CHANGELOG.md",
+      "frontmatter_line_end": 7,
+      "headings": [
+        {
+          "title": "ISBE — Changelog",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "title": "2026-05-23",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "title": "2026-05-22",
+          "level": 2,
+          "line": 23
+        },
+        {
+          "title": "2026-05-20",
+          "level": 2,
+          "line": 31
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "dsp-001",
+      "type": "dispatch",
+      "title": "任务: 服务器更新至最新代码并重启 radar-worker",
+      "status": "completed",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "ops",
+      "action": "deploy",
+      "feature": "-",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/dsp-001-deploy-latest-code.md",
+      "frontmatter_line_end": 12,
+      "headings": [
+        {
+          "title": "任务: 服务器更新至最新代码并重启 radar-worker",
+          "level": 1,
+          "line": 14
+        },
+        {
+          "title": "背景",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "title": "要求",
+          "level": 2,
+          "line": 32
+        },
+        {
+          "title": "1. 预览并拉取最新代码",
+          "level": 1,
+          "line": 39
+        },
+        {
+          "title": "2. 重建 radar 镜像（含 tenacity 等新依赖）",
+          "level": 1,
+          "line": 44
+        },
+        {
+          "title": "3. 应用 DB 迁移（幂等；近 10 个提交未新增 alembic 迁移，预期 no-op，可安全执行）",
+          "level": 1,
+          "line": 48
+        },
+        {
+          "title": "4. 用新镜像重建并重启 worker",
+          "level": 1,
+          "line": 52
+        },
+        {
+          "title": "验收标准",
+          "level": 2,
+          "line": 61
+        },
+        {
+          "title": "A. worker 在跑且新镜像",
+          "level": 1,
+          "line": 64
+        },
+        {
+          "title": "B. 启动日志干净",
+          "level": 1,
+          "line": 68
+        },
+        {
+          "title": "回滚",
+          "level": 2,
+          "line": 77
+        },
+        {
+          "title": "参考",
+          "level": 2,
+          "line": 83
+        },
+        {
+          "title": "结果（2026-05-22）✅ completed",
+          "level": 2,
+          "line": 90
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "dsp-002",
+      "type": "dispatch",
+      "title": "任务: 邮件 digest 投递 MVP —— nvda 单 topic 试水",
+      "status": "completed",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "notify",
+      "action": "develop",
+      "feature": "ft-001",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/dsp-002-email-digest-mvp.md",
+      "frontmatter_line_end": 12,
+      "headings": [
+        {
+          "title": "任务: 邮件 digest 投递 MVP —— nvda 单 topic 试水",
+          "level": 1,
+          "line": 14
+        },
+        {
+          "title": "背景",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "title": "要求",
+          "level": 2,
+          "line": 22
+        },
+        {
+          "title": "验收标准",
+          "level": 2,
+          "line": 39
+        },
+        {
+          "title": "参考",
+          "level": 2,
+          "line": 46
+        },
+        {
+          "title": "结果（2026-05-23）✅ completed（代码部分）",
+          "level": 2,
+          "line": 52
+        }
+      ],
+      "task_count": 4,
+      "open_tasks": 0
+    },
+    {
+      "id": "dsp-003",
+      "type": "dispatch",
+      "title": "任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱",
+      "status": "pending",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "user",
+      "action": "verify",
+      "feature": "ft-001",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/dsp-003-server-smtp-live-test.md",
+      "frontmatter_line_end": 11,
+      "headings": [
+        {
+          "title": "任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱",
+          "level": 1,
+          "line": 13
+        },
+        {
+          "title": "背景",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "title": "前置条件",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "title": "要求",
+          "level": 2,
+          "line": 29
+        },
+        {
+          "title": "1. 合并分支到 main（本机）",
+          "level": 3,
+          "line": 31
+        },
+        {
+          "title": "清理 worktree（释放分支）",
+          "level": 1,
+          "line": 36
+        },
+        {
+          "title": "合并 + 推",
+          "level": 1,
+          "line": 39
+        },
+        {
+          "title": "2. server 上更新代码 + `.env` 加 SMTP 凭据",
+          "level": 3,
+          "line": 45
+        },
+        {
+          "title": "编辑 .env，新增 7 项（参照 .env.example）：",
+          "level": 1,
+          "line": 52
+        },
+        {
+          "title": "ISBE_SMTP_HOST=...        # 例如 smtp.qq.com / smtp.163.com / smtp.gmail.com",
+          "level": 1,
+          "line": 53
+        },
+        {
+          "title": "ISBE_SMTP_PORT=587        # STARTTLS；465 走 SSL",
+          "level": 1,
+          "line": 54
+        },
+        {
+          "title": "ISBE_SMTP_FROM=...        # 发件人地址（通常 = USER）",
+          "level": 1,
+          "line": 55
+        },
+        {
+          "title": "ISBE_SMTP_TO=...          # 收件人（你自己的邮箱）",
+          "level": 1,
+          "line": 56
+        },
+        {
+          "title": "ISBE_SMTP_USER=...        # 登录账号",
+          "level": 1,
+          "line": 57
+        },
+        {
+          "title": "ISBE_SMTP_PASS=...        # 授权码（不是邮箱登录密码）",
+          "level": 1,
+          "line": 58
+        },
+        {
+          "title": "# ISBE_SMTP_ALLOW_PLAINTEXT=1   # 只有走本地受信中继才开",
+          "level": 1,
+          "line": 59
+        },
+        {
+          "title": "3. 手动触发一次 nvda digest",
+          "level": 3,
+          "line": 71
+        },
+        {
+          "title": "进容器跑 CLI（避免本机依赖问题）",
+          "level": 1,
+          "line": 76
+        },
+        {
+          "title": "4. 验收落箱",
+          "level": 3,
+          "line": 84
+        },
+        {
+          "title": "验收标准",
+          "level": 2,
+          "line": 90
+        },
+        {
+          "title": "失败回报",
+          "level": 2,
+          "line": 97
+        },
+        {
+          "title": "完成后",
+          "level": 2,
+          "line": 103
+        },
+        {
+          "title": "参考",
+          "level": 2,
+          "line": 108
+        }
+      ],
+      "task_count": 4,
+      "open_tasks": 4
+    },
+    {
+      "id": "rpt-001",
+      "type": "report",
+      "title": "报告: 服务器更新至最新代码并重启 — 完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "-",
+      "dispatch_ref": "dsp-001",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/rpt-001-deploy-report.md",
+      "frontmatter_line_end": 9,
+      "headings": [
+        {
+          "title": "报告: 服务器更新至最新代码并重启 — 完成",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "title": "摘要",
+          "level": 2,
+          "line": 13
+        },
+        {
+          "title": "执行记录",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "title": "验收结果",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "title": "发现 / 遗留",
+          "level": 2,
+          "line": 34
+        },
+        {
+          "title": "状态变更",
+          "level": 2,
+          "line": 45
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "rpt-002",
+      "type": "report",
+      "title": "报告: 邮件 digest 投递 MVP — 代码部分完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "ft-001",
+      "dispatch_ref": "dsp-002",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/rpt-002-email-mvp-report.md",
+      "frontmatter_line_end": 9,
+      "headings": [
+        {
+          "title": "报告: 邮件 digest 投递 MVP — 代码部分完成",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "title": "摘要",
+          "level": 2,
+          "line": 13
+        },
+        {
+          "title": "交付",
+          "level": 2,
+          "line": 20
+        },
+        {
+          "title": "验收",
+          "level": 2,
+          "line": 40
+        },
+        {
+          "title": "测试结果",
+          "level": 2,
+          "line": 49
+        },
+        {
+          "title": "派遣过程小记（PM 留档）",
+          "level": 2,
+          "line": 59
+        },
+        {
+          "title": "状态变更",
+          "level": 2,
+          "line": 65
+        },
+        {
+          "title": "用户如何审阅这个分支",
+          "level": 2,
+          "line": 71
+        },
+        {
+          "title": "办法 A：直接看 diff（无需切分支）",
+          "level": 1,
+          "line": 76
+        },
+        {
+          "title": "办法 B：清理 worktree 后再切分支",
+          "level": 1,
+          "line": 79
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "ft-001",
+      "type": "feature",
+      "title": "邮件 digest 投递（订阅邮件）",
+      "status": "wip",
+      "priority": "P1",
+      "milestone": "v1.1",
+      "parent": "ep-delivery",
+      "project": "",
+      "domain": [
+        "notify",
+        "digester"
+      ],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "features/ft-001-email-digest-delivery.md",
+      "frontmatter_line_end": 17,
+      "headings": [
+        {
+          "title": "邮件 digest 投递（订阅邮件）",
+          "level": 1,
+          "line": 19
+        },
+        {
+          "title": "概述",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "title": "范围",
+          "level": 2,
+          "line": 47
+        },
+        {
+          "title": "MVP（本特性当前目标）—— nvda 单 topic 试水",
+          "level": 3,
+          "line": 49
+        },
+        {
+          "title": "拉伸目标（非 MVP，验证通过后再排）",
+          "level": 3,
+          "line": 59
+        },
+        {
+          "title": "不做",
+          "level": 3,
+          "line": 65
+        },
+        {
+          "title": "需求",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "title": "功能需求",
+          "level": 3,
+          "line": 72
+        },
+        {
+          "title": "非功能需求",
+          "level": 3,
+          "line": 77
+        },
+        {
+          "title": "验收标准",
+          "level": 2,
+          "line": 81
+        },
+        {
+          "title": "任务分工",
+          "level": 2,
+          "line": 88
+        },
+        {
+          "title": "依赖关系",
+          "level": 2,
+          "line": 97
+        },
+        {
+          "title": "变更记录",
+          "level": 2,
+          "line": 103
+        },
+        {
+          "title": "备注",
+          "level": 2,
+          "line": 110
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "roadmap-main",
+      "type": "roadmap",
+      "title": "ISBE — Roadmap",
+      "status": "wip",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "project": "ISBE",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "",
+      "dispatch_ref": "",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "ROADMAP.md",
+      "frontmatter_line_end": 10,
+      "headings": [
+        {
+          "title": "ISBE — Roadmap",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "title": "已交付 — 核心管线（P0–P2，🚀 Shipped）",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "title": "v1.1 — 投递与运维（🚧 WIP）",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "title": "Epic: 主动投递（Delivery）",
+          "level": 3,
+          "line": 47
+        },
+        {
+          "title": "Epic: 运维（Ops）",
+          "level": 3,
+          "line": 53
+        },
+        {
+          "title": "Backlog（待规划）",
+          "level": 2,
+          "line": 61
+        },
+        {
+          "title": "版本概览",
+          "level": 2,
+          "line": 76
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    }
+  ],
+  "items": [
+    {
+      "id": "dsp-001",
+      "type": "dispatch",
+      "title": "任务: 服务器更新至最新代码并重启 radar-worker",
+      "status": "completed",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "ops",
+      "feature": "-",
+      "file": "communications/dsp-001-deploy-latest-code.md",
+      "line": 13
+    },
+    {
+      "id": "dsp-002",
+      "type": "dispatch",
+      "title": "任务: 邮件 digest 投递 MVP —— nvda 单 topic 试水",
+      "status": "completed",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "notify",
+      "feature": "ft-001",
+      "file": "communications/dsp-002-email-digest-mvp.md",
+      "line": 13
+    },
+    {
+      "id": "dsp-003",
+      "type": "dispatch",
+      "title": "任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱",
+      "status": "pending",
+      "priority": "P1",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "user",
+      "feature": "ft-001",
+      "file": "communications/dsp-003-server-smtp-live-test.md",
+      "line": 12
+    },
+    {
+      "id": "rpt-001",
+      "type": "report",
+      "title": "报告: 服务器更新至最新代码并重启 — 完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "",
+      "feature": "-",
+      "file": "communications/rpt-001-deploy-report.md",
+      "line": 10
+    },
+    {
+      "id": "rpt-002",
+      "type": "report",
+      "title": "报告: 邮件 digest 投递 MVP — 代码部分完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "",
+      "feature": "ft-001",
+      "file": "communications/rpt-002-email-mvp-report.md",
+      "line": 10
+    },
+    {
+      "id": "ft-001",
+      "type": "feature",
+      "title": "邮件 digest 投递（订阅邮件）",
+      "status": "wip",
+      "priority": "P1",
+      "milestone": "v1.1",
+      "parent": "ep-delivery",
+      "domain": [
+        "notify",
+        "digester"
+      ],
+      "target": "",
+      "feature": "",
+      "file": "features/ft-001-email-digest-delivery.md",
+      "line": 18
+    }
+  ],
+  "errors": []
+}
