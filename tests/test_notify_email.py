@@ -179,7 +179,13 @@ def test_body_contains_full_artifact_when_readable(monkeypatch, tmp_path):
 
     assert ok is True
     msg = captured["msg"]
-    body = msg.get_content()
+    # Message is now multipart/alternative (text/plain + text/html).
+    # Extract the plaintext part to verify artifact contents.
+    if msg.is_multipart():
+        plain_part = next(p for p in msg.walk() if p.get_content_type() == "text/plain")
+        body = plain_part.get_content()
+    else:
+        body = msg.get_content()
     # Full artifact text is embedded
     assert "FlashAttention-4 lands in mainline torch" in body
     assert "Lorem ipsum dolor sit amet." in body
@@ -225,3 +231,252 @@ def test_failure_message_goes_to_stderr(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "boom" in captured.err
     assert "boom" not in captured.out
+
+
+# ---------------------------------------------------------------------------
+# render_html unit tests (ft-002 Academic Ink brand)
+# ---------------------------------------------------------------------------
+
+from isbe.notify.render import render_html  # noqa: E402
+
+
+_SAMPLE_MD = (
+    "# Hello World\n\n"
+    "This is a **test** with [a link](https://example.com).\n\n"
+    "- bullet 1\n"
+    "- bullet 2\n\n"
+    "```python\nprint('code block')\n```\n\n"
+    "| col1 | col2 |\n|------|------|\n| a    | b    |\n\n"
+    "> This is a blockquote\n"
+)
+
+
+def test_render_html_link_has_accent_color():
+    """Links must carry accent color #0d6e6e as an inline style."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md=_SAMPLE_MD,
+        artifact_path=None,
+    )
+    # premailer inlines the style; check the anchor has the accent
+    assert "#0d6e6e" in html
+    assert "<a " in html
+
+
+def test_render_html_background_color_inlined():
+    """Background color #fdfcf8 (ivory) must appear inline on body/container."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md=_SAMPLE_MD,
+        artifact_path=None,
+    )
+    assert "#fdfcf8" in html
+
+
+def test_render_html_ink_color_inlined():
+    """Foreground ink #1a1a1a must appear inline."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md=_SAMPLE_MD,
+        artifact_path=None,
+    )
+    assert "#1a1a1a" in html
+
+
+def test_render_html_font_family_present():
+    """Serif font stack must appear in the rendered HTML."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md=_SAMPLE_MD,
+        artifact_path=None,
+    )
+    # Check for key fonts in the stack
+    assert "Georgia" in html
+    assert "serif" in html
+
+
+def test_render_html_table_rendered():
+    """Markdown table should produce a <table> element with inline borders."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md=_SAMPLE_MD,
+        artifact_path=None,
+    )
+    assert "<table" in html
+    # Table should have top/bottom ink border from CSS
+    assert "#1a1a1a" in html  # ink borders inlined
+
+
+def test_render_html_code_block_has_code_bg():
+    """Fenced code blocks must get the code-bg color #f4f1ea."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md=_SAMPLE_MD,
+        artifact_path=None,
+    )
+    assert "<pre" in html
+    assert "#f4f1ea" in html
+
+
+def test_render_html_banner_contains_topic_uppercase():
+    """Banner must show the topic label in UPPERCASE."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md="# Test",
+        artifact_path=None,
+    )
+    assert "NOWCASTING" in html
+
+
+def test_render_html_banner_contains_period():
+    """Banner must show the period label verbatim."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md="# Test",
+        artifact_path=None,
+    )
+    assert "2026-W21" in html
+
+
+def test_render_html_footer_dots_and_tagline():
+    """Footer must contain '· · ·' dots and the ISBE tagline."""
+    html = render_html(
+        topic_label="nowcasting",
+        period_label="2026-W21",
+        artifact_md="# Test",
+        artifact_path=None,
+    )
+    assert "·  ·  ·" in html
+    assert "self-hosted research radar" in html
+
+
+# ---------------------------------------------------------------------------
+# multipart integration tests
+# ---------------------------------------------------------------------------
+
+
+def test_send_produces_multipart_when_artifact_readable(monkeypatch, tmp_path):
+    """When artifact_path is a readable file, the email must be multipart with
+    both text/plain and text/html parts."""
+    _set_env(monkeypatch)
+    artifact = tmp_path / "latest.md"
+    artifact.write_text(_SAMPLE_MD, encoding="utf-8")
+
+    captured = {}
+    fake_srv = MagicMock()
+    fake_srv.send_message.side_effect = lambda m: captured.setdefault("msg", m)
+    fake_smtp = MagicMock()
+    fake_smtp.__enter__ = MagicMock(return_value=fake_srv)
+    fake_smtp.__exit__ = MagicMock(return_value=False)
+
+    with patch("isbe.notify.smtplib.SMTP", return_value=fake_smtp):
+        ok = send_digest_notification(
+            topic_label="nowcasting",
+            period_label="2026-W21",
+            artifact_path=artifact,
+            excerpt="short excerpt",
+        )
+
+    assert ok is True
+    msg = captured["msg"]
+    assert msg.is_multipart()
+    content_types = [part.get_content_type() for part in msg.walk()]
+    assert "text/plain" in content_types
+    assert "text/html" in content_types
+
+
+def test_send_html_part_contains_topic_and_period(monkeypatch, tmp_path):
+    """The HTML part must contain the uppercased topic label and period."""
+    _set_env(monkeypatch)
+    artifact = tmp_path / "latest.md"
+    artifact.write_text(_SAMPLE_MD, encoding="utf-8")
+
+    captured = {}
+    fake_srv = MagicMock()
+    fake_srv.send_message.side_effect = lambda m: captured.setdefault("msg", m)
+    fake_smtp = MagicMock()
+    fake_smtp.__enter__ = MagicMock(return_value=fake_srv)
+    fake_smtp.__exit__ = MagicMock(return_value=False)
+
+    with patch("isbe.notify.smtplib.SMTP", return_value=fake_smtp):
+        send_digest_notification(
+            topic_label="nowcasting",
+            period_label="2026-W21",
+            artifact_path=artifact,
+            excerpt="",
+        )
+
+    msg = captured["msg"]
+    html_part = next(
+        p for p in msg.walk() if p.get_content_type() == "text/html"
+    )
+    html_content = html_part.get_content()
+    assert "NOWCASTING" in html_content
+    assert "2026-W21" in html_content
+
+
+def test_send_plaintext_only_when_artifact_missing(monkeypatch, tmp_path):
+    """When artifact_path does not exist, email stays plaintext-only (no HTML part)."""
+    _set_env(monkeypatch)
+    missing = tmp_path / "gone.md"
+
+    captured = {}
+    fake_srv = MagicMock()
+    fake_srv.send_message.side_effect = lambda m: captured.setdefault("msg", m)
+    fake_smtp = MagicMock()
+    fake_smtp.__enter__ = MagicMock(return_value=fake_srv)
+    fake_smtp.__exit__ = MagicMock(return_value=False)
+
+    with patch("isbe.notify.smtplib.SMTP", return_value=fake_smtp):
+        ok = send_digest_notification(
+            topic_label="nowcasting",
+            period_label="2026-W21",
+            artifact_path=missing,
+            excerpt="fallback excerpt",
+        )
+
+    assert ok is True
+    msg = captured["msg"]
+    content_types = [part.get_content_type() for part in msg.walk()]
+    assert "text/html" not in content_types
+
+
+def test_send_html_render_failure_falls_back_to_plaintext(monkeypatch, tmp_path, capsys):
+    """When HTML rendering raises, the email is still sent as plaintext and
+    a WARN is emitted to stderr. Must not raise."""
+    _set_env(monkeypatch)
+    artifact = tmp_path / "latest.md"
+    artifact.write_text(_SAMPLE_MD, encoding="utf-8")
+
+    captured = {}
+    fake_srv = MagicMock()
+    fake_srv.send_message.side_effect = lambda m: captured.setdefault("msg", m)
+    fake_smtp = MagicMock()
+    fake_smtp.__enter__ = MagicMock(return_value=fake_srv)
+    fake_smtp.__exit__ = MagicMock(return_value=False)
+
+    with (
+        patch("isbe.notify.smtplib.SMTP", return_value=fake_smtp),
+        patch("isbe.notify.render_html", side_effect=RuntimeError("render boom")),
+    ):
+        ok = send_digest_notification(
+            topic_label="nowcasting",
+            period_label="2026-W21",
+            artifact_path=artifact,
+            excerpt="fallback excerpt",
+        )
+
+    assert ok is True  # email still sent
+    msg = captured["msg"]
+    content_types = [part.get_content_type() for part in msg.walk()]
+    assert "text/html" not in content_types  # HTML part absent
+    err = capsys.readouterr().err
+    assert "HTML render failed" in err
