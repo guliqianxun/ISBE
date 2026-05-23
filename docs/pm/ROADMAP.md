@@ -68,7 +68,7 @@ updated_at: 2026-05-20
 
 | # | Feature | 优先级 | 状态 | Feature Doc | 备注 |
 |---|---------|--------|------|-------------|------|
-| 1 | 邮件 HTML 渲染（学术墨色 brand）| P1 | 🚧 WIP | [features/ft-002-email-html-rendering.md](features/ft-002-email-html-rendering.md) | id: ft-002｜ISBE 首版品牌规范定义在此 |
+| 1 | 邮件 HTML 渲染（学术墨色 brand）| P1 | 🚧 WIP | [features/ft-002-email-html-rendering.md](features/ft-002-email-html-rendering.md) | id: ft-002｜代码 ✅（dsp-005, [rpt-005](communications/rpt-005-email-html-report.md)）；等用户 server 视觉验收 |
 
 ---
 

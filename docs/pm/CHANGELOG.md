@@ -11,6 +11,16 @@ updated_at: 2026-05-20
 > 项目级聚合历史。逐次迭代/特性的状态变更汇总于此。
 > 更早的工程进度见 `docs/superpowers/PROGRESS.md` 与 `docs/superpowers/archive/`。
 
+## 2026-05-23 (晚-3)
+
+- **Feature**: [ft-002 邮件 HTML 渲染](features/ft-002-email-html-rendering.md) 代码部分完成
+  ([dsp-005](communications/dsp-005-email-html-mvp.md) → ✅；见 [rpt-005](communications/rpt-005-email-html-report.md))。
+  分支 `feat/email-html-brand`，3 commit，6 文件 +591/-4，合入 main `8799c15`。
+- **Notify**: 加 `markdown` + `premailer` 依赖；新增 `notify/render.py` + `templates/email.html.j2`；
+  `send_digest_notification` 改造为 multipart/alternative（HTML + plaintext 双轨），HTML 渲染异常自动 fallback。
+- **Tests**: notify 测试 11 → 24（+13）；整套 170 passed / 3 pre-existing PG 整合测试失败。
+- **Brand check**: agent 实渲示例输出验证品牌色全部 inline —— `#fdfcf8` bg / `#1a1a1a` 正文 / `#0d6e6e` 链接 / `#f4f1ea` 代码块 / banner 双实线 / 表格 ink+rule 边线 / dotted underline 链接。
+
 ## 2026-05-23 (晚-2)
 
 - **Milestone**: 新开 **v1.2「邮件订阅体验升级」🚧 WIP**。

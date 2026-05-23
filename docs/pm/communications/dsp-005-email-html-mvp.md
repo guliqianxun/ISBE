@@ -5,9 +5,10 @@ target: notify
 action: develop
 feature: ft-002
 priority: P1
-status: pending
+status: completed
 created_at: 2026-05-23
 deadline: 2026-05-27
+completed_at: 2026-05-23
 ---
 
 # 任务: 邮件 HTML 渲染 MVP —— 学术墨色
@@ -135,3 +136,27 @@ agent 回报必须包含：
 - 现有 notify: `src/isbe/notify/__init__.py`
 - markdown 库: https://python-markdown.github.io/
 - premailer: https://github.com/peterbe/premailer
+
+## 结果（2026-05-23）✅ completed
+
+- 分支 `feat/email-html-brand`，3 个 commit：
+  - `861fdca chore(deps): add markdown + premailer for email HTML rendering`
+  - `e06b85c feat(notify): academic-ink HTML email template + jinja2 envelope`
+  - `abf289b feat(notify): multipart HTML alternative with plaintext fallback`
+- 合并入 main：merge commit `8799c15`
+- 6 文件改动（+591 / −4）：
+  - `pyproject.toml` + `uv.lock`（markdown ≥3.6, premailer ≥3.10）
+  - `src/isbe/notify/render.py`（new，73 行）
+  - `src/isbe/notify/templates/email.html.j2`（new，187 行）
+  - `src/isbe/notify/__init__.py`（+18 / −4，multipart 改造）
+  - `tests/test_notify_email.py`（+253 / 0）
+- 测试：notify 单测 **24/24 通过**（11 → 24，新增 13 个）；整套 pytest **170 通过 / 3 失败**（3 失败仍是无 PG 的整合测试，pre-existing）
+- 验收（agent 实跑可视检查）：
+  - [x] HTML 含 inline brand 颜色：`#fdfcf8` bg / `#1a1a1a` 正文 / `#0d6e6e` 链接 / `#f4f1ea` 代码块
+  - [x] Banner 上下 `2px solid #1a1a1a` 实线
+  - [x] 表格 ink 顶/底 + rule 行间
+  - [x] 链接 accent + dotted underline
+  - [x] 字体栈精确照搬 ft-002 规范
+  - [x] multipart text/plain + text/html 双轨
+  - [x] render 失败时 fallback 到 plaintext，notify 不 raise
+- 报告：[rpt-005](rpt-005-email-html-report.md)

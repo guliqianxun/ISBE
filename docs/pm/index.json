@@ -1,7 +1,7 @@
 {
   "project": {
     "name": "ISBE",
-    "generated_at": "2026-05-23T10:18:02Z",
+    "generated_at": "2026-05-23T10:47:08Z",
     "pm_root": "docs/pm"
   },
   "documents": [
@@ -33,29 +33,34 @@
           "line": 9
         },
         {
-          "title": "2026-05-23 (晚-2)",
+          "title": "2026-05-23 (晚-3)",
           "level": 2,
           "line": 14
         },
         {
-          "title": "2026-05-23 (晚)",
+          "title": "2026-05-23 (晚-2)",
           "level": 2,
           "line": 24
         },
         {
+          "title": "2026-05-23 (晚)",
+          "level": 2,
+          "line": 34
+        },
+        {
           "title": "2026-05-23",
           "level": 2,
-          "line": 32
+          "line": 42
         },
         {
           "title": "2026-05-22",
           "level": 2,
-          "line": 44
+          "line": 54
         },
         {
           "title": "2026-05-20",
           "level": 2,
-          "line": 52
+          "line": 62
         }
       ],
       "task_count": 0,
@@ -419,7 +424,7 @@
       "id": "dsp-005",
       "type": "dispatch",
       "title": "任务: 邮件 HTML 渲染 MVP —— 学术墨色",
-      "status": "pending",
+      "status": "completed",
       "priority": "P1",
       "milestone": "",
       "parent": "",
@@ -435,65 +440,70 @@
       "start_date": "",
       "end_date": "",
       "file": "communications/dsp-005-email-html-mvp.md",
-      "frontmatter_line_end": 11,
+      "frontmatter_line_end": 12,
       "headings": [
         {
           "title": "任务: 邮件 HTML 渲染 MVP —— 学术墨色",
           "level": 1,
-          "line": 13
+          "line": 14
         },
         {
           "title": "背景",
           "level": 2,
-          "line": 15
+          "line": 16
         },
         {
           "title": "要求",
           "level": 2,
-          "line": 21
+          "line": 22
         },
         {
           "title": "1. 新增依赖",
           "level": 3,
-          "line": 23
+          "line": 24
         },
         {
           "title": "2. 渲染模块 `src/isbe/notify/render.py`（新文件）",
           "level": 3,
-          "line": 34
+          "line": 35
         },
         {
           "title": "3. 修改 `src/isbe/notify/__init__.py`",
           "level": 3,
-          "line": 59
+          "line": 60
         },
         {
           "title": "4. 测试 `tests/test_notify_email.py`（扩充）",
           "level": 3,
-          "line": 76
+          "line": 77
         },
         {
           "title": "5. 分支 + commit",
           "level": 3,
-          "line": 93
+          "line": 94
         },
         {
           "title": "严格不做",
           "level": 2,
-          "line": 106
+          "line": 107
         },
         {
           "title": "验收标准（你 PM 验收）",
           "level": 2,
-          "line": 115
+          "line": 116
         },
         {
           "title": "参考",
           "level": 2,
-          "line": 131
+          "line": 132
+        },
+        {
+          "title": "结果（2026-05-23）✅ completed",
+          "level": 2,
+          "line": 140
         }
       ],
-      "task_count": 0,
+      "task_count": 7,
       "open_tasks": 0
     },
     {
@@ -679,6 +689,77 @@
           "title": "用户下一步（自动续上 dsp-003）",
           "level": 2,
           "line": 53
+        }
+      ],
+      "task_count": 0,
+      "open_tasks": 0
+    },
+    {
+      "id": "rpt-005",
+      "type": "report",
+      "title": "报告: 邮件 HTML 渲染（学术墨色） — 代码部分完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "project": "",
+      "domain": [],
+      "depends_on": [],
+      "blocks": [],
+      "target": "",
+      "action": "",
+      "feature": "ft-002",
+      "dispatch_ref": "dsp-005",
+      "goals": [],
+      "start_date": "",
+      "end_date": "",
+      "file": "communications/rpt-005-email-html-report.md",
+      "frontmatter_line_end": 9,
+      "headings": [
+        {
+          "title": "报告: 邮件 HTML 渲染（学术墨色） — 代码部分完成",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "title": "摘要",
+          "level": 2,
+          "line": 13
+        },
+        {
+          "title": "交付",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "title": "验收（agent 可视化证据节选）",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "title": "测试",
+          "level": 2,
+          "line": 77
+        },
+        {
+          "title": "状态变更",
+          "level": 2,
+          "line": 84
+        },
+        {
+          "title": "用户下一步（在 server 上跑）",
+          "level": 2,
+          "line": 90
+        },
+        {
+          "title": "重建 radar worker（pyproject 改了 → 重建镜像；走阿里云镜像源避免 14 分钟下载）",
+          "level": 1,
+          "line": 97
+        },
+        {
+          "title": "触发 digest，看邮箱",
+          "level": 1,
+          "line": 104
         }
       ],
       "task_count": 0,
@@ -902,7 +983,7 @@
         {
           "title": "备注",
           "level": 2,
-          "line": 159
+          "line": 160
         }
       ],
       "task_count": 0,
@@ -1041,7 +1122,7 @@
       "id": "dsp-005",
       "type": "dispatch",
       "title": "任务: 邮件 HTML 渲染 MVP —— 学术墨色",
-      "status": "pending",
+      "status": "completed",
       "priority": "P1",
       "milestone": "",
       "parent": "",
@@ -1049,7 +1130,7 @@
       "target": "notify",
       "feature": "ft-002",
       "file": "communications/dsp-005-email-html-mvp.md",
-      "line": 12
+      "line": 13
     },
     {
       "id": "rpt-001",
@@ -1091,6 +1172,20 @@
       "target": "",
       "feature": "ft-001",
       "file": "communications/rpt-004-compose-fix-report.md",
+      "line": 10
+    },
+    {
+      "id": "rpt-005",
+      "type": "report",
+      "title": "报告: 邮件 HTML 渲染（学术墨色） — 代码部分完成",
+      "status": "completed",
+      "priority": "",
+      "milestone": "",
+      "parent": "",
+      "domain": [],
+      "target": "",
+      "feature": "ft-002",
+      "file": "communications/rpt-005-email-html-report.md",
       "line": 10
     },
     {

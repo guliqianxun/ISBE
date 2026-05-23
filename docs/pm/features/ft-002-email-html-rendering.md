@@ -140,10 +140,10 @@ ISBE · self-hosted research radar
 
 ## 任务分工
 
-| 工作流 | 职责概述 | Assignment |
-|-------|---------|------------|
-| notify | markdown→HTML 渲染层 + 学术墨色模板 + multipart + 测试 | [dsp-005](../communications/dsp-005-email-html-mvp.md) |
-| user/ops | 触发 nowcasting / nvda digest 实测 + 跨客户端肉眼验收 | 整合在 dsp-005 验收里 |
+| 工作流 | 职责概述 | Assignment | 状态 |
+|-------|---------|------------|------|
+| notify | markdown→HTML 渲染层 + 学术墨色模板 + multipart + 测试 | [dsp-005](../communications/dsp-005-email-html-mvp.md) | ✅ 2026-05-23（见 [rpt-005](../communications/rpt-005-email-html-report.md)） |
+| user/ops | server pull + restart + 触发 digest + 邮箱视觉验收 | 在 [rpt-005](../communications/rpt-005-email-html-report.md) 末尾的 runbook | 📋 Pending |
 
 ## 依赖关系
 
@@ -155,6 +155,7 @@ ISBE · self-hosted research radar
 | 日期 | 变更内容 |
 |------|---------|
 | 2026-05-23 | 初始创建。ft-001 实测后用户反馈 raw markdown 可读性差；定品牌方向「学术墨色」；范围锁 MVP（markdown lib + premailer + jinja2 + multipart） |
+| 2026-05-23 | dsp-005 ✅（合入 main `8799c15`，3 commit，6 文件 +591/-4，notify 测试 11→24，HTML 输出验证品牌色全部 inline）；剩用户 server 上 pull+restart+触发 digest 做最终视觉验收 |
 
 ## 备注
 
