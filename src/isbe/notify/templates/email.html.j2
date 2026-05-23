@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISBE · {{ topic_label_upper }} · {{ period_label }}</title>
+<style>
+/* Academic Ink — ISBE v1 brand */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fdfcf8;
+  color: #1a1a1a;
+  font-family: "Source Serif 4", "Source Han Serif SC", Charter, Lora, Georgia, "Songti SC", STSong, serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: #fdfcf8;
+}
+
+/* Banner */
+.banner {
+  border-top: 2px solid #1a1a1a;
+  border-bottom: 2px solid #1a1a1a;
+  padding: 12px 0;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.banner-title {
+  font-family: "Source Serif 4", "Source Han Serif SC", Charter, Lora, Georgia, "Songti SC", STSong, serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+}
+
+.banner-period {
+  font-family: "Source Serif 4", "Source Han Serif SC", Charter, Lora, Georgia, "Songti SC", STSong, serif;
+  font-size: 0.95em;
+  color: #666666;
+  margin: 4px 0 0 0;
+  padding: 0;
+}
+
+/* Content */
+.content {
+  color: #1a1a1a;
+}
+
+.content p {
+  margin: 1em 0;
+  color: #1a1a1a;
+}
+
+.content h1 {
+  font-family: "Source Serif 4", "Source Han Serif SC", Charter, Lora, Georgia, "Songti SC", STSong, serif;
+  font-size: 1.5em;
+  color: #1a1a1a;
+  margin: 1.2em 0 0.5em 0;
+}
+
+.content h2 {
+  font-family: "Source Serif 4", "Source Han Serif SC", Charter, Lora, Georgia, "Songti SC", STSong, serif;
+  font-size: 1.25em;
+  color: #1a1a1a;
+  margin: 1.2em 0 0.5em 0;
+}
+
+.content h3 {
+  font-family: "Source Serif 4", "Source Han Serif SC", Charter, Lora, Georgia, "Songti SC", STSong, serif;
+  font-size: 1.1em;
+  color: #1a1a1a;
+  margin: 1.2em 0 0.5em 0;
+}
+
+.content a {
+  color: #0d6e6e;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.content blockquote {
+  border-left: 3px solid #0d6e6e;
+  margin: 1em 0;
+  padding: 0.5em 0 0.5em 1em;
+  color: #666666;
+}
+
+.content pre {
+  background-color: #f4f1ea;
+  border-radius: 4px;
+  padding: 12px;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "SF Mono", Consolas, Menlo, monospace;
+  font-size: 0.9em;
+  color: #1a1a1a;
+}
+
+.content code {
+  font-family: "JetBrains Mono", "SF Mono", Consolas, Menlo, monospace;
+  background-color: #f4f1ea;
+  padding: 0 2px;
+  font-size: 0.9em;
+}
+
+.content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.content table th {
+  border-bottom: 0.5px solid #e0ddd5;
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.content table td {
+  border-bottom: 0.5px solid #e0ddd5;
+  padding: 6px 8px;
+  color: #1a1a1a;
+}
+
+.content ul,
+.content ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.content li {
+  margin: 0.3em 0;
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  text-align: center;
+}
+
+.footer-dots {
+  color: #1a1a1a;
+  font-size: 1.1em;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-tagline {
+  color: #666666;
+  font-size: 0.85em;
+  margin: 4px 0 0 0;
+  padding: 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="banner">
+    <p class="banner-title">ISBE · {{ topic_label_upper }}</p>
+    <p class="banner-period">{{ period_label }}</p>
+  </div>
+  <div class="content">
+    {{ body_html }}
+  </div>
+  <div class="footer">
+    <p class="footer-dots">·  ·  ·</p>
+    <p class="footer-tagline">ISBE · self-hosted research radar</p>
+  </div>
+</div>
+</body>
+</html>
