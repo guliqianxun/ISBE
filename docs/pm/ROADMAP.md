@@ -38,17 +38,17 @@ updated_at: 2026-05-20
 
 ---
 
-## v1.1 — 投递与运维（🚧 WIP）
+## v1.1 — 投递与运维（🚀 Shipped）
 
 > 🎯 目标: digest 不止落盘 —— 主动推送到我的邮箱；服务器部署流程标准化
 > 📅 计划时间: 2026-05
-> 状态: 🚧 WIP
+> 状态: 🚀 Shipped (2026-05-23)
 
 ### Epic: 主动投递（Delivery）
 
 | # | Feature | 优先级 | 状态 | Feature Doc | 备注 |
 |---|---------|--------|------|-------------|------|
-| 1 | 邮件 digest 投递（订阅邮件） | P1 | 🚧 WIP | [features/ft-001-email-digest-delivery.md](features/ft-001-email-digest-delivery.md) | id: ft-001｜dsp-002 代码 ✅，[dsp-003](communications/dsp-003-server-smtp-live-test.md) 用户实测中 |
+| 1 | 邮件 digest 投递（订阅邮件） | P1 | ✅ Completed (2026-05-23) | [features/ft-001-email-digest-delivery.md](features/ft-001-email-digest-delivery.md) | id: ft-001｜MVP 闭环（plaintext markdown）；HTML 渲染拆出独立 ft-002 |
 
 ### Epic: 运维（Ops）
 
@@ -78,5 +78,5 @@ updated_at: 2026-05-20
 | 版本 | 状态 | 计划特性数 | 已完成 | 进度 |
 |------|------|-----------|--------|------|
 | P0–P2 | 🚀 Shipped | — | — | 100% |
-| v1.1 | 🚧 WIP | 1 | 0 | 0% |
-| Backlog | — | 5 | — | — |
+| v1.1 | 🚀 Shipped | 1 | 1 | 100% |
+| Backlog | — | 6 | — | — |

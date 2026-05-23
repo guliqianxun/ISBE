@@ -2,7 +2,7 @@
 pm_id: ft-001
 pm_type: feature
 title: 邮件 digest 投递（订阅邮件）
-status: wip
+status: completed
 priority: P1
 milestone: v1.1
 parent: ep-delivery
@@ -14,12 +14,13 @@ managed_by: skills/project-manager/scripts/pm_index.py
 source_of_truth: markdown
 tags: [feature, delivery, email]
 created_at: 2026-05-20
+completed_at: 2026-05-23
 ---
 
 # 邮件 digest 投递（订阅邮件）
 
 > **所属**: [v1.1 投递与运维](../ROADMAP.md) > Epic: 主动投递
-> **状态**: 🚧 WIP
+> **状态**: ✅ Completed (2026-05-23)
 > **优先级**: P1
 > **涉及工作流**: notify, digester
 > **创建日期**: 2026-05-20
@@ -90,7 +91,8 @@ env 变量缺失即 no-op，digest 流程绝不因推送失败而 fail。
 | 工作流 | 职责概述 | Assignment | 状态 |
 |-------|---------|------------|------|
 | notify | `.env.example` 补全 + 邮件正文改为全文投递 | [dsp-002](../communications/dsp-002-email-digest-mvp.md) | ✅ 2026-05-23（见 [rpt-002](../communications/rpt-002-email-mvp-report.md)） |
-| user/ops | server `.env` 填 SMTP 凭据 + 触发 nvda digest + 验收落箱 | [dsp-003](../communications/dsp-003-server-smtp-live-test.md) | 📋 Pending |
+| user/ops | server `.env` 填 SMTP 凭据 + 触发 nvda digest + 验收落箱 | [dsp-003](../communications/dsp-003-server-smtp-live-test.md) | ✅ 2026-05-23 |
+| ops | 补 docker-compose `ISBE_SMTP_*` 透传（dsp-002 漏项的 hotfix）| [dsp-004](../communications/dsp-004-compose-smtp-env-passthrough.md) | ✅ 2026-05-23（见 [rpt-004](../communications/rpt-004-compose-fix-report.md)）|
 
 > 具体任务拆分与进度由执行方维护。PM 通过 `pm_index.py aggregate` 读取全局状态。
 
@@ -106,6 +108,7 @@ env 变量缺失即 no-op，digest 流程绝不因推送失败而 fail。
 |------|---------|
 | 2026-05-20 | 初始创建。确认 `notify` SMTP 传输层已存在并接入 digester；范围定为产品化 3 缺口；MVP 锁 nvda 单 topic |
 | 2026-05-23 | dsp-002 代码部分 ✅（分支 `feat/email-digest-delivery`，2 commit，11/11 notify 测试通过）；剩 dsp-003 用户在 server 实测落箱 |
+| 2026-05-23 | dsp-004 ✅（docker-compose.yml 补 `ISBE_SMTP_*` 透传，hotfix dsp-002 漏项）；dsp-003 ✅（用户在 server 上确认收件箱收到 nowcasting digest 邮件）；**ft-001 MVP 闭环 ✅ Completed**。后续 HTML 渲染拆为 ft-002。|
 
 ## 备注
 

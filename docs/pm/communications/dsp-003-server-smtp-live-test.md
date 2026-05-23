@@ -5,9 +5,10 @@ target: user
 action: verify
 feature: ft-001
 priority: P1
-status: pending
+status: completed
 created_at: 2026-05-23
 deadline: 2026-05-26
+completed_at: 2026-05-23
 ---
 
 # 任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱
@@ -110,3 +111,12 @@ deployment 点 Run。
 - Feature: [ft-001](../features/ft-001-email-digest-delivery.md)
 - 前序: [dsp-002](dsp-002-email-digest-mvp.md) + [rpt-002](rpt-002-email-mvp-report.md)
 - notify 实现（已合并后）：`src/isbe/notify/__init__.py`
+
+## 结果（2026-05-23）✅ completed
+
+- 实测过程中发现 [dsp-004](dsp-004-compose-smtp-env-passthrough.md) 这个 hotfix：
+  改 `.env` 后 `up -d` 没把 `ISBE_SMTP_*` 注入容器（docker-compose.yml 漏了透传）。
+  补 7 行后 `Recreated`，`exec env | grep ISBE_SMTP` 输出 7 行。
+- 触发 `nowcasting --digest`（flow `military-panda`），10 秒完成，产 `2026-W21` artifact + 3 drafts pending。
+- **邮件成功落箱** ✅ —— ft-001 MVP 闭环。
+- 后续不满意正文是 raw markdown → 转为 ft-002（HTML 渲染）独立处理。

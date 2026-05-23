@@ -1,7 +1,7 @@
 {
   "project": {
     "name": "ISBE",
-    "generated_at": "2026-05-23T09:40:52Z",
+    "generated_at": "2026-05-23T09:52:55Z",
     "pm_root": "docs/pm"
   },
   "documents": [
@@ -33,19 +33,24 @@
           "line": 9
         },
         {
-          "title": "2026-05-23",
+          "title": "2026-05-23 (晚)",
           "level": 2,
           "line": 14
         },
         {
+          "title": "2026-05-23",
+          "level": 2,
+          "line": 22
+        },
+        {
           "title": "2026-05-22",
           "level": 2,
-          "line": 26
+          "line": 34
         },
         {
           "title": "2026-05-20",
           "level": 2,
-          "line": 34
+          "line": 42
         }
       ],
       "task_count": 0,
@@ -202,7 +207,7 @@
       "id": "dsp-003",
       "type": "dispatch",
       "title": "任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱",
-      "status": "pending",
+      "status": "completed",
       "priority": "P1",
       "milestone": "",
       "parent": "",
@@ -218,122 +223,127 @@
       "start_date": "",
       "end_date": "",
       "file": "communications/dsp-003-server-smtp-live-test.md",
-      "frontmatter_line_end": 11,
+      "frontmatter_line_end": 12,
       "headings": [
         {
           "title": "任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱",
           "level": 1,
-          "line": 13
+          "line": 14
         },
         {
           "title": "背景",
           "level": 2,
-          "line": 15
+          "line": 16
         },
         {
           "title": "前置条件",
           "level": 2,
-          "line": 25
+          "line": 26
         },
         {
           "title": "要求",
           "level": 2,
-          "line": 29
+          "line": 30
         },
         {
           "title": "1. 合并分支到 main（本机）",
           "level": 3,
-          "line": 31
+          "line": 32
         },
         {
           "title": "清理 worktree（释放分支）",
           "level": 1,
-          "line": 36
+          "line": 37
         },
         {
           "title": "合并 + 推",
           "level": 1,
-          "line": 39
+          "line": 40
         },
         {
           "title": "2. server 上更新代码 + `.env` 加 SMTP 凭据",
           "level": 3,
-          "line": 45
+          "line": 46
         },
         {
           "title": "编辑 .env，新增 7 项（参照 .env.example）：",
           "level": 1,
-          "line": 52
+          "line": 53
         },
         {
           "title": "ISBE_SMTP_HOST=...        # 例如 smtp.qq.com / smtp.163.com / smtp.gmail.com",
           "level": 1,
-          "line": 53
+          "line": 54
         },
         {
           "title": "ISBE_SMTP_PORT=587        # STARTTLS；465 走 SSL",
           "level": 1,
-          "line": 54
+          "line": 55
         },
         {
           "title": "ISBE_SMTP_FROM=...        # 发件人地址（通常 = USER）",
           "level": 1,
-          "line": 55
+          "line": 56
         },
         {
           "title": "ISBE_SMTP_TO=...          # 收件人（你自己的邮箱）",
           "level": 1,
-          "line": 56
+          "line": 57
         },
         {
           "title": "ISBE_SMTP_USER=...        # 登录账号",
           "level": 1,
-          "line": 57
+          "line": 58
         },
         {
           "title": "ISBE_SMTP_PASS=...        # 授权码（不是邮箱登录密码）",
           "level": 1,
-          "line": 58
+          "line": 59
         },
         {
           "title": "# ISBE_SMTP_ALLOW_PLAINTEXT=1   # 只有走本地受信中继才开",
           "level": 1,
-          "line": 59
+          "line": 60
         },
         {
           "title": "3. 手动触发一次 nvda digest",
           "level": 3,
-          "line": 71
+          "line": 72
         },
         {
           "title": "进容器跑 CLI（避免本机依赖问题）",
           "level": 1,
-          "line": 76
+          "line": 77
         },
         {
           "title": "4. 验收落箱",
           "level": 3,
-          "line": 84
+          "line": 85
         },
         {
           "title": "验收标准",
           "level": 2,
-          "line": 90
+          "line": 91
         },
         {
           "title": "失败回报",
           "level": 2,
-          "line": 97
+          "line": 98
         },
         {
           "title": "完成后",
           "level": 2,
-          "line": 103
+          "line": 104
         },
         {
           "title": "参考",
           "level": 2,
-          "line": 108
+          "line": 109
+        },
+        {
+          "title": "结果（2026-05-23）✅ completed",
+          "level": 2,
+          "line": 115
         }
       ],
       "task_count": 4,
@@ -592,7 +602,7 @@
       "id": "ft-001",
       "type": "feature",
       "title": "邮件 digest 投递（订阅邮件）",
-      "status": "wip",
+      "status": "completed",
       "priority": "P1",
       "milestone": "v1.1",
       "parent": "ep-delivery",
@@ -611,77 +621,77 @@
       "start_date": "",
       "end_date": "",
       "file": "features/ft-001-email-digest-delivery.md",
-      "frontmatter_line_end": 17,
+      "frontmatter_line_end": 18,
       "headings": [
         {
           "title": "邮件 digest 投递（订阅邮件）",
           "level": 1,
-          "line": 19
+          "line": 20
         },
         {
           "title": "概述",
           "level": 2,
-          "line": 28
+          "line": 29
         },
         {
           "title": "范围",
           "level": 2,
-          "line": 47
+          "line": 48
         },
         {
           "title": "MVP（本特性当前目标）—— nvda 单 topic 试水",
           "level": 3,
-          "line": 49
+          "line": 50
         },
         {
           "title": "拉伸目标（非 MVP，验证通过后再排）",
           "level": 3,
-          "line": 59
+          "line": 60
         },
         {
           "title": "不做",
           "level": 3,
-          "line": 65
+          "line": 66
         },
         {
           "title": "需求",
           "level": 2,
-          "line": 70
+          "line": 71
         },
         {
           "title": "功能需求",
           "level": 3,
-          "line": 72
+          "line": 73
         },
         {
           "title": "非功能需求",
           "level": 3,
-          "line": 77
+          "line": 78
         },
         {
           "title": "验收标准",
           "level": 2,
-          "line": 81
+          "line": 82
         },
         {
           "title": "任务分工",
           "level": 2,
-          "line": 88
+          "line": 89
         },
         {
           "title": "依赖关系",
           "level": 2,
-          "line": 97
+          "line": 99
         },
         {
           "title": "变更记录",
           "level": 2,
-          "line": 103
+          "line": 105
         },
         {
           "title": "备注",
           "level": 2,
-          "line": 110
+          "line": 113
         }
       ],
       "task_count": 0,
@@ -720,7 +730,7 @@
           "line": 26
         },
         {
-          "title": "v1.1 — 投递与运维（🚧 WIP）",
+          "title": "v1.1 — 投递与运维（🚀 Shipped）",
           "level": 2,
           "line": 41
         },
@@ -782,7 +792,7 @@
       "id": "dsp-003",
       "type": "dispatch",
       "title": "任务: 服务器配置 SMTP + 触发 nvda digest 实测落箱",
-      "status": "pending",
+      "status": "completed",
       "priority": "P1",
       "milestone": "",
       "parent": "",
@@ -790,7 +800,7 @@
       "target": "user",
       "feature": "ft-001",
       "file": "communications/dsp-003-server-smtp-live-test.md",
-      "line": 12
+      "line": 13
     },
     {
       "id": "dsp-004",
@@ -852,7 +862,7 @@
       "id": "ft-001",
       "type": "feature",
       "title": "邮件 digest 投递（订阅邮件）",
-      "status": "wip",
+      "status": "completed",
       "priority": "P1",
       "milestone": "v1.1",
       "parent": "ep-delivery",
@@ -863,7 +873,7 @@
       "target": "",
       "feature": "",
       "file": "features/ft-001-email-digest-delivery.md",
-      "line": 18
+      "line": 19
     }
   ],
   "errors": []

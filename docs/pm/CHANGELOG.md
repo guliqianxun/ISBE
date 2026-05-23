@@ -11,6 +11,14 @@ updated_at: 2026-05-20
 > 项目级聚合历史。逐次迭代/特性的状态变更汇总于此。
 > 更早的工程进度见 `docs/superpowers/PROGRESS.md` 与 `docs/superpowers/archive/`。
 
+## 2026-05-23 (晚)
+
+- **Milestone**: **v1.1「投递与运维」🚀 Shipped** —— 唯一计划特性 ft-001 闭环。
+- **Feature**: [ft-001 邮件 digest 投递](features/ft-001-email-digest-delivery.md) → **✅ Completed**。
+  用户在 server 上确认收到 `nowcasting` digest 邮件（flow `military-panda`），MVP（plaintext markdown）闭环。
+- **Dispatch**: [dsp-003](communications/dsp-003-server-smtp-live-test.md) → ✅；[dsp-004](communications/dsp-004-compose-smtp-env-passthrough.md) → ✅。
+- **后续**: 用户反馈 raw markdown 在邮件客户端可读性差（预期之中，dsp-002 已标 stretch goal）→ 待开 ft-002 做 HTML 渲染。
+
 ## 2026-05-23
 
 - **Feature**: [ft-001 邮件 digest 投递](features/ft-001-email-digest-delivery.md) 代码部分完成
