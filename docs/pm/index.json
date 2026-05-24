@@ -1,7 +1,7 @@
 {
   "project": {
     "name": "ISBE",
-    "generated_at": "2026-05-23T10:47:08Z",
+    "generated_at": "2026-05-24T15:28:23Z",
     "pm_root": "docs/pm"
   },
   "documents": [
@@ -33,34 +33,39 @@
           "line": 9
         },
         {
-          "title": "2026-05-23 (晚-3)",
+          "title": "2026-05-24",
           "level": 2,
           "line": 14
         },
         {
-          "title": "2026-05-23 (晚-2)",
+          "title": "2026-05-23 (晚-3)",
           "level": 2,
           "line": 24
         },
         {
-          "title": "2026-05-23 (晚)",
+          "title": "2026-05-23 (晚-2)",
           "level": 2,
           "line": 34
         },
         {
+          "title": "2026-05-23 (晚)",
+          "level": 2,
+          "line": 44
+        },
+        {
           "title": "2026-05-23",
           "level": 2,
-          "line": 42
+          "line": 52
         },
         {
           "title": "2026-05-22",
           "level": 2,
-          "line": 54
+          "line": 64
         },
         {
           "title": "2026-05-20",
           "level": 2,
-          "line": 62
+          "line": 72
         }
       ],
       "task_count": 0,
@@ -868,7 +873,7 @@
       "id": "ft-002",
       "type": "feature",
       "title": "邮件 HTML 渲染（学术墨色 brand）",
-      "status": "planned",
+      "status": "completed",
       "priority": "P1",
       "milestone": "v1.2",
       "parent": "ep-delivery",
@@ -888,102 +893,102 @@
       "start_date": "",
       "end_date": "",
       "file": "features/ft-002-email-html-rendering.md",
-      "frontmatter_line_end": 17,
+      "frontmatter_line_end": 18,
       "headings": [
         {
           "title": "邮件 HTML 渲染（学术墨色 brand）",
           "level": 1,
-          "line": 19
+          "line": 20
         },
         {
           "title": "概述",
           "level": 2,
-          "line": 28
+          "line": 29
         },
         {
           "title": "品牌规范（学术墨色 / Academic Ink）",
           "level": 2,
-          "line": 35
+          "line": 36
         },
         {
           "title": "调色板",
           "level": 3,
-          "line": 39
+          "line": 40
         },
         {
           "title": "字体栈",
           "level": 3,
-          "line": 52
+          "line": 53
         },
         {
           "title": "排版",
           "level": 3,
-          "line": 63
+          "line": 64
         },
         {
           "title": "信封（envelope）",
           "level": 3,
-          "line": 75
+          "line": 76
         },
         {
           "title": "范围",
           "level": 2,
-          "line": 91
+          "line": 92
         },
         {
           "title": "MVP",
           "level": 3,
-          "line": 93
+          "line": 94
         },
         {
           "title": "拉伸目标（不在本期）",
           "level": 3,
-          "line": 104
+          "line": 105
         },
         {
           "title": "不做",
           "level": 3,
-          "line": 111
+          "line": 112
         },
         {
           "title": "需求",
           "level": 2,
-          "line": 119
+          "line": 120
         },
         {
           "title": "功能需求",
           "level": 3,
-          "line": 121
+          "line": 122
         },
         {
           "title": "非功能需求",
           "level": 3,
-          "line": 127
+          "line": 128
         },
         {
           "title": "验收标准",
           "level": 2,
-          "line": 132
+          "line": 133
         },
         {
           "title": "任务分工",
           "level": 2,
-          "line": 141
+          "line": 142
         },
         {
           "title": "依赖关系",
           "level": 2,
-          "line": 148
+          "line": 149
         },
         {
           "title": "变更记录",
           "level": 2,
-          "line": 153
+          "line": 154
         },
         {
           "title": "备注",
           "level": 2,
-          "line": 160
+          "line": 162
         }
       ],
       "task_count": 0,
@@ -1037,7 +1042,7 @@
           "line": 53
         },
         {
-          "title": "v1.2 — 邮件订阅体验升级（🚧 WIP）",
+          "title": "v1.2 — 邮件订阅体验升级（🚀 Shipped）",
           "level": 2,
           "line": 61
         },
@@ -1209,7 +1214,7 @@
       "id": "ft-002",
       "type": "feature",
       "title": "邮件 HTML 渲染（学术墨色 brand）",
-      "status": "planned",
+      "status": "completed",
       "priority": "P1",
       "milestone": "v1.2",
       "parent": "ep-delivery",
@@ -1219,7 +1224,7 @@
       "target": "",
       "feature": "",
       "file": "features/ft-002-email-html-rendering.md",
-      "line": 18
+      "line": 19
     }
   ],
   "errors": []

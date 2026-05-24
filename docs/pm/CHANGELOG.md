@@ -11,6 +11,16 @@ updated_at: 2026-05-20
 > 项目级聚合历史。逐次迭代/特性的状态变更汇总于此。
 > 更早的工程进度见 `docs/superpowers/PROGRESS.md` 与 `docs/superpowers/archive/`。
 
+## 2026-05-24
+
+- **Milestone**: **v1.2「邮件订阅体验升级」🚀 Shipped** —— 唯一计划特性 ft-002 闭环。
+- **Feature**: [ft-002 邮件 HTML 渲染](features/ft-002-email-html-rendering.md) → **✅ Completed**。
+  用户 server 上 pull + restart + 触发 digest,实测落箱反馈"还行"。学术墨色 brand 规范沉淀进 ft-002 文档,后续视觉产物回引。
+- **Companion**: 启动 moxunzhi(AI 新车情报平台,客户向)作为 **ISBE `moxunzhi` 分支**,共用 backbone,
+  PM 台账独立至 `docs/projects/moxunzhi/`。
+- **Infra**: ISBE 仓库新增 GitLab 远端 `http://192.168.0.156:8928/zore/isbe.git`(本地 LAN),
+  与现有 GitHub origin 共存;moxunzhi 分支仅推 GitLab(含商业敏感材料)。
+
 ## 2026-05-23 (晚-3)
 
 - **Feature**: [ft-002 邮件 HTML 渲染](features/ft-002-email-html-rendering.md) 代码部分完成

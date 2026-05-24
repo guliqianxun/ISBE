@@ -2,7 +2,7 @@
 pm_id: ft-002
 pm_type: feature
 title: 邮件 HTML 渲染（学术墨色 brand）
-status: planned
+status: completed
 priority: P1
 milestone: v1.2
 parent: ep-delivery
@@ -14,6 +14,7 @@ managed_by: skills/project-manager/scripts/pm_index.py
 source_of_truth: markdown
 tags: [feature, delivery, email, html, branding]
 created_at: 2026-05-23
+completed_at: 2026-05-24
 ---
 
 # 邮件 HTML 渲染（学术墨色 brand）
@@ -143,7 +144,7 @@ ISBE · self-hosted research radar
 | 工作流 | 职责概述 | Assignment | 状态 |
 |-------|---------|------------|------|
 | notify | markdown→HTML 渲染层 + 学术墨色模板 + multipart + 测试 | [dsp-005](../communications/dsp-005-email-html-mvp.md) | ✅ 2026-05-23（见 [rpt-005](../communications/rpt-005-email-html-report.md)） |
-| user/ops | server pull + restart + 触发 digest + 邮箱视觉验收 | 在 [rpt-005](../communications/rpt-005-email-html-report.md) 末尾的 runbook | 📋 Pending |
+| user/ops | server pull + restart + 触发 digest + 邮箱视觉验收 | 在 [rpt-005](../communications/rpt-005-email-html-report.md) 末尾的 runbook | ✅ 2026-05-24（用户反馈"还行"） |
 
 ## 依赖关系
 
@@ -156,6 +157,7 @@ ISBE · self-hosted research radar
 |------|---------|
 | 2026-05-23 | 初始创建。ft-001 实测后用户反馈 raw markdown 可读性差；定品牌方向「学术墨色」；范围锁 MVP（markdown lib + premailer + jinja2 + multipart） |
 | 2026-05-23 | dsp-005 ✅（合入 main `8799c15`，3 commit，6 文件 +591/-4，notify 测试 11→24，HTML 输出验证品牌色全部 inline）；剩用户 server 上 pull+restart+触发 digest 做最终视觉验收 |
+| 2026-05-24 | 用户 server 实测落箱,反馈"还行" → **ft-002 ✅ Completed**。v1.2 milestone 🚀 Shipped。学术墨色品牌规范沉淀进本文件,后续视觉产物回引。 |
 
 ## 备注
 

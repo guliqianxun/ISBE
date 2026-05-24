@@ -58,17 +58,17 @@ updated_at: 2026-05-20
 
 ---
 
-## v1.2 — 邮件订阅体验升级（🚧 WIP）
+## v1.2 — 邮件订阅体验升级（🚀 Shipped）
 
 > 🎯 目标: 邮件不止"能读"，而是"读着舒服" —— 引入 ISBE 第一版视觉品牌
 > 📅 计划时间: 2026-05
-> 状态: 🚧 WIP
+> 状态: 🚀 Shipped (2026-05-24)
 
 ### Epic: 主动投递（Delivery）
 
 | # | Feature | 优先级 | 状态 | Feature Doc | 备注 |
 |---|---------|--------|------|-------------|------|
-| 1 | 邮件 HTML 渲染（学术墨色 brand）| P1 | 🚧 WIP | [features/ft-002-email-html-rendering.md](features/ft-002-email-html-rendering.md) | id: ft-002｜代码 ✅（dsp-005, [rpt-005](communications/rpt-005-email-html-report.md)）；等用户 server 视觉验收 |
+| 1 | 邮件 HTML 渲染（学术墨色 brand）| P1 | ✅ Completed (2026-05-24) | [features/ft-002-email-html-rendering.md](features/ft-002-email-html-rendering.md) | id: ft-002｜用户实测"还行";学术墨色 brand 规范沉淀 |
 
 ---
 
@@ -93,5 +93,5 @@ updated_at: 2026-05-20
 |------|------|-----------|--------|------|
 | P0–P2 | 🚀 Shipped | — | — | 100% |
 | v1.1 | 🚀 Shipped | 1 | 1 | 100% |
-| v1.2 | 🚧 WIP | 1 | 0 | 0% |
+| v1.2 | 🚀 Shipped | 1 | 1 | 100% |
 | Backlog | — | 6 | — | — |
