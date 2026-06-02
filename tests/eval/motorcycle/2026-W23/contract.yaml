@@ -1,0 +1,30 @@
+# 摩托车检索契约（= TREC topic）。钉住本快照所用版本。
+# machine 字段 out_of_scope_keywords 直接迁自 topic.yaml 的 rss.exclude_keywords。
+intent: "200cc+ 摩托车市场调研：新车发布、改款年款、定价、上市、第一手评测/对比、影响购买的行业动向"
+version: 1
+
+in_scope:
+  - 排量 >= 200cc 的量产 / 概念摩托车
+  - 新车型发布、改款、定价、上市时间
+  - 第一手评测、长测、对比
+  - 影响购车决策的行业动向（厂商策略、关税、排放法规）
+
+out_of_scope:
+  - 踏板 / 轻便摩托（scooter / moped）、<200cc、纯电助力
+  - 赛事八卦 / 车手绯闻（除非影响量产车）
+  - 配件 / 服饰 / 装备促销软文（pants / jacket / helmet 评测等）
+
+out_of_scope_keywords: [scooter, moped, 50cc, 125cc, e-bike, electric kick]
+
+entity_terms:
+  [Kawasaki, Yamaha, Honda, KTM, Aprilia, Suzuki, BMW, Triumph, Ducati,
+   Harley, Royal Enfield, naked, sport, ADV, cruiser, retro]
+
+key_entities:
+  brands: [Kawasaki, Yamaha, Honda, KTM, Aprilia, Suzuki, BMW, Triumph, Ducati]
+  segments: [naked, sport, ADV, cruiser, retro]
+
+must_not_miss:
+  - 任一主流厂商 200-500cc 新车 / 改款发布
+
+quality_bar: "好内容 = 含可决策信息（参数 / 价格 / 上市 / 对比结论），非纯转发标题党"

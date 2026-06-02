@@ -9,6 +9,7 @@ relates: 2026-06-02-functional-architecture.md（修订其 F2/F5 边界）
 revisions:
   - r1 2026-06-03 first-principles 草案
   - r2 2026-06-03 锚定行业标准（Cranfield/TREC qrels+pooling、RAG eval RAGAS/TruLens、LLM-as-judge 校准、级联打分、pytrec_eval）；修正召回框架（triage 真召回 vs 采集召回）
+  - r3 2026-06-03 最小闭环检验落地（见 §9）：建 `isbe.triage` 隔离块 + 冻结真实采集集 + 机制测试绿 + 摩托车回归待 qrels
 ---
 
 # 检索契约与检索评估（设计）
@@ -248,6 +249,28 @@ F2 采集(raw→facts, 只管机制, 不声称相关性)
 - 标注一致性：**Cohen's κ** / Krippendorff's α
 
 > 注：以上为方法学定位锚点；实现期需对每个拟复用件做一次合身性 spike（尤其 RAGAS/TruLens 的 per-query 假设 vs ISBE 常驻契约的差异）。
+
+---
+
+## 9. 最小闭环检验（r3，2026-06-03 落地）
+
+按"先检验"做了一个端到端最小切片，验证这套设计**可实现、可测**：
+
+**建的东西**
+- `src/isbe/triage/`：隔离的 FT 块（纯函数，无 IO）——`models`（Item/RelevanceScore/TriageResult/Qrel/EvalMetrics）/ `contract`（= TREC topic，pydantic `extra=forbid`）/ `scorer`（级联阶段一规则；阶段二 LLM 留接缝）/ `eval`（set-based P/R/F1/anchor，手算，注明生产委托 pytrec_eval）。
+- `scripts/eval/freeze_collection.py`：抓真实 RSS、**过滤前**冻结采集集 + 出 qrels 模板。
+- 真实 fixture：`tests/eval/motorcycle/2026-W23/`（**54 条真实采集集** + contract.yaml + qrels 模板）。
+- 测试：`tests/triage/test_eval_mechanism.py`（合成数据验机器，**3 绿**）、`tests/eval/test_motorcycle_triage.py`（真实回归，**待 qrels，现 skip**）。
+
+**验证结论**
+- 机制可测：keep-all 基线 precision=0.5 < 0.8 门槛、规则 triage=1.0 —— 指标能区分好坏 triage，"质量"成了有阈值的数。✅
+- ruff clean；改动**纯增量**（未碰任何现有代码），不影响既有 73 测试。
+- **一条实证发现（直接印证设计）**：采集集里 `Klim Badlands Pro Pants Review`（摩托裤评测）属 `out_of_scope`（配件/服饰），但 `out_of_scope_keywords` **抓不到**（无 "pants"）——纯关键词阶段一会让它混进周报。**这就是阶段二 LLM-judge 必要性的活样本**，也说明 `quality_bar` 须由语义判而非关键词判。
+
+**下一步（你来 + 我来）**
+1. **你标 qrels**（ground truth 不可程序捏造）：编辑 `tests/eval/motorcycle/2026-W23/qrels.template.jsonl`，每行填 `rel: 0|1|2`、锚点设 `must_hit: true`，另存为 `qrels.jsonl`。54 条，约 15-20 分钟。
+2. 标完跑 `uv run pytest tests/eval` —— 大概率 **红**（关键词阶段一精度不够，如摩托裤漏网）。这就是 TDD 的失败测试。
+3. 我据红的结果实现**阶段二 LLM-judge**（复用 `article_reviews` 种子 + §8 校准）到变绿。
 
 ---
 
