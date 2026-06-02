@@ -6,6 +6,9 @@ phase: 重构准备 · 第 2 步（检索契约与评估 · 设计）
 scope: 给"相关性 / 检索质量"一个可隔离、可测试、可评估的家。本步只出设计，不写实现。
 sample_domain: motorcycle（200cc+ 摩托车市场调研）
 relates: 2026-06-02-functional-architecture.md（修订其 F2/F5 边界）
+revisions:
+  - r1 2026-06-03 first-principles 草案
+  - r2 2026-06-03 锚定行业标准（Cranfield/TREC qrels+pooling、RAG eval RAGAS/TruLens、LLM-as-judge 校准、级联打分、pytrec_eval）；修正召回框架（triage 真召回 vs 采集召回）
 ---
 
 # 检索契约与检索评估（设计）
@@ -106,39 +109,62 @@ class TriageResult:
 要点：
 
 - **输入输出全是数据** → 喂 fixture、断输出，天然可测。
-- **打分实现先不锁**（本步不实现）：可纯规则/关键词、可 LLM-judge、可混合。设计只定**接缝**；测试只对金标准断言，与实现无关——换打分器，测试不动。
-- 现有 `article_reviews` 的逐条 LLM 评价是 triage 的天然种子：把它的判断**落成 `RelevanceScore` 数据**（而非只渲染进模板），就有了 LLM-judge 打分器的雏形 + 可与人工标注校准的素材。
+- **打分器形态已定 = 级联 two-stage（行业标准）**：阶段一规则粗筛（`out_of_scope` 关键词 + 实体匹配，召回导向、零 LLM 成本、完全可解释）→ 阶段二 LLM-judge 只细判灰区（精度导向）。这正是 IR 里 `BM25 → cross-encoder reranker` 的级联范式（cheap recall filter → expensive precision stage）。设计只定**接缝**；测试只对金标准（qrels）断言，与实现无关——换打分器，测试不动。
+- 现有 `article_reviews` 的逐条 LLM 评价是阶段二 LLM-judge 的天然种子：把它的判断**落成 `RelevanceScore` 数据**（而非只渲染进模板），就有了 LLM-judge 雏形 + 可与人工标注校准的素材。**LLM-judge 必须按文献做校准**（§8）：报告与人工的一致性（Cohen's κ），并缓解 position / verbosity / self-enhancement 偏置。
 - **红线相容**：单向流（采集→triage→生成）；契约是用户手写（同 feedback，红线 #6）；triage 不回写 memory。
 
 ---
 
-## 4. 检索评估（"搜了多少 / 质量如何"的测量）
+## 4. 检索评估（Cranfield/TREC 范式落地）
 
-### 4.1 金标准 fixture（一次性人工标注，永久回归）
+采用 Cranfield 范式的标准三件套：**collection（采集集快照）+ topics（检索契约）+ qrels（相关性判定）**。
 
-冻结某域某周的快照 + 人工标注：
+### 4.1 qrels 金标准（Cranfield relevance judgments）
+
+冻结某域某周的快照 + 人工判定：
 
 ```
 tests/eval/motorcycle/2026-W19/
-  source_items.jsonl   # 该周抓到的原始 articles 快照: {id, source, headline, summary, url, published_at}
-  labels.jsonl         # 人工标注: {id, relevant: yes|no|borderline, must_hit: bool, note}
-  contract.yaml        # 钉住当时的契约版本
+  collection.jsonl   # 该周采集集快照: {id, source, headline, summary, url, published_at}
+  qrels.jsonl        # 相关性判定: {id, rel: 0|1|2, must_hit: bool, note}
+                     #   rel: 0=不相关 1=相关 2=高价值; 二值化规则 rel>=1 算相关(钉死, 防 borderline 漂移)
+  contract.yaml      # 钉住当时的契约版本(= TREC topic)
 ```
 
-- 规模小（几十条/周起步），**标一次复用为永久回归基线**。
-- 人（你）是相关性的最终裁判——金标准就是把你脑中的判断**落成数据**这一动作。
+- **关键事实：采集集小到可全标**（摩托车一周 ~29 条），不同于 TREC 几百万文档须**池化(pooling)**——这里能对**整个采集集**做穷尽判定，所以 triage 召回是**真召回**，不是池化近似。
+- 单标注者（你）即 ground truth；引入 LLM-judge 时按 §8 报告 judge↔human 的 Cohen's κ。
+- 标一次复用为永久回归基线；指标计算直接喂 `pytrec_eval`（trec_eval 的 Python 绑定），不自己写。
 
-### 4.2 指标（诚实，区分能测与不能测）
+### 4.2 指标（区分两种召回 —— 这是上一版框糙、本版修正的核心）
 
-| 指标 | 定义 | 可断言阈值 | 答哪个问题 |
+**召回必须拆成两层**，各对应不同问题、不同可测性：
+
+| 召回类型 | 定义 | 可测？ | 归因 |
 |---|---|---|---|
-| **Precision@kept** | relevant ∩ kept / kept | `>= 0.8` | 质量如何（留下的准不准） |
-| **Anchor recall** | must_hit ∩ kept / must_hit | `== 1.0` | 搜了多少（必命中漏没漏，最强信号） |
-| **False-drop rate** | relevant ∩ dropped / dropped | `<= 0.1` | 质量如何（有没有误杀） |
-| **Entity coverage** | 本周活跃必盯实体中被命中的比例 | 趋势观察 | 搜了多少（代理） |
-| **Source liveness** | 配置的优质源里本周真出数的比例 | `== 1.0` | 搜了多少（抓死链/失效 feed） |
+| **Triage 召回** | 相关∩kept / 全部相关（相对**已采集集**） | ✅ **真召回**（采集集可全标） | triage 打分器漏没漏 |
+| **采集召回** | 相对**真实世界**的相关全集 | ❌ 无 oracle（开放域不可知） | 信源覆盖，**与 triage 无关** |
 
-**诚实声明（必须写进系统文档）**：开放域**没有真召回率**——"本周相关全集"不可知。"搜了多少"只能用 **anchor recall + source liveness + entity coverage** 这组**代理指标**回答，不假装是 true recall oracle。这一句要大声说，免得给系统一个它给不出的承诺。
+triage 层用标准 IR 指标（喂 qrels 由 `pytrec_eval` 算）：
+
+| 指标 | 标准名 | 定义 | 可断言阈值 | 答哪个问题 |
+|---|---|---|---|---|
+| **Precision** | set precision (= RAGAS context-precision 同源) | 相关 ∩ kept / kept | `>= 0.8` | 质量如何 |
+| **Recall** | set recall（相对采集集，真召回） | 相关 ∩ kept / 全部相关 | `>= 0.9` | 搜了多少（triage 侧） |
+| **F1** | — | precision/recall 调和 | 趋势 | 综合 |
+| **Anchor recall** | TREC "known-item" 变体 | must_hit ∩ kept / must_hit | `== 1.0` | 搜了多少（硬约束） |
+
+采集召回不可测，用**代理信号**回答（明确标注为代理，非 true recall）：
+
+| 代理信号 | 定义 | 阈值 | 抓什么 |
+|---|---|---|---|
+| **Source liveness** | 配置优质源里本周真出数的比例 | `== 1.0` | 死链 / 失效 feed |
+| **Entity coverage** | 本周活跃必盯实体中被命中比例 | 趋势 | 信源盲区 |
+
+> **诚实声明（写进系统文档）**：triage 召回是真召回（采集集穷尽可标）；采集召回**没有 oracle**，只能用 source liveness + entity coverage 这组**代理信号**逼近，不冒充 true recall。上一版把两者糊成"代理指标"，退让过头——**triage 侧能测真召回**。
+
+### 4.3 精度的统计严谨性（kept 集大时）
+
+若某域 kept 集很大（不可全标），按标准做**分层抽样估计** precision：抽 N 条标注，报 `precision ± 置信区间`，而非声称全标。摩托车现规模无需，但设计要为大域留这条标准路径。
 
 ---
 
@@ -147,16 +173,17 @@ tests/eval/motorcycle/2026-W19/
 这正是你要的"先有契约、先有失败测试、再有实现"：
 
 1. **冻结 + 标注**：跑一周 motorcycle 采集 → 导出 `source_items.jsonl` → 你人工标 `labels.jsonl`（含 must_hit 锚点）。
-2. **写失败测试**：
+2. **写失败测试**（指标用 `pytrec_eval` 算，断言用标准 IR 指标名）：
    ```python
-   def test_motorcycle_triage_precision():
-       items = load_fixture("motorcycle/2026-W19/source_items.jsonl")
-       contract = load_contract("motorcycle/2026-W19/contract.yaml")
-       result = triage(items, contract)
-       m = evaluate(result, load_labels("motorcycle/2026-W19/labels.jsonl"))
-       assert m.anchor_recall == 1.0
-       assert m.precision_at_kept >= 0.8
-       assert m.false_drop_rate <= 0.1
+   def test_motorcycle_triage_meets_bar():
+       items    = load_collection("motorcycle/2026-W19/collection.jsonl")
+       contract = load_contract("motorcycle/2026-W19/contract.yaml")   # = TREC topic
+       qrels    = load_qrels("motorcycle/2026-W19/qrels.jsonl")
+       result   = triage(items, contract)
+       m = evaluate(result, qrels)          # 内部走 pytrec_eval
+       assert m.anchor_recall == 1.0        # 硬约束
+       assert m.precision     >= 0.8
+       assert m.recall        >= 0.9        # triage 真召回(相对采集集)
    ```
    现状下它**必然红**：当前等价于"全留"，precision 被噪音拖垮；且根本没有 `triage`。
 3. **实现 triage 到变绿**，迭代打分器。
@@ -185,10 +212,42 @@ F2 采集(raw→facts, 只管机制, 不声称相关性)
 ## 7. 范围与开放问题（待你拍板，下一步前确认）
 
 1. **契约落点**：放 `topic.yaml` 的 `retrieval:` 块（机器读，推荐）vs 独立 `retrieval.yaml` vs memory `reference/`。建议先 topic.yaml，日后可毕业。
-2. **打分器起步形态**：纯规则（快、确定、可解释，但弱）vs LLM-judge（强、贵、需校准）vs 混合（规则粗筛 + LLM 细判）。设计已留接缝，实现期再定。
-3. **金标准标注成本**：每域每次标几十条，谁标、多久标一次、是否只标"换契约/换打分器时"的回归周。
-4. **与 ADR 的张力**：v1 ADR 说"不做横向抽象除非第 5/6 域有成本"。现已 6 域，且这是质量 backbone 而非花活——我判断该做，但要你确认它**插队**到统一 collector 基类之前。
-5. **是否把指标接进 `observability`**：让每期 digest 自带一行"本期 triage：留 X/Y，precision≈Z（按最近金标准）"，使质量可持续被看见。
+2. ~~**打分器起步形态**~~ **已定 = 级联 two-stage（规则粗筛 + LLM 细判）**，见 §3 / §8。
+3. **指标计算 adopt vs build**（OSS-first）：`pytrec_eval`（trec_eval 绑定，算 P/R/nDCG/MAP 的事实标准）直接用；LLM-judge 实现复用 RAGAS/TruLens 的 judge 还是自写薄封装——实现期定。**契约/qrels 加载、triage 接缝自写**（无现成件合身）。
+4. **金标准标注成本**：每域每次穷尽标采集集（摩托车 ~29 条/周），谁标、多久标一次、是否只标"换契约/换打分器时"的回归周。
+5. **与 ADR 的张力**：v1 ADR 说"不做横向抽象除非第 5/6 域有成本"。现已 6 域，且这是质量 backbone 而非花活——我判断该做，但要你确认它**插队**到统一 collector 基类之前。
+6. **是否把指标接进 `observability`**：让每期 digest 自带一行"本期 triage：留 X/Y，P≈_ R≈_（按最近 qrels）"，使质量可持续被看见。
+
+---
+
+## 8. 行业标准对齐（本设计的方法学锚点）
+
+本设计**不是自创**，是把成熟范式落到 ISBE 语境。逐项映射：
+
+| 本设计构件 | 锚定的标准 | 采用方式 |
+|---|---|---|
+| 检索契约 `retrieval:` | **Cranfield / TREC topic**（`title/desc/narrative` ↔ `intent/in_scope/narrative-style scope`） | 采用其结构与语义 |
+| qrels 金标准 | **TREC relevance judgments (qrels)** | 采用；格式对齐 `{qid, docid, rel}` |
+| 全标采集集而非池化 | TREC **pooling** 的简化——集合够小则免池化、做穷尽判定 | 适配（我们比 TREC 简单） |
+| Precision/Recall/F1/nDCG | 经典 IR 指标 + **`trec_eval` / `pytrec_eval`** 工具 | 直接复用工具算 |
+| triage 召回 vs 采集召回 | 系统侧 recall vs collection coverage 的区分 | 适配命名 |
+| 级联打分器（规则→LLM） | **two-stage retrieval**（first-stage retriever → reranker，如 BM25 → cross-encoder） | 采用范式 |
+| triage 相关性指标 | **RAG eval 检索侧**：RAGAS `context precision/recall`、TruLens RAG triad `context relevance`；**ARES** | 复用指标定义 + LLM-judge 实现 |
+| LLM-judge 校准 | **LLM-as-judge 文献**：MT-Bench/Chatbot Arena (Zheng 2023)、**G-Eval**；已知偏置 position/verbosity/self-enhancement | 采用：报告 judge↔human **Cohen's κ**，做偏置缓解 |
+| 抽样估计 precision | 评测学标准（置信区间） | 大域时采用 |
+
+**与本项目既有原则一致**：[`2026-05-14-oss-survey-first.md`](../superpowers/specs/2026-05-14-oss-survey-first.md) 说"硬方法学问题先调研 OSS 再自建"——评估方法学正属此类，故先锚标准、能复用就复用（pytrec_eval / RAGAS judge），只在无合身件处自写（契约/qrels 加载、triage 接缝）。
+
+### 参考（方法学来源）
+
+- Cleverdon, *Cranfield* evaluation paradigm；TREC qrels & pooling（Voorhees & Harman, *TREC: Experiment and Evaluation in IR*）
+- `trec_eval` / `pytrec_eval`（Van Gysel & de Rijke）— 指标计算事实标准
+- Two-stage retrieval / reranking（BM25 → cross-encoder，如 monoBERT / ColBERT 线）
+- RAG eval：**RAGAS**（Es et al.）、**TruLens** RAG triad、**ARES**（Saad-Falcon et al.）
+- LLM-as-judge：**Zheng et al. 2023**（Judging LLM-as-a-Judge, MT-Bench）、**G-Eval**（Liu et al.）；偏置与缓解综述
+- 标注一致性：**Cohen's κ** / Krippendorff's α
+
+> 注：以上为方法学定位锚点；实现期需对每个拟复用件做一次合身性 spike（尤其 RAGAS/TruLens 的 per-query 假设 vs ISBE 常驻契约的差异）。
 
 ---
 
