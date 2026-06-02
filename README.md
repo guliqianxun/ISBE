@@ -2,6 +2,12 @@
 
 > Information System with Backbone of Evolution
 
+[![CI](https://github.com/guliqianxun/ISBE/actions/workflows/ci.yml/badge.svg)](https://github.com/guliqianxun/ISBE/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+
+**中文** | [English](README.en.md)
+
 每周一早上，打开邮箱，你会看到一份周报：
 - **你关心的所有领域，过去 7 天发生了什么**（不是简讯堆叠，是 LLM 阅读完所有原文后写的人话总结）
 - **逐条点评**：哪几篇值得读、哪些是噪音、为什么

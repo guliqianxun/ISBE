@@ -1,0 +1,35 @@
+name: Bug report
+description: Report something that isn't working as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, plus what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `uv run radar topics run <topic> --collect`
+        2. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - collector / data source
+        - digester / LLM output
+        - memory / review
+        - scheduler / infra (docker)
+        - other
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Python version, LLM provider (deepseek/anthropic), Docker version.

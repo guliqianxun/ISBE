@@ -32,6 +32,8 @@ dev = [
     "pytest-asyncio>=0.23",
     "ruff>=0.5",
     "bandit>=1.7",
+    "mypy>=1.11",
+    "pre-commit>=3.8",
 ]
 
 [project.scripts]
@@ -66,3 +68,14 @@ ignore = ["UP042"]
 "src/isbe/llm/prompts.py" = ["E501"]
 "src/isbe/llm/finance_prompts.py" = ["E501"]
 "src/isbe/topics/_shared/article_reviews.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+# Gradual typing: lenient by default so it can be adopted module-by-module.
+# Not yet wired into CI; run locally with `uv run mypy src/`.
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+exclude = "(^|/)(alembic|tests|scripts)/"
