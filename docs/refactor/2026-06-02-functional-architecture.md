@@ -36,6 +36,10 @@ ISBE 是一条**确定式的周期性信息管线**：按 `topic.yaml` 配置，
 | F3 | **存储 · 三层数据模型** | facts（原子事实）/ artifacts（LLM 产出）/ memory（人的知识），三层永不混用 | PostgreSQL + SQLAlchemy 2.0 + psycopg3；MinIO blob；文件式 markdown+frontmatter | `facts/*`、`artifacts/store.py`、`memory/*` |
 | F4 | **处理 · 生成（Digest）** | 读 facts×memory → LLM 走 5 段契约 → 产出 artifact + 蒸馏草稿；不直接落正式 memory | LLM client（anthropic SDK / DeepSeek OpenAI-compat）+ tenacity；字符串 prompt + Jinja2 渲染 | `topics/_shared/{digester,articles_digester,article_reviews,comparison}.py`、`topics/*/digester.py`、`llm/*` |
 | F5 | **检索（Retrieval）** | 给 digester 喂"时间窗内的 facts" + "本 topic 相关 memory"；当前是 SQL 时间窗 + 文件过滤，**无语义检索** | SQLAlchemy 时间窗查询 + `build_memory_block()` topic 过滤；Qdrant 预留未启用 | `_shared/digester_utils.py`、各 `facts.py` 的 `*_keyword_filter` |
+
+> **⚠ F5 边界修订（2026-06-03）**：此行"检索 = SQL 时间窗"的写法掩盖了一个结构性缺口——**相关性 / 检索质量无主，不可测**。
+> 详见 [2026-06-03 检索契约与评估设计](2026-06-03-retrieval-contract-and-eval.md)：在 F2 与 F4 间应插入一等公民块
+> **FT Triage（选品与相关性）** + 旁路 **Eval（检索评估）**，二者共享一份"检索契约"。下表 §4 的 F5「低 🔧」即指此。
 | F6 | **分发 · 通知（Notify）** | 把生成的 digest 推送给用户；失败绝不让管线 fail | smtplib（STARTTLS/SSL）+ markdown→HTML + Jinja2 + Premailer 内联 CSS | `notify/render.py` |
 | F7 | **编排 · 调度（Orchestration）** | 从 `topic.yaml.schedules` 生成 Prefect deployment + cron，长进程触发；状态可恢复（红线 #3） | Prefect 3（`to_deployment` + `serve`） | `scheduler.py`、`dispatch.py` |
 | F8 | **接口（CLI）** | 人手动触发采集/生成、审核 memory、看状态；不含业务逻辑（仅编排调用） | Typer（4 个 subapp + `status`） | `cli/*` |
