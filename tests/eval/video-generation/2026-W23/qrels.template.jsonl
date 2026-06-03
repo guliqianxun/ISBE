@@ -1,0 +1,88 @@
+{"item_id": "2602.20999", "rel": null, "facet": null, "must_hit": false, "_title": "VII: Visual Instruction Injection for Jailbreaking Image-to-Video Generation Models", "_arxiv": "2602.20999", "_cite": 6}
+{"item_id": "2602.10113", "rel": null, "facet": null, "must_hit": false, "_title": "ConsID-Gen: View-Consistent and Identity-Preserving Image-to-Video Generation", "_arxiv": "2602.10113", "_cite": 5}
+{"item_id": "2601.05729", "rel": null, "facet": null, "must_hit": false, "_title": "TAGRPO: Boosting GRPO on Image-to-Video Generation with Direct Trajectory Alignment", "_arxiv": "2601.05729", "_cite": 6}
+{"item_id": "s2:e3fe60be0268f619dd9f4a710db42d3a9181c92b", "rel": null, "facet": null, "must_hit": false, "_title": "Prompt Guided Image to Video Resume", "_arxiv": null, "_cite": 0}
+{"item_id": "2512.06674", "rel": null, "facet": null, "must_hit": false, "_title": "RunawayEvil: Jailbreaking the Image-to-Video Generative Models", "_arxiv": "2512.06674", "_cite": 5}
+{"item_id": "2511.01266", "rel": null, "facet": null, "must_hit": false, "_title": "MotionStream: Real-Time Video Generation with Interactive Motion Controls", "_arxiv": "2511.01266", "_cite": 46}
+{"item_id": "s2:45f59417127f269d4442cda257ca2155bb5ffa26", "rel": null, "facet": null, "must_hit": false, "_title": "Interactive image-to-video transfer learning", "_arxiv": null, "_cite": 0}
+{"item_id": "2510.14255", "rel": null, "facet": null, "must_hit": false, "_title": "Identity-Preserving Image-to-Video Generation via Reward-Guided Optimization", "_arxiv": "2510.14255", "_cite": 6}
+{"item_id": "2510.02283", "rel": null, "facet": null, "must_hit": false, "_title": "Self-Forcing++: Towards Minute-Scale High-Quality Video Generation", "_arxiv": "2510.02283", "_cite": 110}
+{"item_id": "2509.26391", "rel": null, "facet": null, "must_hit": false, "_title": "MotionRAG: Motion Retrieval-Augmented Image-to-Video Generation", "_arxiv": "2509.26391", "_cite": 4}
+{"item_id": "2509.25161", "rel": null, "facet": null, "must_hit": false, "_title": "Rolling Forcing: Autoregressive Long Video Diffusion in Real Time", "_arxiv": "2509.25161", "_cite": 114}
+{"item_id": "2509.24427", "rel": null, "facet": null, "must_hit": false, "_title": "UI2V-Bench: An Understanding-based Image-to-video Generation Benchmark", "_arxiv": "2509.24427", "_cite": 5}
+{"item_id": "2509.24695", "rel": null, "facet": null, "must_hit": false, "_title": "SANA-Video: Efficient Video Generation with Block Linear Diffusion Transformer", "_arxiv": "2509.24695", "_cite": 67}
+{"item_id": "2509.22622", "rel": null, "facet": null, "must_hit": false, "_title": "LongLive: Real-time Interactive Long Video Generation", "_arxiv": "2509.22622", "_cite": 138}
+{"item_id": "2508.21058", "rel": null, "facet": null, "must_hit": false, "_title": "Mixture of Contexts for Long Video Generation", "_arxiv": "2508.21058", "_cite": 69}
+{"item_id": "2508.18621", "rel": null, "facet": null, "must_hit": false, "_title": "Wan-S2V: Audio-Driven Cinematic Video Generation", "_arxiv": "2508.18621", "_cite": 47}
+{"item_id": "2508.01698", "rel": null, "facet": null, "must_hit": false, "_title": "Versatile Transition Generation with Image-to-Video Diffusion", "_arxiv": "2508.01698", "_cite": 7}
+{"item_id": "2507.12898", "rel": null, "facet": null, "must_hit": false, "_title": "Vidar: Embodied Video Diffusion Model for Generalist Manipulation", "_arxiv": "2507.12898", "_cite": 28}
+{"item_id": "2507.07982", "rel": null, "facet": null, "must_hit": false, "_title": "Geometry Forcing: Marrying Video Diffusion and 3D Representation for Consistent World Modeling", "_arxiv": "2507.07982", "_cite": 54}
+{"item_id": "2506.23858", "rel": null, "facet": null, "must_hit": false, "_title": "VMoBA: Mixture-of-Block Attention for Video Diffusion Models", "_arxiv": "2506.23858", "_cite": 23}
+{"item_id": "2506.19852", "rel": null, "facet": null, "must_hit": false, "_title": "Radial Attention: O(n log n) Sparse Attention with Energy Decay for Long Video Generation", "_arxiv": "2506.19852", "_cite": 46}
+{"item_id": "2506.18866", "rel": null, "facet": null, "must_hit": false, "_title": "OmniAvatar: Efficient Audio-Driven Avatar Video Generation with Adaptive Body Animation", "_arxiv": "2506.18866", "_cite": 67}
+{"item_id": "2506.17201", "rel": null, "facet": null, "must_hit": false, "_title": "Hunyuan-GameCraft: High-dynamic Interactive Game Video Generation with Hybrid History Condition", "_arxiv": "2506.17201", "_cite": 55}
+{"item_id": "s2:ebc8a7e4b2a177386a2ac5285d339827de7f3ffd", "rel": null, "facet": null, "must_hit": false, "_title": "I2VGuard: Safeguarding Images against Misuse in Diffusion-based Image-to-Video Models", "_arxiv": null, "_cite": 7}
+{"item_id": "2506.08456", "rel": null, "facet": null, "must_hit": false, "_title": "Improving Motion in Image-to-Video Models via Adaptive Low-Pass Guidance", "_arxiv": "2506.08456", "_cite": 4}
+{"item_id": "2506.09113", "rel": null, "facet": null, "must_hit": false, "_title": "Seedance 1.0: Exploring the Boundaries of Video Generation Models", "_arxiv": "2506.09113", "_cite": 204}
+{"item_id": "2506.08009", "rel": null, "facet": null, "must_hit": false, "_title": "Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion", "_arxiv": "2506.08009", "_cite": 349}
+{"item_id": "2506.07713", "rel": null, "facet": null, "must_hit": false, "_title": "Consistent Video Editing as Flow-Driven Image-to-Video Generation", "_arxiv": "2506.07713", "_cite": 6}
+{"item_id": "2506.04225", "rel": null, "facet": null, "must_hit": false, "_title": "Voyager: Long-Range and World-Consistent Video Diffusion for Explorable 3D Scene Generation", "_arxiv": "2506.04225", "_cite": 76}
+{"item_id": "2506.03141", "rel": null, "facet": null, "must_hit": false, "_title": "Context as Memory: Scene-Consistent Interactive Long Video Generation with Memory Retrieval", "_arxiv": "2506.03141", "_cite": 108}
+{"item_id": "2505.22647", "rel": null, "facet": null, "must_hit": false, "_title": "Let Them Talk: Audio-Driven Multi-Person Conversational Video Generation", "_arxiv": "2505.22647", "_cite": 53}
+{"item_id": "2505.21491", "rel": null, "facet": null, "must_hit": false, "_title": "Frame In-N-Out: Unbounded Controllable Image-to-Video Generation", "_arxiv": "2505.21491", "_cite": 8}
+{"item_id": "2505.20287", "rel": null, "facet": null, "must_hit": false, "_title": "MotionPro: A Precise Motion Controller for Image-to-Video Generation*", "_arxiv": "2505.20287", "_cite": 24}
+{"item_id": "2505.19901", "rel": null, "facet": null, "must_hit": false, "_title": "Dynamic-I2V: Exploring Image-to-Video Generation Models via Multimodal LLM", "_arxiv": "2505.19901", "_cite": 5}
+{"item_id": "2505.18875", "rel": null, "facet": null, "must_hit": false, "_title": "Sparse VideoGen2: Accelerate Video Generation with Sparse Attention via Semantic-Aware Permutation", "_arxiv": "2505.18875", "_cite": 72}
+{"item_id": "2505.17333", "rel": null, "facet": null, "must_hit": false, "_title": "Temporal Differential Fields for 4D Motion Modeling via Image-to-Video Synthesis", "_arxiv": "2505.17333", "_cite": 4}
+{"item_id": "2505.14357", "rel": null, "facet": null, "must_hit": false, "_title": "Vid2World: Crafting Video Diffusion Models to Interactive World Models", "_arxiv": "2505.14357", "_cite": 42}
+{"item_id": "2505.13389", "rel": null, "facet": null, "must_hit": false, "_title": "VSA: Faster Video Diffusion with Trainable Sparse Attention", "_arxiv": "2505.13389", "_cite": 77}
+{"item_id": "2505.13211", "rel": null, "facet": null, "must_hit": false, "_title": "MAGI-1: Autoregressive Video Generation at Scale", "_arxiv": "2505.13211", "_cite": 197}
+{"item_id": "2505.04512", "rel": null, "facet": null, "must_hit": false, "_title": "HunyuanCustom: A Multimodal-Driven Architecture for Customized Video Generation", "_arxiv": "2505.04512", "_cite": 61}
+{"item_id": "2504.14899", "rel": null, "facet": null, "must_hit": false, "_title": "Uni3C: Unifying Precisely 3D-Enhanced Camera and Human Motion Controls for Video Generation", "_arxiv": "2504.14899", "_cite": 57}
+{"item_id": "2504.12626", "rel": null, "facet": null, "must_hit": false, "_title": "Frame Context Packing and Drift Prevention in Next-Frame-Prediction Video Diffusion Models", "_arxiv": "2504.12626", "_cite": 93}
+{"item_id": "2504.11289", "rel": null, "facet": null, "must_hit": false, "_title": "UniAnimate-DiT: Human Image Animation with Large-Scale Video Diffusion Transformer", "_arxiv": "2504.11289", "_cite": 39}
+{"item_id": "s2:4d5335739d7596c4efc5e895859bc141affebb64", "rel": null, "facet": null, "must_hit": false, "_title": "TC-LLaVA: Rethinking the Transfer of LLava from Image to Video Understanding with Temporal Considerations", "_arxiv": null, "_cite": 4}
+{"item_id": "2504.08685", "rel": null, "facet": null, "must_hit": false, "_title": "Seaweed-7B: Cost-Effective Training of Video Generation Foundation Model", "_arxiv": "2504.08685", "_cite": 85}
+{"item_id": "2504.05298", "rel": null, "facet": null, "must_hit": false, "_title": "One-Minute Video Generation with Test-Time Training", "_arxiv": "2504.05298", "_cite": 103}
+{"item_id": "2504.02436", "rel": null, "facet": null, "must_hit": false, "_title": "SkyReels-A2: Compose Anything in Video Diffusion Transformers", "_arxiv": "2504.02436", "_cite": 61}
+{"item_id": "2503.23377", "rel": null, "facet": null, "must_hit": false, "_title": "JavisDiT: Joint Audio-Video Diffusion Transformer with Hierarchical Spatio-Temporal Prior Synchronization", "_arxiv": "2503.23377", "_cite": 53}
+{"item_id": "2503.21781", "rel": null, "facet": null, "must_hit": false, "_title": "VideoMage: Multi-Subject and Motion Customization of Text-to-Video Diffusion Models", "_arxiv": "2503.21781", "_cite": 15}
+{"item_id": "2503.21755", "rel": null, "facet": null, "must_hit": false, "_title": "VBench-2.0: Advancing Video Generation Benchmark Suite for Intrinsic Faithfulness", "_arxiv": "2503.21755", "_cite": 182}
+{"item_id": "2503.16396", "rel": null, "facet": null, "must_hit": false, "_title": "SV4D 2.0: Enhancing Spatio-Temporal Consistency in Multi-View Video Diffusion for High-Quality 4D Generation", "_arxiv": "2503.16396", "_cite": 45}
+{"item_id": "2503.14966", "rel": null, "facet": null, "must_hit": false, "_title": "Ultrasound Image-to-Video Synthesis via Latent Dynamic Diffusion Models", "_arxiv": "2503.14966", "_cite": 20}
+{"item_id": "2503.11251", "rel": null, "facet": null, "must_hit": false, "_title": "Step-Video-TI2V Technical Report: A State-of-the-Art Text-Driven Image-to-Video Generation Model", "_arxiv": "2503.11251", "_cite": 24}
+{"item_id": "2503.10592", "rel": null, "facet": null, "must_hit": false, "_title": "CameraCtrl II: Dynamic Scene Exploration via Camera-Controlled Video Diffusion Models", "_arxiv": "2503.10592", "_cite": 75}
+{"item_id": "2503.10342", "rel": null, "facet": null, "must_hit": false, "_title": "DreamInsert: Zero-Shot Image-to-Video Object Insertion from A Single Image", "_arxiv": "2503.10342", "_cite": 5}
+{"item_id": "2503.10589", "rel": null, "facet": null, "must_hit": false, "_title": "Long Context Tuning for Video Generation", "_arxiv": "2503.10589", "_cite": 92}
+{"item_id": "2503.09595", "rel": null, "facet": null, "must_hit": false, "_title": "PISA Experiments: Exploring Physics Post-Training for Video Diffusion Models by Watching Stuff Drop", "_arxiv": "2503.09595", "_cite": 39}
+{"item_id": "2503.09733", "rel": null, "facet": null, "must_hit": false, "_title": "I2V3D: Controllable Image-to-Video Generation with 3D Guidance", "_arxiv": "2503.09733", "_cite": 6}
+{"item_id": "2503.09642", "rel": null, "facet": null, "must_hit": false, "_title": "Open-Sora 2.0: Training a Commercial-Level Video Generation Model in $200k", "_arxiv": "2503.09642", "_cite": 133}
+{"item_id": "2503.07418", "rel": null, "facet": null, "must_hit": false, "_title": "AR-Diffusion: Asynchronous Video Generation with Auto-Regressive Diffusion", "_arxiv": "2503.07418", "_cite": 44}
+{"item_id": "2503.05082", "rel": null, "facet": null, "must_hit": false, "_title": "Taming Video Diffusion Prior with Scene-Grounding Guidance for 3D Gaussian Splatting from Sparse Inputs", "_arxiv": "2503.05082", "_cite": 24}
+{"item_id": "2503.03751", "rel": null, "facet": null, "must_hit": false, "_title": "Gen3C: 3D-Informed World-Consistent Video Generation with Precise Camera Control", "_arxiv": "2503.03751", "_cite": 246}
+{"item_id": "2503.00948", "rel": null, "facet": null, "must_hit": false, "_title": "Extrapolating and Decoupling Image-to-Video Generation Models: Motion Modeling is Easier Than You Think", "_arxiv": "2503.00948", "_cite": 12}
+{"item_id": "2502.20694", "rel": null, "facet": null, "must_hit": false, "_title": "WorldModelBench: Judging Video Generation Models As World Models", "_arxiv": "2502.20694", "_cite": 73}
+{"item_id": "2502.15894", "rel": null, "facet": null, "must_hit": false, "_title": "RIFLEx: A Free Lunch for Length Extrapolation in Video Diffusion Transformers", "_arxiv": "2502.15894", "_cite": 62}
+{"item_id": "2502.14801", "rel": null, "facet": null, "must_hit": false, "_title": "AVD2: Accident Video Diffusion for Accident Video Description", "_arxiv": "2502.14801", "_cite": 20}
+{"item_id": "2502.11079", "rel": null, "facet": null, "must_hit": false, "_title": "Phantom: Subject-Consistent Video Generation via Cross-Modal Alignment", "_arxiv": "2502.11079", "_cite": 101}
+{"item_id": "2502.10841", "rel": null, "facet": null, "must_hit": false, "_title": "SkyReels-A1: Expressive Portrait Animation in Video Diffusion Transformers", "_arxiv": "2502.10841", "_cite": 38}
+{"item_id": "2502.10059", "rel": null, "facet": null, "must_hit": false, "_title": "RealCam-I2V: Real-World Image-to-Video Generation with Interactive Complex Camera Control", "_arxiv": "2502.10059", "_cite": 49}
+{"item_id": "2502.08244", "rel": null, "facet": null, "must_hit": false, "_title": "FloVD: Optical Flow Meets Video Diffusion Model for Enhanced Camera-Controlled Video Synthesis", "_arxiv": "2502.08244", "_cite": 34}
+{"item_id": "2502.07531", "rel": null, "facet": null, "must_hit": false, "_title": "VidCRAFT3: Camera, Object, and Lighting Control for Image-to-Video Generation", "_arxiv": "2502.07531", "_cite": 24}
+{"item_id": "2502.06764", "rel": null, "facet": null, "must_hit": false, "_title": "History-Guided Video Diffusion", "_arxiv": "2502.06764", "_cite": 127}
+{"item_id": "2502.06155", "rel": null, "facet": null, "must_hit": false, "_title": "Efficient-vDiT: Efficient Video Diffusion Transformers With Attention Tile", "_arxiv": "2502.06155", "_cite": 23}
+{"item_id": "2502.07001", "rel": null, "facet": null, "must_hit": false, "_title": "From Image to Video: An Empirical Study of Diffusion Representations", "_arxiv": "2502.07001", "_cite": 9}
+{"item_id": "2502.04299", "rel": null, "facet": null, "must_hit": false, "_title": "MotionCanvas: Cinematic Shot Design with Controllable Image-to-Video Generation", "_arxiv": "2502.04299", "_cite": 44}
+{"item_id": "2502.04507", "rel": null, "facet": null, "must_hit": false, "_title": "Fast Video Generation with Sliding Tile Attention", "_arxiv": "2502.04507", "_cite": 98}
+{"item_id": "2502.01776", "rel": null, "facet": null, "must_hit": false, "_title": "Sparse VideoGen: Accelerating Video Diffusion Transformers with Spatial-Temporal Sparsity", "_arxiv": "2502.01776", "_cite": 166}
+{"item_id": "2501.18590", "rel": null, "facet": null, "must_hit": false, "_title": "DiffusionRenderer: Neural Inverse and Forward Rendering with Video Diffusion Models", "_arxiv": "2501.18590", "_cite": 42}
+{"item_id": "2501.13918", "rel": null, "facet": null, "must_hit": false, "_title": "Improving Video Generation with Human Feedback", "_arxiv": "2501.13918", "_cite": 202}
+{"item_id": "2501.08331", "rel": null, "facet": null, "must_hit": false, "_title": "Go-with-the-Flow: Motion-Controllable Video Diffusion Models Using Real-Time Warped Noise", "_arxiv": "2501.08331", "_cite": 106}
+{"item_id": "2501.08453", "rel": null, "facet": null, "must_hit": false, "_title": "Vchitect-2.0: Parallel Transformer for Scaling Up Video Diffusion Models", "_arxiv": "2501.08453", "_cite": 53}
+{"item_id": "s2:8c93c2743a1fbfaa9aa08a435c776b63a4e5665d", "rel": null, "facet": null, "must_hit": false, "_title": "I2V-CMGAN: Generative Adversarial Cross-Modal Network-Based Image-to-Video Person Re-identification", "_arxiv": null, "_cite": 3}
+{"item_id": "2501.08316", "rel": null, "facet": null, "must_hit": false, "_title": "Diffusion Adversarial Post-Training for One-Step Video Generation", "_arxiv": "2501.08316", "_cite": 103}
+{"item_id": "2501.03847", "rel": null, "facet": null, "must_hit": false, "_title": "Diffusion as Shader: 3D-aware Video Diffusion for Versatile Video Generation Control", "_arxiv": "2501.03847", "_cite": 154}
+{"item_id": "2501.03931", "rel": null, "facet": null, "must_hit": false, "_title": "MagicMirror: ID-Preserved Video Generation in Video Diffusion Transformers", "_arxiv": "2501.03931", "_cite": 31}
+{"item_id": "2501.03059", "rel": null, "facet": null, "must_hit": false, "_title": "Through-The-Mask: Mask-based Motion Trajectories for Image-to-Video Generation", "_arxiv": "2501.03059", "_cite": 18}
+{"item_id": "2501.01042", "rel": null, "facet": null, "must_hit": false, "_title": "Transferability of Adversarial Attacks in Video-based MLLMs: A Cross-modal Image-to-Video Approach", "_arxiv": "2501.01042", "_cite": 6}
+{"item_id": "s2:9aec97a1576d6f0f4f1907ad9e9983e7b86ce986", "rel": null, "facet": null, "must_hit": false, "_title": "CameraCtrl: Enabling Camera Control for Video Diffusion Models", "_arxiv": null, "_cite": 53}

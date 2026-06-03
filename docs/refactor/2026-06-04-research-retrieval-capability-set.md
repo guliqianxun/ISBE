@@ -117,11 +117,37 @@ sortBy submittedDate desc, max_results=50, 关键词仅匹配 abstract
 （6 次 UA+退避重试，全 429 / RemoteProtocolError，`fetched=0`）——即 PROGRESS 反复记录的
 "CN 本机 arxiv 网络顽疾"。**故本节量化数字暂缺**，不影响 §3 缺口结论（查询结构分析即确凿证据）。
 
-补数字的可行路径（择一，下一步做）：
-- 走**现有 collector**（`_shared/arxiv.py` 自带 tenacity 退避 + `export.arxiv.org`，且生产在服务器侧跑过）冻一份真实池；
-- 或在服务器 192.168.0.156 上跑 freezer（PROGRESS：服务器侧 arxiv 可达）。
+**数据源可达性诊断 + 解决（2026-06-04，"先解决 arxiv 可达"的产出）**：
 
-待回填的三项：① 当前 6-kw 查询本周命中数；② 其中 `world model` 命中样本混入的非视频生成（RL/机器人）比例（RC4 精度泄漏）；③ 跨写法+跨 category 池相对当前窄查询的漏检数（RC2/RC3 召回缺口）。
+| 源 | 本机实测 | 结论 |
+|---|---|---|
+| `export.arxiv.org` API（经代理 127.0.0.1:7890） | 429 + 14B（出口 IP 被 WAF 封） | ❌ 不可达 |
+| `export.arxiv.org` 直连（绕代理） | RemoteProtocolError 断连 | ❌ 不可达 |
+| **Semantic Scholar** graph API | 退避 4 次后 200，命中 ~41.8 万 | ✅ **可达**（退避） |
+| HuggingFace daily papers | 200 即通，带 upvotes | ✅ 可达（备选 + 显著性信号） |
+
+**解决方案**：本机 arxiv API WAF 封死、仅服务器侧可达；改用 **Semantic Scholar（退避）** 作 eval 数据源 ——
+它返回同样的论文 + `externalIds.ArXiv`（桥回现有 papers 管线）+ `citationCount`（RC5 显著性）+
+`fieldsOfStudy`（RC7 归类）+ references（RC6 谱系）。**这反而升级了能力集**：arxiv API 给不了这些元数据。
+新增 `scripts/eval/freeze_papers.py`（S2 多关键词并集 → 比当前单窄查询更宽的池，供 RC2/RC3 召回评估）。
+
+待回填的三项（标注 qrels 后算）：① 当前 6-kw 窄查询相对 S2 宽池的漏检数（RC2/RC3 召回缺口）；
+② `world model` 命中混入的非视频生成（RL/机器人）比例（RC4 精度泄漏）；③ PRISMA flow 计数（RC8）。
+**冻结结果（snapshot 2026-W23）**：88 篇真实视频生成论文（82 带 arxiv_id），存于
+`tests/eval/video-generation/2026-W23/`。S2 未授权限速重，6 条关键词查询里 3 条成功
+（video diffusion / image-to-video / video generation），3 条退避耗尽失败
+（text-to-video / world model / video synthesis）——**池暂为部分**，补全靠重跑或申请免费 S2 API key。
+
+**池里已肉眼可见的能力缺口活样本**（无需标注就能看出，印证 §3）：
+- **RC4 精度泄漏**：`VII: Visual Instruction Injection for Jailbreaking` / `RunawayEvil: Jailbreaking the
+  Image-to-Video` —— 命中 "image-to-video" 字串但其实是**安全/越狱论文**，非视频生成方法；
+  另有若干 `cite=0` 无 arxiv_id 的低质条目（"Prompt Guided Image to Video Resume"）。
+- **RC4 反例（精度其实没想象差）**：`world model` 那 7 个命中来自**别的**查询，且 Vid2World / MAGI-1
+  确是视频生成×世界模型的正例 —— 说明 S2 的相关性排序已先压掉了"arxiv 关键词 ilike 会捞进 RL 世界模型"的泄漏。
+- **RC5 信号现成**：`citationCount` 直接区分显著性（Self-Forcing++=110 / MotionStream=46 vs 一众 cite≤6），
+  arxiv API 给不了这个。
+
+待回填三项（标 qrels 后算）：① 当前 6-kw 窄查询相对 S2 宽池漏检数（RC2/RC3）；② RC4 精度（泄漏比例）；③ PRISMA flow 计数（RC8）。
 
 ---
 
