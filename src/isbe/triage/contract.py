@@ -46,3 +46,15 @@ def load_contract(path: str | Path) -> RetrievalContract:
     if "retrieval" in data:
         data = data["retrieval"]
     return RetrievalContract.model_validate(data)
+
+
+def contract_from_config(cfg: dict | None) -> RetrievalContract | None:
+    """从已载入的 topic.yaml dict 取 `retrieval:` 块；缺省返回 None（→ triage 直通）。
+
+    这是迁移安全网：未写 `retrieval:` 块的 topic（当前全部 6 个产线域）拿到 None，
+    triage 直通全留，digest 行为逐字节不变。
+    """
+    block = (cfg or {}).get("retrieval")
+    if not block:
+        return None
+    return RetrievalContract.model_validate(block)

@@ -5,11 +5,48 @@ and memory loading utilities.
 """
 import os
 import re
+from collections.abc import Callable
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
 from isbe.memory.loader import load_index
 from isbe.topics.base import PendingMemoryDraft
+from isbe.triage import Item, RetrievalContract, TriageResult, triage
+
+
+def paper_to_item(p) -> Item:
+    """Paper ORM 行 → triage Item（duck-typed，不 import ORM，守模块边界）。"""
+    return Item(
+        id=p.arxiv_id, source="arxiv", headline=p.title, summary=p.abstract,
+        url=p.source_url, published_at=p.submitted_at,
+    )
+
+
+def article_to_item(a) -> Item:
+    """Article ORM 行 → triage Item。"""
+    return Item(
+        id=a.id, source=a.source, headline=a.headline, summary=a.summary,
+        url=a.url, published_at=a.published_at,
+    )
+
+
+def apply_triage(
+    rows: list,
+    contract: RetrievalContract | None,
+    to_item: Callable[[object], Item],
+) -> tuple[list, TriageResult | None]:
+    """对 facts 行跑 triage，返回 (kept_rows, result)。
+
+    迁移安全网：contract 为 None（未写 `retrieval:` 块）→ 原样返回，行为不变。
+    保持 rows 与 items 顺序对应，按 kept_ids 过滤回原始行（下游照常用 ORM 对象）。
+    """
+    if contract is None:
+        return list(rows), None
+    items = [to_item(r) for r in rows]
+    result = triage(items, contract)
+    kept_ids = result.kept_ids
+    kept_rows = [r for r, it in zip(rows, items, strict=True) if it.id in kept_ids]
+    return kept_rows, result
 
 
 def facts_window(today: date, *, lookback_days: int) -> tuple[datetime, datetime]:

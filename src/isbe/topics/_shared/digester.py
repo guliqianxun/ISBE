@@ -27,8 +27,10 @@ from isbe.observability.runs import topic_run
 from isbe.topics._shared.arxiv import papers_keyword_filter
 from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
+    apply_triage,
     build_memory_block,
     facts_window,
+    paper_to_item,
     parse_bracketed_reviews,
     parse_distillation_section,  # noqa: F401  — re-exported for back-compat
     parse_paper_reviews,
@@ -42,6 +44,8 @@ from isbe.topics._shared.digester_utils import (
 from isbe.topics.base import DigestResult, DigestSection
 from isbe.topics.nowcasting.facts import Paper, Repo  # shared facts tables
 from isbe.topics.registry import default_topics_root, load_topic_config
+from isbe.triage import RetrievalContract
+from isbe.triage.contract import contract_from_config
 
 SHARED_TEMPLATE = Path(__file__).parent / "templates" / "weekly.j2"
 
@@ -88,6 +92,7 @@ def weekly_digester(
             facts_window_days=facts_window_days,
             keywords=keywords,
             include_repos=include_repos,
+            contract=contract_from_config(cfg),
             run=run,
         )
 
@@ -101,7 +106,8 @@ def _digester_impl(
     facts_window_days: int,
     keywords: list[str],
     include_repos: bool,
-    run,
+    contract: RetrievalContract | None = None,
+    run=None,
 ) -> DigestResult:
     cutoff_low, cutoff_high = facts_window(today, lookback_days=facts_window_days)
 
@@ -114,6 +120,9 @@ def _digester_impl(
         if kw_filter is not None:
             query = query.where(kw_filter)
         papers = list(s.scalars(query).all())
+        # FT triage：契约缺省（当前所有产线域）→ 直通全留，行为不变。
+        n_pre_triage = len(papers)
+        papers, triage_result = apply_triage(papers, contract, paper_to_item)
         repos = list(s.scalars(select(Repo)).all()) if include_repos else None
         prior_artifact = load_prior_artifact(s, topic_id, period_label)
         comparison = build_comparison(
@@ -189,6 +198,12 @@ def _digester_impl(
 
     run.payload["period_label"] = period_label
     run.payload["n_papers"] = len(papers)
+    if triage_result is not None:
+        run.payload["triage"] = {
+            "kept": len(papers),
+            "dropped": len(triage_result.dropped),
+            "pre_triage": n_pre_triage,
+        }
     run.payload["n_repos"] = len(repos) if repos is not None else 0
     run.payload["n_drafts"] = len(drafts)
     run.payload["artifact_id"] = str(artifact_id)

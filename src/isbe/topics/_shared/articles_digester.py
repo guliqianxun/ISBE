@@ -35,6 +35,8 @@ from isbe.observability.runs import topic_run
 from isbe.topics._shared.article_reviews import collect_article_reviews
 from isbe.topics._shared.comparison import build_comparison, load_prior_artifact
 from isbe.topics._shared.digester_utils import (
+    apply_triage,
+    article_to_item,
     build_memory_block,
     facts_window,
     memory_root,
@@ -43,7 +45,12 @@ from isbe.topics._shared.digester_utils import (
     split_sections,
 )
 from isbe.topics.base import DigestResult, DigestSection
-from isbe.topics.registry import default_topics_root, load_topic_config_typed
+from isbe.topics.registry import (
+    default_topics_root,
+    load_topic_config,
+    load_topic_config_typed,
+)
+from isbe.triage.contract import contract_from_config
 
 
 def _build_facts_block(
@@ -149,6 +156,10 @@ def _run_impl(
                 .order_by(Article.published_at.desc())
             ).all()
         )
+        # FT triage：契约缺省（当前所有产线域）→ 直通全留，行为不变。
+        contract = contract_from_config(load_topic_config(default_topics_root(), topic_id))
+        n_pre_triage = len(articles)
+        articles, triage_result = apply_triage(articles, contract, article_to_item)
         prior_artifact = load_prior_artifact(s, topic_id, period_label)
         comparison = build_comparison(
             prior_artifact,
@@ -236,6 +247,12 @@ def _run_impl(
 
     run.payload["period_label"] = period_label
     run.payload["n_articles"] = len(articles)
+    if triage_result is not None:
+        run.payload["triage"] = {
+            "kept": len(articles),
+            "dropped": len(triage_result.dropped),
+            "pre_triage": n_pre_triage,
+        }
     run.payload["n_drafts"] = len(drafts)
     run.payload["artifact_id"] = str(artifact_id)
     run.payload["llm_input_tokens"] = resp.input_tokens
