@@ -22,6 +22,9 @@ class Item:
     url: str = ""
     published_at: datetime | None = None
     lang: str = "en"
+    # 可选元数据（论文源给，RSS 源为空）。RC5 显著性 / RC6 谱系消费。
+    citation_count: int | None = None
+    fields_of_study: tuple[str, ...] = ()
 
     @property
     def text(self) -> str:

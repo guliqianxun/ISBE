@@ -15,6 +15,7 @@ from isbe.triage.contract import RetrievalContract, load_contract
 from isbe.triage.eval import EvalMetrics, evaluate
 from isbe.triage.models import Item, Qrel, RelevanceScore, TriageResult
 from isbe.triage.scorer import triage
+from isbe.triage.significance import SignificanceScore, rank_significance, ranked
 
 __all__ = [
     "EvalMetrics",
@@ -22,8 +23,11 @@ __all__ = [
     "Qrel",
     "RelevanceScore",
     "RetrievalContract",
+    "SignificanceScore",
     "TriageResult",
     "evaluate",
     "load_contract",
+    "rank_significance",
+    "ranked",
     "triage",
 ]
