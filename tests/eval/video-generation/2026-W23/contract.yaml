@@ -1,0 +1,53 @@
+# 视频生成检索契约（= TREC topic）。钉住本快照所用版本。
+# facets 从 2026-W23 真实 88 篇池归纳（非先验拍定）；多标签可重叠。
+# >>> 待用户增删确认 <<<  改任一字段请 bump version，并刷新同目录 qrels 回归基线。
+intent: "视频生成模型科研追踪：新方法/架构、SOTA、benchmark、可控/高效/世界模型，及影响该方向判断的里程碑工作"
+version: 1
+
+in_scope:
+  - 视频生成方法 / 模型 / 架构本身（diffusion / autoregressive / flow / 世界模型）
+  - 评测指标、benchmark、数据集
+  - 训练 / 推理效率化（蒸馏、稀疏注意力、少步、长度外推）
+  - 可控生成（相机 / 运动 / 主体 / 音频驱动）与一致性
+  - 基座大模型发布、规模化训练配方、对齐 / RLHF / 物理后训练
+
+out_of_scope:
+  - 视频**理解** / 检索 / 重识别 / MLLM（把 "image-to-video" 当字串命中，非生成方法）
+  - 针对生成模型的**安全 / 越狱 / 防护**论文（攻击或防御，非生成方法本身）
+  - 纯应用堆叠 / 无方法贡献 / 无 arxiv 的低质条目
+  - 强化学习 "world model"（除非确为视频生成）
+
+# RC1 子主题面（从池归纳，10 面，多标签可重叠）
+facets:
+  - autoregressive-long      # 自回归 / 长视频 / 实时流式（池里最热：Self-Forcing/MAGI-1/LongLive/Rolling-Forcing）
+  - efficiency               # 加速 / 稀疏注意力 / 蒸馏 / 少步 / 长度外推
+  - controllable             # 相机 / 运动 / 轨迹可控
+  - world-model-3d           # 世界模型 / 3D 一致 / 可探索 / 游戏
+  - human-avatar             # 数字人 / 音频驱动 / 肖像动画（文档原 8 面漏掉）
+  - foundation               # 基座大模型 / 规模化 / 训练配方（文档原 8 面漏掉）
+  - image-to-video           # 图生视频本体
+  - subject-customization    # 主体 / 身份保持 / 定制（Phantom/VideoMage/HunyuanCustom）
+  - eval-bench               # 评测 / benchmark / 指标
+  - physics-feedback         # 物理 / RLHF / 人类反馈 / 对齐
+
+# machine signals：triage 规则阶段一直接消费（零 LLM）
+out_of_scope_keywords:
+  - jailbreak
+  - re-identification
+  - re-id
+  - "video understanding"
+  - "adversarial attack"
+  - safeguard
+  - misuse
+
+entity_terms:
+  [diffusion, autoregressive, "text-to-video", "image-to-video", transformer,
+   attention, "world model", avatar, camera, motion, benchmark]
+
+must_not_miss:
+  - 任一主流实验室基座视频模型发布（Seedance / Wan / Hunyuan / Open-Sora / MAGI / Kling / Veo / Sora 级）
+  - 公开 benchmark 榜首易主（VBench 等）
+  - 开宗立派的范式级方法（如自回归实时流式奠基作 Self-Forcing 线）
+  # 操作化：citationCount >= 池 P90  OR  引用速度 cite/age 异常  OR  命名匹配大厂前缀
+
+quality_bar: "好论文 = 有方法/架构贡献或 SOTA/benchmark/公开代码；非纯应用堆叠、非两页 workshop note、非把 image-to-video 当字串的安全/理解/重识别论文"

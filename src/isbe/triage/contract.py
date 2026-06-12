@@ -29,6 +29,9 @@ class RetrievalContract(BaseModel):
     out_of_scope: list[str] = Field(default_factory=list)
     quality_bar: str = ""
 
+    # RC1 子主题面（faceted；多标签，可重叠）。驱动分面 digest（M3）+ 分面覆盖核算。
+    facets: list[str] = Field(default_factory=list)
+
     # machine signals（规则阶段直接用）
     out_of_scope_keywords: list[str] = Field(default_factory=list)
     entity_terms: list[str] = Field(default_factory=list)
