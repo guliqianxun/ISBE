@@ -21,6 +21,22 @@ from isbe.triage.pipeline import retrieve
 REPO = Path(__file__).resolve().parents[2]
 
 
+def _load_env() -> None:
+    """把 .env 的 KEY=VALUE 注入 os.environ（仅当未设），供 LLM-judge 取 key。"""
+    import os
+    env = REPO / ".env"
+    if not env.exists():
+        return
+    for line in env.read_text(encoding="utf-8").splitlines():
+        s = line.strip()
+        if not s or s.startswith("#") or "=" not in s:
+            continue
+        k, v = s.split("=", 1)
+        k, v = k.strip(), v.strip().strip('"').strip("'")
+        if k and v and k not in os.environ:
+            os.environ[k] = v
+
+
 def _find_contract(topic: str) -> RetrievalContract:
     flat = REPO / "tests" / "eval" / topic / "contract.yaml"
     if flat.exists():
@@ -45,6 +61,8 @@ def main() -> None:
     ap.add_argument("--judge", action="store_true", help="跑 stage-2 LLM-judge 语义筛")
     args = ap.parse_args()
 
+    if args.judge:
+        _load_env()
     today = date.today()
     pub_date = f"{today - timedelta(days=args.since_days)}:{today}"
     contract = _find_contract(args.topic)
