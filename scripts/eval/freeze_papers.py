@@ -83,9 +83,10 @@ def freeze(topic: str, year_from: int, per_query: int) -> None:
             }, ensure_ascii=False) + "\n")
 
     arxiv_n = sum(1 for r in items if r["arxiv_id"])
+    out = f"tests/eval/{topic}/{snapshot}"
     print(f"snapshot {snapshot}: {len(items)} papers ({arxiv_n} with arxiv_id)  per_query={per_q}")
-    print(f"  collection: tests/eval/{topic}/{snapshot}/collection.jsonl")
-    print(f"  qrels tmpl: tests/eval/{topic}/{snapshot}/qrels.template.jsonl (fill rel/facet -> qrels.jsonl)")
+    print(f"  collection: {out}/collection.jsonl")
+    print(f"  qrels tmpl: {out}/qrels.template.jsonl (fill rel/facet -> qrels.jsonl)")
 
 
 if __name__ == "__main__":
