@@ -1,0 +1,52 @@
+# 降水临近预报检索契约（= TREC topic）。
+# nowcasting 是绝佳探针：词被经济学(GDP nowcasting)/疾病(influenza nowcasting)大量占用，
+# S2 宽召回必捞进 off-domain，正好考验框架精度。>>> 待用户增删确认 <<<
+intent: "降水临近预报（0–6h 短临）科研追踪：雷达回波外推、深度学习/生成式/扩散临近预报、对流短临、SOTA 与评测"
+version: 1
+
+in_scope:
+  - 降水 / 对流 0–6h 短临预报方法、模型、架构
+  - 雷达回波外推（光流 / 深度学习 / 生成式）
+  - 深度学习 / 扩散 / 生成式临近预报（DGMR / MetNet / NowcastNet 系）
+  - 评测指标、benchmark、数据集
+  - 卫星 / 多源融合服务于降水短临
+
+out_of_scope:
+  - 经济 / 金融 nowcasting（GDP / 宏观指标即时预估）—— 同名不同域
+  - 疾病 / 流行病 nowcasting（流感 / COVID 病例即时估计）—— 同名不同域
+  - 中长期天气预报 / 气候预测（非 0–6h 短临）
+  - 非降水要素单独预报（温度 / 风 / 电力负荷），除非服务降水短临
+  - 通用视频预测 / 时空预测（与降水无关）
+
+# RC2/RC3 Acquire 宽召回（撒大网，相关性留给 triage）
+queries:
+  - precipitation nowcasting
+  - radar echo extrapolation
+  - convective nowcasting
+  - radar precipitation deep learning
+  - short-term precipitation forecasting
+  - generative precipitation nowcasting
+
+facets:
+  - radar-extrapolation        # 雷达回波外推（光流 / 传统）
+  - deep-learning-nowcasting   # 通用深度学习短临
+  - generative-diffusion       # 生成式 / GAN / 扩散（DGMR / NowcastNet / PreDiff）
+  - transformer-spatiotemporal # MetNet 系 / 时空 transformer
+  - satellite-multisource      # 卫星 / 多源融合
+  - physics-hybrid             # 物理 - 数据混合
+  - eval-benchmark             # 评测 / 数据集
+
+# stage-1 机器粗筛：挡同名异域（经济 / 疾病 / 金融）
+out_of_scope_keywords:
+  [GDP, economic, macroeconomic, financial, inflation, unemployment, stock market,
+   influenza, epidemic, epidemiolog, COVID, disease, mortality, election]
+
+entity_terms:
+  [radar, precipitation, nowcasting, convective, "echo extrapolation", rainfall,
+   DGMR, MetNet, NowcastNet, reflectivity]
+
+must_not_miss:
+  - 主流临近预报里程碑 / SOTA（DGMR / MetNet-3 / NowcastNet / PreDiff 级）
+  - 公开 benchmark 榜首易主
+
+quality_bar: "好论文 = 有方法/架构贡献或 SOTA/benchmark/公开代码；非纯个例应用、非经济/疾病 nowcasting"
