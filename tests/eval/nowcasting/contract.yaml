@@ -1,52 +1,53 @@
 # 降水临近预报检索契约（= TREC topic）。
-# nowcasting 是绝佳探针：词被经济学(GDP nowcasting)/疾病(influenza nowcasting)大量占用，
-# S2 宽召回必捞进 off-domain，正好考验框架精度。>>> 待用户增删确认 <<<
-intent: "降水临近预报（0–6h 短临）科研追踪：雷达回波外推、深度学习/生成式/扩散临近预报、对流短临、SOTA 与评测"
-version: 1
+# 用户定调：降水相关的都算，但有显示优先级——核心(0-6h 雷达短临)置顶，
+# 相关次级(降尺度/卫星估计/S2S后处理/洪水/QPE/归因)靠后。分层用透明规则(secondary_terms)，不靠 judge。
+intent: "降水临近预报为核心(0–6h 雷达回波外推/深度学习/生成式短临)，并涵盖降水相关的降尺度、卫星估计、集合后处理、洪水、QPE/归因——核心置顶，相关次级"
+version: 2
 
 in_scope:
-  - 降水 / 对流 0–6h 短临预报方法、模型、架构
+  - 降水 / 对流 0–6h 短临预报方法（核心）
   - 雷达回波外推（光流 / 深度学习 / 生成式）
   - 深度学习 / 扩散 / 生成式临近预报（DGMR / MetNet / NowcastNet 系）
+  - 降水降尺度（统计 / 动力 / AI downscaling）
+  - 卫星 / 多源降水估计
+  - S2S / 集合预报后处理（降水）
+  - 洪水 nowcasting / 制图
+  - QPE 校正、降水归因、径流
   - 评测指标、benchmark、数据集
-  - 卫星 / 多源融合服务于降水短临
 
-out_of_scope:
-  - 经济 / 金融 nowcasting（GDP / 宏观指标即时预估）—— 同名不同域
-  - 疾病 / 流行病 nowcasting（流感 / COVID 病例即时估计）—— 同名不同域
-  - 中长期天气预报 / 气候预测（非 0–6h 短临）
-  - 非降水要素单独预报（温度 / 风 / 电力负荷），除非服务降水短临
-  - 通用视频预测 / 时空预测（与降水无关）
+out_of_scope:   # 真·非降水域（硬剔，用户确认无争议）
+  - 军用 / 传感 / 生物医学雷达（目标跟踪 / RCS / 心率 / 呼吸 / 手势 / 无人机 / 船舶 / 人体定位）
+  - 经济 / 金融 / 疾病 / 地震 / 藻华 nowcasting（同名异域）
+  - 纯流体力学 / 传热数值模拟（与降水无关）
 
-# RC2/RC3 Acquire 宽召回（撒大网，相关性留给 triage）
-queries:
-  - precipitation nowcasting
-  - radar echo extrapolation
-  - convective nowcasting
-  - radar precipitation deep learning
-  - short-term precipitation forecasting
-  - generative precipitation nowcasting
+# 显示/分析优先级：命中 → 相关次级层(靠后)；其余降水内容 → 核心层(置顶)。透明规则，可直接改。
+secondary_terms:
+  [downscaling, downscale, satellite, multi-satellite, "inter-satellite", S2S,
+   sub-seasonal, subseasonal, "seasonal", flood, QPE, attribution, runoff,
+   postprocessing, "ensemble post", reanalysis, climate, teleconnection]
 
 facets:
-  - radar-extrapolation        # 雷达回波外推（光流 / 传统）
-  - deep-learning-nowcasting   # 通用深度学习短临
-  - generative-diffusion       # 生成式 / GAN / 扩散（DGMR / NowcastNet / PreDiff）
-  - transformer-spatiotemporal # MetNet 系 / 时空 transformer
-  - satellite-multisource      # 卫星 / 多源融合
-  - physics-hybrid             # 物理 - 数据混合
-  - eval-benchmark             # 评测 / 数据集
+  - radar-extrapolation
+  - deep-learning-nowcasting
+  - generative-diffusion
+  - transformer-spatiotemporal
+  - satellite-multisource
+  - downscaling
+  - flood
+  - eval-benchmark
 
-# stage-1 机器粗筛：挡同名异域（经济 / 疾病 / 金融）
+# stage-1 机器粗筛（标题）：只挡同名异域 + 明确非降水雷达
 out_of_scope_keywords:
-  [GDP, economic, macroeconomic, financial, inflation, unemployment, stock market,
-   influenza, epidemic, epidemiolog, COVID, disease, mortality, election]
+  [GDP, economic, macroeconomic, financial, influenza, epidemic, COVID, disease,
+   earthquake, "algal bloom", "heart rate", "vital sign", missile, "sign language",
+   "vessel classification", RCS, "gesture recognition"]
 
 entity_terms:
   [radar, precipitation, nowcasting, convective, "echo extrapolation", rainfall,
    DGMR, MetNet, NowcastNet, reflectivity]
 
 must_not_miss:
-  - 主流临近预报里程碑 / SOTA（DGMR / MetNet-3 / NowcastNet / PreDiff 级）
+  - 本期新发布的主流降水临近预报 SOTA / 新方法
   - 公开 benchmark 榜首易主
 
-quality_bar: "好论文 = 有方法/架构贡献或 SOTA/benchmark/公开代码；非纯个例应用、非经济/疾病 nowcasting"
+quality_bar: "好论文 = 有方法/架构贡献或 SOTA/benchmark/公开代码；非纯个例应用、非同名异域 nowcasting"

@@ -96,14 +96,19 @@ def main() -> None:
         for it, reason in tri.dropped[:25]:
             print(f"  DROP [{reason[:34]:34}] {it.headline[:48]}")
 
-    # 实时雷达：时间倒序为主（kept 已按日期降序），新颖性(cite)作辅助标注
-    print("\n-- 本期新增（按时间倒序，cite 仅作辅助；新论文 cite≈0 正常）--")
-    for it in tri.kept[:25]:
-        s = res.significance[it.id]
+    # 显示优先级分层：核心(0-6h 雷达短临)置顶，相关次级靠后；层内时间倒序
+    def _show(it):
         when = it.published_at.date().isoformat() if it.published_at else "??"
-        cc = str(s.citation_count) if s.citation_count is not None else "-"
-        tag = "★" if s.tier == "must-read" else " "
-        print(f"  {tag} {when} cite={cc:>3} | {it.headline[:58]}")
+        print(f"    {when} | {it.headline[:62]}")
+
+    core = [it for it in tri.kept if res.tiers.get(it.id) == "core"]
+    secondary = [it for it in tri.kept if res.tiers.get(it.id) == "secondary"]
+    print(f"\n== 核心：0-6h 雷达短临（{len(core)}）按时间倒序 ==")
+    for it in core[:25]:
+        _show(it)
+    print(f"\n== 相关次级：降尺度/卫星/S2S/洪水/QPE（{len(secondary)}）==")
+    for it in secondary[:20]:
+        _show(it)
 
     if args.dump:
         import json

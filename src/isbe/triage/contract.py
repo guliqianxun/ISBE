@@ -32,6 +32,10 @@ class RetrievalContract(BaseModel):
     # RC1 子主题面（faceted；多标签，可重叠）。驱动分面 digest（M3）+ 分面覆盖核算。
     facets: list[str] = Field(default_factory=list)
 
+    # 显示/分析优先级：命中 secondary_terms 的入选项 → 次级层（靠后展示）；其余 → 核心层。
+    # 规则驱动、透明可改（不依赖 LLM-judge）。in_scope 全保留，只是分层。
+    secondary_terms: list[str] = Field(default_factory=list)
+
     # RC2/RC3 Acquire 宽召回：驱动 S2 多查询并集的检索词（每条一查询）。
     # 空 → 退回 arxiv.include_keywords（向后兼容）。相关性不靠它，靠下游 triage。
     queries: list[str] = Field(default_factory=list)

@@ -14,6 +14,7 @@ from datetime import date, datetime
 from isbe.topics._shared.semantic_scholar import S2Paper, acquire
 from isbe.triage.contract import RetrievalContract
 from isbe.triage.models import Item, TriageResult
+from isbe.triage.priority import tier_of
 from isbe.triage.scorer import triage
 from isbe.triage.significance import SignificanceScore, rank_significance, ranked
 
@@ -39,6 +40,7 @@ class RetrievalResult:
     triage: TriageResult
     significance: dict[str, SignificanceScore]
     ranked_kept: list[Item]   # triage.kept 按显著性降序
+    tiers: dict[str, str]     # {item_id: 'core' | 'secondary'} 显示优先级
 
 
 def retrieve(
@@ -62,4 +64,5 @@ def retrieve(
     items = [s2paper_to_item(p) for p in papers]
     tri = triage(items, contract)
     sig = rank_significance(tri.kept, reference_date)
-    return RetrievalResult(items, per_query, tri, sig, ranked(tri.kept, sig))
+    tiers = tier_of(tri.kept, contract)
+    return RetrievalResult(items, per_query, tri, sig, ranked(tri.kept, sig), tiers)
