@@ -59,6 +59,8 @@ def main() -> None:
                     help="实时雷达近窗：只取近 N 天发表（默认 30）")
     ap.add_argument("--limit", type=int, default=40, help="per-query S2 cap")
     ap.add_argument("--judge", action="store_true", help="跑 stage-2 LLM-judge 语义筛")
+    ap.add_argument("--dump", type=str, default=None,
+                    help="把全部判定(IN/OUT+理由)落成 jsonl，当范围参考用")
     args = ap.parse_args()
 
     if args.judge:
@@ -102,6 +104,32 @@ def main() -> None:
         cc = str(s.citation_count) if s.citation_count is not None else "-"
         tag = "★" if s.tier == "must-read" else " "
         print(f"  {tag} {when} cite={cc:>3} | {it.headline[:58]}")
+
+    if args.dump:
+        import json
+        rows = []
+        for it in tri.kept:
+            sc = tri.scores.get(it.id)
+            rows.append({
+                "item_id": it.id, "verdict": "IN",
+                "stage": sc.stage if sc else "", "reason": sc.reason if sc else "",
+                "published_at": it.published_at.date().isoformat() if it.published_at else None,
+                "headline": it.headline, "url": it.url,
+            })
+        for it, reason in tri.dropped:
+            rows.append({
+                "item_id": it.id, "verdict": "OUT",
+                "stage": "rule" if reason.startswith("out_of_scope") else "llm",
+                "reason": reason,
+                "published_at": it.published_at.date().isoformat() if it.published_at else None,
+                "headline": it.headline, "url": it.url,
+            })
+        out = Path(args.dump)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with out.open("w", encoding="utf-8") as f:
+            for r in rows:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        print(f"\n判定清单已落: {args.dump}  ({len(rows)} 行: {nk} IN / {nd} OUT)")
 
 
 if __name__ == "__main__":
