@@ -15,7 +15,6 @@ import markdown
 import premailer
 from jinja2 import Environment, FileSystemLoader
 
-
 _TEMPLATE_DIR = Path(__file__).parent / "templates"
 _TEMPLATE_NAME = "email.html.j2"
 

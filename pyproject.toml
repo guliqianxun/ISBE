@@ -30,7 +30,7 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
-    "ruff>=0.5",
+    "ruff>=0.15",
     "bandit>=1.7",
     "mypy>=1.11",
     "pre-commit>=3.8",
@@ -67,6 +67,8 @@ ignore = ["UP042"]
 # Prompt files contain long Chinese sentences; readability > line-length
 "src/isbe/llm/prompts.py" = ["E501"]
 "src/isbe/llm/finance_prompts.py" = ["E501"]
+"src/isbe/llm/motorcycle_prompts.py" = ["E501"]
+"src/isbe/llm/china_tech_prompts.py" = ["E501"]
 "src/isbe/topics/_shared/article_reviews.py" = ["E501"]
 
 [tool.mypy]

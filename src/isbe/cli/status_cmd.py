@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from sqlalchemy import func, select
@@ -73,10 +74,10 @@ def _latest_local_artifact(topic_id: str, mirror_root: Path) -> Path | None:
 
 
 def status(
-    days: int = typer.Option(7, "--days", help="failed-run window in days"),
-    mirror: Path = typer.Option(
-        Path("artifacts"), "--mirror", help="local artifact mirror root"
-    ),
+    days: Annotated[int, typer.Option("--days", help="failed-run window in days")] = 7,
+    mirror: Annotated[
+        Path, typer.Option("--mirror", help="local artifact mirror root")
+    ] = Path("artifacts"),
 ) -> None:
     """Show one-row-per-topic snapshot: last collect / digest / artifact / recent failures."""
     topics = [t for t in discover_topics(default_topics_root()) if t.active]

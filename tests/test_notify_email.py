@@ -239,7 +239,6 @@ def test_failure_message_goes_to_stderr(monkeypatch, capsys):
 
 from isbe.notify.render import render_html  # noqa: E402
 
-
 _SAMPLE_MD = (
     "# Hello World\n\n"
     "This is a **test** with [a link](https://example.com).\n\n"

@@ -2,11 +2,11 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from isbe.topics.base import DigestResult
 from isbe.topics._shared.digester import (
     parse_distillation_section,
     weekly_digester,
 )
+from isbe.topics.base import DigestResult
 
 
 def test_parse_distillation_yields_drafts():
@@ -87,7 +87,9 @@ PaperX 提了新方法 (memory: nowcasting@1)。
                return_value="00000000-0000-0000-0000-000000000001"), \
          patch("isbe.observability.runs.make_session_factory",
                return_value=lambda: fake_obs_session):
-        result = weekly_digester(topic_id="nowcasting", period_label="2026-W19", today=date(2026, 5, 7))
+        result = weekly_digester(
+            topic_id="nowcasting", period_label="2026-W19", today=date(2026, 5, 7)
+        )
 
     assert isinstance(result, DigestResult)
     assert result.topic_id == "nowcasting"

@@ -111,7 +111,6 @@ def test_status_handles_no_active_topics(monkeypatch, tmp_path):
 
 
 def test_status_filesystem_fallback_when_no_db_artifact(monkeypatch, tmp_path):
-    now = datetime.now(UTC)
     topics = [SimpleNamespace(id="solo", label="solo", cadence="weekly", active=True)]
     # write a local artifact file so the fs-fallback path lights up
     period_dir = tmp_path / "solo" / "2026-W20"

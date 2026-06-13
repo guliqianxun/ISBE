@@ -27,7 +27,6 @@ import re
 from datetime import UTC, datetime, timedelta
 
 from prefect import flow
-from sqlalchemy import select
 
 from isbe.facts.articles import Article
 from isbe.facts.db import make_session_factory
@@ -174,7 +173,9 @@ def _cookies_for_domain(domain: str) -> list[dict]:
             # WEIBO_COOKIES expected as full `k1=v1; k2=v2;` header — split & emit.
             for part in [p.strip() for p in w.split(";") if "=" in p]:
                 k, _, v = part.partition("=")
-                out.append({"name": k.strip(), "value": v.strip(), "domain": ".weibo.com", "path": "/"})
+                out.append(
+                    {"name": k.strip(), "value": v.strip(), "domain": ".weibo.com", "path": "/"}
+                )
     return out
 
 
