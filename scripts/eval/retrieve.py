@@ -65,10 +65,11 @@ def main() -> None:
     print(f"契约 intent: {contract.intent[:70]}")
     print(f"窗口 pub_date={pub_date}  queries({len(contract.queries)})")
     print(f"\nACQUIRE 近窗召回: {n_acq} 篇  per_query={res.per_query}")
+    nk, nd = len(tri.kept), len(tri.dropped)
     if args.judge:
-        print(f"TRIAGE: stage-1 留 {s1_kept} -> stage-2 judge 留 {len(tri.kept)} / 弃 {len(tri.dropped)}")
+        print(f"TRIAGE: stage-1 留 {s1_kept} -> stage-2 judge 留 {nk} / 弃 {nd}")
     else:
-        print(f"TRIAGE 范围筛(仅 stage-1): 留 {len(tri.kept)} / 弃 {len(tri.dropped)}")
+        print(f"TRIAGE 范围筛(仅 stage-1): 留 {nk} / 弃 {nd}")
 
     if tri.dropped:
         print("\n-- 弃（范围外）--")
