@@ -4,6 +4,7 @@ date: 2026-06-13
 supersedes: 2026-06-03-retrieval-contract-and-eval.md 的"triage = 仅过滤"框架（收紧为三步管道）
 revisions:
   - r1 2026-06-13 检索 scope 扩张：从"facts 后加一道过滤"扩为"检索 = 可评估子系统(宽召回→语义筛→显著性排)"
+  - r2 2026-06-13 实时雷达纠正（见 §7）：这是实时信息系统、优先最新；采集近窗化、显著性主序改新鲜度、绝对引用降级、锚点改"新发布"
 ---
 
 # 智能检索管道（检索 scope 扩张）
@@ -73,7 +74,25 @@ F4 生成        digester 读 已排序集 × memory → 5 段，必读置顶 + 
 - Step E   Acquire 宽召回上生产(facets 驱动 S2 多查询) + collector 退化(video-gen 先行影子)
 - Step F   Rank + Account 接进 digester：必读置顶 + 分面分组 + 📊 质量行
 
-## 6. 留待用户
+## 6. 实时雷达纠正（r2）
+
+**ISBE 是实时信息搜集系统，优先"本期最新"，不是"找领域里程碑/文献综述"。** 早期把检索当成
+"按绝对引用排出领域最重要论文"是认知偏差。三处后果与纠正：
+
+| 错的做法 | 为什么错 | 纠正 |
+|---|---|---|
+| 采集 `year=2023–2026` 跨多年 | 实时雷达要"本周新增" | 近窗 `pub_date`（近 N 天），按时间倒序 |
+| RANK 用绝对 `citationCount` | 偏向老论文（5 年攒引用）；本周新论文 cite≈0 无区分度 | **新鲜度为主序**；citation 降为"略陈化尾巴"的弱辅助 |
+| `must_not_miss` = DGMR/MetNet 老奠基作 | 老里程碑出现在本周必读里本身是 bug | 锚点 = "本期新发布/新 SOTA/大厂基座模型" |
+
+对新论文的"显著性/值得读"，真信号不是引用量，而是**大厂/知名实验室署名、SOTA/benchmark 声明、
+代码发布**——这些是 stage-2 LLM-judge 的料，不是元数据排序。故 RC5-citation 退为辅助，
+RC-fresh（新鲜度）扶正为主序。
+
+**数据源诚实声明**：S2 对最新论文有**索引滞后**（几天到数周），近窗召回会偏少；真·实时源是
+arxiv recent listings（服务器侧可达，本机被 WAF 封）。生产应 arxiv-recent 为主、S2 作元数据补充。
+
+## 7. 留待用户
 
 - Acquire 的 K（每面截多少）、judge 保守方向（拿不准宁留/宁弃）——定检索工作点。
 - facets 增删（contract.yaml 待确认）、bootstrap 标 88 条 qrels（解锁 Step C/D）。
