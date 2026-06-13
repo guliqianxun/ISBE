@@ -31,6 +31,7 @@ def triage(items: list[Item], contract: RetrievalContract) -> TriageResult:
     result = TriageResult()
     oos = contract.out_of_scope_keywords
     entities = contract.entity_terms
+    require_any = contract.require_any
 
     for it in items:
         low = it.text.lower()
@@ -45,6 +46,17 @@ def triage(items: list[Item], contract: RetrievalContract) -> TriageResult:
             result.scores[it.id] = RelevanceScore(
                 item_id=it.id, relevant=False, score=0.0, reason=reason,
                 matched=(hit,), stage="rule",
+            )
+            result.dropped.append((it, reason))
+            continue
+
+        # 正向信号门：词被一词多义严重占用时（precipitation=化学沉淀、convective=热对流），
+        # 负向穷举列不完——改要求**全文**正向命中判别词（radar/rainfall/reflectivity…），
+        # 没有任一即弃。透明可改，不靠 LLM。空 require_any 则跳过此门（向后兼容）。
+        if require_any and _first_hit(low, require_any) is None:
+            reason = "no in-domain signal (require_any)"
+            result.scores[it.id] = RelevanceScore(
+                item_id=it.id, relevant=False, score=0.0, reason=reason, stage="rule",
             )
             result.dropped.append((it, reason))
             continue

@@ -55,6 +55,13 @@ entity_terms:
   [radar, precipitation, nowcasting, convective, "echo extrapolation", rainfall,
    DGMR, MetNet, NowcastNet, reflectivity]
 
+# 正向信号门：核心必须全文命中以下任一大气/雷达判别词，否则弃。
+# 挡"化学沉淀(MICP/稀土)、热对流(dynamo/CFD)、恒星"等一词多义噪音——它们不会提这些词。
+require_any:
+  [radar, rainfall, reflectivity, "echo extrapolation", "radar echo", meteorolog,
+   atmospheric, "weather", precipitation forecast, "precipitation nowcast",
+   QPE, DGMR, MetNet, NowcastNet, "convective storm", storm-scale, rain rate]
+
 must_not_miss:
   - 本期新发布的主流降水临近预报 SOTA / 新方法
   - 公开 benchmark 榜首易主

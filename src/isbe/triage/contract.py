@@ -44,6 +44,10 @@ class RetrievalContract(BaseModel):
     out_of_scope_keywords: list[str] = Field(default_factory=list)
     entity_terms: list[str] = Field(default_factory=list)
 
+    # 正向信号门：词被一词多义占用时（precipitation=化学沉淀），要求全文正向命中
+    # 任一判别词（radar/rainfall/…）才保留。空 → 不启用此门。透明替代 LLM-judge。
+    require_any: list[str] = Field(default_factory=list)
+
     key_entities: KeyEntities = Field(default_factory=KeyEntities)
     must_not_miss: list[str] = Field(default_factory=list)
 

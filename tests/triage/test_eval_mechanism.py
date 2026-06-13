@@ -63,6 +63,19 @@ def test_out_of_scope_matches_title_only_not_abstract():
     assert it in res.kept
 
 
+def test_require_any_positive_gate_drops_overloaded_keyword_noise():
+    """一词多义噪音：'precipitation'=化学沉淀，无大气信号 → 正向门弃。"""
+    c = RetrievalContract(intent="降水临近预报", require_any=["radar", "rainfall"])
+    keep = Item(id="k", source="s", headline="Radar echo extrapolation nowcasting")
+    drop = Item(id="d", source="s",
+                headline="Microbially Induced Calcite Precipitation",
+                summary="bacteria-driven calcite precipitation in soil")
+    res = triage([keep, drop], c)
+    assert keep in res.kept
+    assert drop not in res.kept
+    assert "require_any" in res.scores["d"].reason
+
+
 def test_keep_all_baseline_fails_precision_bar():
     """证明指标能区分：keep-all 把噪音全留 → precision 0.5 < 0.8 门槛。"""
     keep_all = TriageResult(kept=list(ITEMS))
