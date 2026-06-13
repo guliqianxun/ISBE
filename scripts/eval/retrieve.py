@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import argparse
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import yaml
@@ -39,32 +39,39 @@ def _find_contract(topic: str) -> RetrievalContract:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("topic")
-    ap.add_argument("--year-from", type=int, default=2024)
-    ap.add_argument("--limit", type=int, default=30, help="per-query S2 cap")
+    ap.add_argument("--since-days", type=int, default=30,
+                    help="实时雷达近窗：只取近 N 天发表（默认 30）")
+    ap.add_argument("--limit", type=int, default=40, help="per-query S2 cap")
     args = ap.parse_args()
 
+    today = date.today()
+    pub_date = f"{today - timedelta(days=args.since_days)}:{today}"
     contract = _find_contract(args.topic)
     res = retrieve(
-        contract, year_from=args.year_from, year_to=datetime.now(UTC).year,
-        limit_per_query=args.limit, reference_date=date.today(), log=print,
+        contract, year_from=today.year - 1, year_to=datetime.now(UTC).year,
+        limit_per_query=args.limit, reference_date=today, pub_date=pub_date, log=print,
     )
 
     n_acq, n_kept, n_drop = len(res.acquired), len(res.triage.kept), len(res.triage.dropped)
-    print(f"\n=== {args.topic} 检索效果 ===")
+    print(f"\n=== {args.topic} 实时检索效果（近 {args.since_days} 天）===")
     print(f"契约 intent: {contract.intent[:70]}")
-    print(f"queries({len(contract.queries)}): {contract.queries}")
-    print(f"\nACQUIRE 宽召回: {n_acq} 篇  per_query={res.per_query}")
-    print(f"TRIAGE 相关性筛: 留 {n_kept} / 弃 {n_drop}")
+    print(f"窗口 pub_date={pub_date}  queries({len(contract.queries)})")
+    print(f"\nACQUIRE 近窗召回: {n_acq} 篇  per_query={res.per_query}")
+    print(f"TRIAGE 范围筛: 留 {n_kept} / 弃 {n_drop}")
 
-    print("\n-- 弃（相关性筛掉，含同名异域精度泄漏）--")
-    for it, reason in res.triage.dropped[:25]:
-        print(f"  DROP [{reason[:30]:30}] {it.headline[:56]}")
+    if res.triage.dropped:
+        print("\n-- 弃（范围外）--")
+        for it, reason in res.triage.dropped[:20]:
+            print(f"  DROP [{reason[:28]:28}] {it.headline[:54]}")
 
-    print("\n-- 必读（显著性置顶 top-12）--")
-    for it in res.ranked_kept[:12]:
+    # 实时雷达：时间倒序为主（kept 已按日期降序），新颖性(cite)作辅助标注
+    print("\n-- 本期新增（按时间倒序，cite 仅作辅助；新论文 cite≈0 正常）--")
+    for it in res.triage.kept[:20]:
         s = res.significance[it.id]
+        when = it.published_at.date().isoformat() if it.published_at else "??"
         cc = str(s.citation_count) if s.citation_count is not None else "-"
-        print(f"  {s.tier:9} cite={cc:>4} | {it.headline[:60]}")
+        tag = "★" if s.tier == "must-read" else " "
+        print(f"  {tag} {when} cite={cc:>3} | {it.headline[:58]}")
 
 
 if __name__ == "__main__":

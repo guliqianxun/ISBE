@@ -48,6 +48,7 @@ def retrieve(
     year_to: int,
     limit_per_query: int,
     reference_date: date,
+    pub_date: str | None = None,
     search_fn=None,
     sleep_fn=None,
     log=lambda _m: None,
@@ -55,7 +56,8 @@ def retrieve(
     extra = {} if sleep_fn is None else {"sleep_fn": sleep_fn}
     papers, per_query = acquire(
         contract.queries, year_from=year_from, year_to=year_to,
-        limit_per_query=limit_per_query, search_fn=search_fn, log=log, **extra,
+        limit_per_query=limit_per_query, pub_date=pub_date,
+        search_fn=search_fn, log=log, **extra,
     )
     items = [s2paper_to_item(p) for p in papers]
     tri = triage(items, contract)

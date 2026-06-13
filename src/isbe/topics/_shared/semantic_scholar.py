@@ -78,11 +78,17 @@ def _to_paper(p: dict, query_hit: str) -> S2Paper | None:
 
 
 def s2_search(
-    query: str, *, year_from: int, year_to: int, limit: int, get_fn=default_get
+    query: str, *, year_from: int, year_to: int, limit: int,
+    pub_date: str | None = None, get_fn=default_get,
 ) -> list[dict] | None:
-    """单条 S2 查询，返回 raw paper dict 列表；失败（退避耗尽）返回 None。"""
+    """单条 S2 查询，返回 raw paper dict 列表；失败（退避耗尽）返回 None。
+
+    pub_date（如 "2026-05-13:2026-06-13"）给定时走 publicationDateOrYear 近窗过滤——
+    实时雷达取最新，而非按年跨多年（后者是 eval fixture 求宽召回才用）。
+    """
     qp = httpx.QueryParams({"q": query})["q"]
-    url = f"{S2_SEARCH}?query={qp}&year={year_from}-{year_to}&limit={limit}&fields={FIELDS}"
+    window = f"publicationDateOrYear={pub_date}" if pub_date else f"year={year_from}-{year_to}"
+    url = f"{S2_SEARCH}?query={qp}&{window}&limit={limit}&fields={FIELDS}"
     d = get_fn(url)
     if d is None:
         return None
@@ -95,6 +101,7 @@ def acquire(
     year_from: int,
     year_to: int,
     limit_per_query: int,
+    pub_date: str | None = None,
     search_fn: SearchFn | None = None,
     sleep_fn=time.sleep,
     polite_sleep: float = 4.0,
@@ -102,12 +109,16 @@ def acquire(
 ) -> tuple[list[S2Paper], dict[str, int]]:
     """多查询并集去重，返回 (papers 按日期降序, per_query 计数)。
 
+    pub_date 给定 → 近窗采集（实时雷达取最新）；否则按年（eval fixture 宽召回）。
     per_query[q] = -1 表示该查询失败；否则为该查询新增（去重后）条数。
     相关性不在这里判——只构池。search_fn 可注入以无网测试。
     """
     if search_fn is None:
         def search_fn(q: str) -> list[dict] | None:
-            return s2_search(q, year_from=year_from, year_to=year_to, limit=limit_per_query)
+            return s2_search(
+                q, year_from=year_from, year_to=year_to,
+                limit=limit_per_query, pub_date=pub_date,
+            )
 
     by_id: dict[str, S2Paper] = {}
     per_query: dict[str, int] = {}
