@@ -42,6 +42,7 @@ def main() -> None:
     ap.add_argument("--since-days", type=int, default=30,
                     help="实时雷达近窗：只取近 N 天发表（默认 30）")
     ap.add_argument("--limit", type=int, default=40, help="per-query S2 cap")
+    ap.add_argument("--judge", action="store_true", help="跑 stage-2 LLM-judge 语义筛")
     args = ap.parse_args()
 
     today = date.today()
@@ -52,21 +53,31 @@ def main() -> None:
         limit_per_query=args.limit, reference_date=today, pub_date=pub_date, log=print,
     )
 
-    n_acq, n_kept, n_drop = len(res.acquired), len(res.triage.kept), len(res.triage.dropped)
+    tri = res.triage
+    n_acq = len(res.acquired)
+    s1_kept = len(tri.kept)
+    if args.judge:
+        from isbe.triage.judge import apply_llm_judge
+        print("\n[stage-2 LLM-judge 语义筛]")
+        tri = apply_llm_judge(res.triage, contract, log=print)
+
     print(f"\n=== {args.topic} 实时检索效果（近 {args.since_days} 天）===")
     print(f"契约 intent: {contract.intent[:70]}")
     print(f"窗口 pub_date={pub_date}  queries({len(contract.queries)})")
     print(f"\nACQUIRE 近窗召回: {n_acq} 篇  per_query={res.per_query}")
-    print(f"TRIAGE 范围筛: 留 {n_kept} / 弃 {n_drop}")
+    if args.judge:
+        print(f"TRIAGE: stage-1 留 {s1_kept} -> stage-2 judge 留 {len(tri.kept)} / 弃 {len(tri.dropped)}")
+    else:
+        print(f"TRIAGE 范围筛(仅 stage-1): 留 {len(tri.kept)} / 弃 {len(tri.dropped)}")
 
-    if res.triage.dropped:
+    if tri.dropped:
         print("\n-- 弃（范围外）--")
-        for it, reason in res.triage.dropped[:20]:
-            print(f"  DROP [{reason[:28]:28}] {it.headline[:54]}")
+        for it, reason in tri.dropped[:25]:
+            print(f"  DROP [{reason[:34]:34}] {it.headline[:48]}")
 
     # 实时雷达：时间倒序为主（kept 已按日期降序），新颖性(cite)作辅助标注
     print("\n-- 本期新增（按时间倒序，cite 仅作辅助；新论文 cite≈0 正常）--")
-    for it in res.triage.kept[:20]:
+    for it in tri.kept[:25]:
         s = res.significance[it.id]
         when = it.published_at.date().isoformat() if it.published_at else "??"
         cc = str(s.citation_count) if s.citation_count is not None else "-"
