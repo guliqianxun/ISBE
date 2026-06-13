@@ -20,6 +20,15 @@ out_of_scope:   # 真·非降水域（硬剔，用户确认无争议）
   - 经济 / 金融 / 疾病 / 地震 / 藻华 nowcasting（同名异域）
   - 纯流体力学 / 传热数值模拟（与降水无关）
 
+# RC2/RC3 Acquire 宽召回：驱动 S2 多查询并集（撒大网，相关性留给 triage）
+queries:
+  - precipitation nowcasting
+  - radar echo extrapolation
+  - convective nowcasting
+  - radar precipitation deep learning
+  - short-term precipitation forecasting
+  - generative precipitation nowcasting
+
 # 显示/分析优先级：命中 → 相关次级层(靠后)；其余降水内容 → 核心层(置顶)。透明规则，可直接改。
 secondary_terms:
   [downscaling, downscale, satellite, multi-satellite, "inter-satellite", S2S,
