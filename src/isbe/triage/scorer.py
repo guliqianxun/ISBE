@@ -35,8 +35,11 @@ def triage(items: list[Item], contract: RetrievalContract) -> TriageResult:
     for it in items:
         low = it.text.lower()
 
-        # 阶段一：out_of_scope 关键词命中即弃
-        hit = _first_hit(low, oos)
+        # 阶段一：out_of_scope 关键词命中即弃。
+        # 只匹配**标题**，不匹配摘要——摘要的动机句（"reduce economic losses"、
+        # 跨域对比提到 inflation 等）会让规则误杀真域论文（nowcasting live 实测 7/7 误杀）。
+        # 规则阶段必须高精度、recall-safe；语义级 out-of-scope 交 stage-2 LLM-judge。
+        hit = _first_hit(it.headline.lower(), oos)
         if hit is not None:
             reason = f"out_of_scope keyword: {hit}"
             result.scores[it.id] = RelevanceScore(

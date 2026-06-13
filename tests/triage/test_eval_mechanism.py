@@ -47,6 +47,22 @@ def test_metrics_are_correct_for_rule_triage():
     assert m.n_judged == 4
 
 
+def test_out_of_scope_matches_title_only_not_abstract():
+    """recall-safe：out_of_scope 关键词只在摘要(动机句)出现，不应被 stage-1 误杀。
+
+    nowcasting live 实测：摘要里 'reduce economic losses' 让规则全文匹配误杀 7/7 真域论文。
+    规则阶段只匹配标题；语义级 out-of-scope 交 stage-2 LLM-judge。
+    """
+    it = Item(
+        id="x", source="s",
+        headline="Radar precipitation nowcasting with diffusion",  # 标题无 out_of_scope 词
+        summary="Accurate nowcasting reduces economic losses from floods.",  # 摘要含 'economic'
+    )
+    c = RetrievalContract(intent="precip nowcasting", out_of_scope_keywords=["economic"])
+    res = triage([it], c)
+    assert it in res.kept
+
+
 def test_keep_all_baseline_fails_precision_bar():
     """证明指标能区分：keep-all 把噪音全留 → precision 0.5 < 0.8 门槛。"""
     keep_all = TriageResult(kept=list(ITEMS))
