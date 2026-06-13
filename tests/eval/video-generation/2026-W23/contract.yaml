@@ -17,6 +17,15 @@ out_of_scope:
   - 纯应用堆叠 / 无方法贡献 / 无 arxiv 的低质条目
   - 强化学习 "world model"（除非确为视频生成）
 
+# RC2/RC3 Acquire 宽召回：驱动 S2 多查询并集（撒大网，相关性留给 triage）
+queries:
+  - text-to-video
+  - video diffusion
+  - image-to-video
+  - video generation
+  - world model
+  - video synthesis
+
 # RC1 子主题面（从池归纳，10 面，多标签可重叠）
 facets:
   - autoregressive-long      # 自回归 / 长视频 / 实时流式（池里最热：Self-Forcing/MAGI-1/LongLive/Rolling-Forcing）

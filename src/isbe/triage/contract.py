@@ -32,6 +32,10 @@ class RetrievalContract(BaseModel):
     # RC1 子主题面（faceted；多标签，可重叠）。驱动分面 digest（M3）+ 分面覆盖核算。
     facets: list[str] = Field(default_factory=list)
 
+    # RC2/RC3 Acquire 宽召回：驱动 S2 多查询并集的检索词（每条一查询）。
+    # 空 → 退回 arxiv.include_keywords（向后兼容）。相关性不靠它，靠下游 triage。
+    queries: list[str] = Field(default_factory=list)
+
     # machine signals（规则阶段直接用）
     out_of_scope_keywords: list[str] = Field(default_factory=list)
     entity_terms: list[str] = Field(default_factory=list)
