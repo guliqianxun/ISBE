@@ -46,23 +46,27 @@ class RetrievalResult:
 def retrieve(
     contract: RetrievalContract,
     *,
-    year_from: int,
-    year_to: int,
-    limit_per_query: int,
     reference_date: date,
+    year_from: int = 0,
+    year_to: int = 0,
+    limit_per_query: int = 0,
     pub_date: str | None = None,
     search_fn=None,
     sleep_fn=None,
     log=lambda _m: None,
+    papers: list[S2Paper] | None = None,
+    per_query: dict[str, int] | None = None,
 ) -> RetrievalResult:
-    extra = {} if sleep_fn is None else {"sleep_fn": sleep_fn}
-    papers, per_query = acquire(
-        contract.queries, year_from=year_from, year_to=year_to,
-        limit_per_query=limit_per_query, pub_date=pub_date,
-        search_fn=search_fn, log=log, **extra,
-    )
+    """papers 已给则直接用（本地源等）；否则走 S2 acquire。"""
+    if papers is None:
+        extra = {} if sleep_fn is None else {"sleep_fn": sleep_fn}
+        papers, per_query = acquire(
+            contract.queries, year_from=year_from, year_to=year_to,
+            limit_per_query=limit_per_query, pub_date=pub_date,
+            search_fn=search_fn, log=log, **extra,
+        )
     items = [s2paper_to_item(p) for p in papers]
     tri = triage(items, contract)
     sig = rank_significance(tri.kept, reference_date)
     tiers = tier_of(tri.kept, contract)
-    return RetrievalResult(items, per_query, tri, sig, ranked(tri.kept, sig), tiers)
+    return RetrievalResult(items, per_query or {}, tri, sig, ranked(tri.kept, sig), tiers)

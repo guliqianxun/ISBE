@@ -58,6 +58,8 @@ def main() -> None:
     ap.add_argument("--since-days", type=int, default=30,
                     help="实时雷达近窗：只取近 N 天发表（默认 30）")
     ap.add_argument("--limit", type=int, default=40, help="per-query S2 cap")
+    ap.add_argument("--source", choices=["s2", "local"], default="s2",
+                    help="local = 本地每日 papers.db(当天新鲜/无限速); s2 = Semantic Scholar")
     ap.add_argument("--judge", action="store_true", help="跑 stage-2 LLM-judge 语义筛")
     ap.add_argument("--dump", type=str, default=None,
                     help="把全部判定(IN/OUT+理由)落成 jsonl，当范围参考用")
@@ -68,10 +70,18 @@ def main() -> None:
     today = date.today()
     pub_date = f"{today - timedelta(days=args.since_days)}:{today}"
     contract = _find_contract(args.topic)
-    res = retrieve(
-        contract, year_from=today.year - 1, year_to=datetime.now(UTC).year,
-        limit_per_query=args.limit, reference_date=today, pub_date=pub_date, log=print,
-    )
+    if args.source == "local":
+        from isbe.topics._shared.local_arxiv import acquire_local
+        papers, per_query = acquire_local(
+            contract.queries, reference_date=today, since_days=args.since_days,
+            limit_per_query=args.limit, log=print,
+        )
+        res = retrieve(contract, reference_date=today, papers=papers, per_query=per_query)
+    else:
+        res = retrieve(
+            contract, year_from=today.year - 1, year_to=datetime.now(UTC).year,
+            limit_per_query=args.limit, reference_date=today, pub_date=pub_date, log=print,
+        )
 
     tri = res.triage
     n_acq = len(res.acquired)
