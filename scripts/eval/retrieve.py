@@ -73,8 +73,8 @@ def main() -> None:
     if args.source == "local":
         from isbe.topics._shared.local_arxiv import acquire_local
         papers, per_query = acquire_local(
-            contract.queries, reference_date=today, since_days=args.since_days,
-            limit_per_query=args.limit, log=print,
+            contract, reference_date=today, since_days=args.since_days,
+            limit=max(args.limit, 500), log=print,
         )
         res = retrieve(contract, reference_date=today, papers=papers, per_query=per_query)
     else:

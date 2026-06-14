@@ -2,13 +2,26 @@
 
 from __future__ import annotations
 
-from isbe.topics._shared.local_arxiv import _fts_query, _row_to_paper
+from isbe.topics._shared.local_arxiv import _net_query, _phrase, _row_to_paper
+from isbe.triage.contract import RetrievalContract
 
 
-def test_fts_query_sanitizes_special_chars_to_anded_tokens():
-    assert _fts_query("text-to-video") == '"text" "to" "video"'
-    assert _fts_query("radar echo extrapolation") == '"radar" "echo" "extrapolation"'
-    assert _fts_query("S2S/postproc") == '"S2S" "postproc"'
+def test_phrase_sanitizes_special_chars_to_quoted_phrase():
+    assert _phrase("text-to-video") == '"text to video"'
+    assert _phrase("precipitation forecast") == '"precipitation forecast"'
+    assert _phrase("S2S/postproc") == '"S2S postproc"'
+
+
+def test_net_query_ors_dedup_domain_vocab():
+    c = RetrievalContract(
+        intent="x", queries=["radar echo extrapolation"],
+        entity_terms=["radar", "precipitation"], require_any=["radar", "rainfall"],
+    )
+    net = _net_query(c)
+    # OR 连接、去重（radar 只出现一次）
+    assert " OR " in net
+    assert net.count('"radar"') == 1
+    assert '"rainfall"' in net and '"precipitation"' in net
 
 
 def test_row_to_paper_maps_fields():

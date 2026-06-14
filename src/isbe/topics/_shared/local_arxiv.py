@@ -15,17 +15,34 @@ from collections.abc import Callable
 from datetime import date, timedelta
 
 from isbe.topics._shared.semantic_scholar import S2Paper
+from isbe.triage.contract import RetrievalContract
 
 DEFAULT_DB = r"I:\essaies\archive\arxiv-cs.CV\papers.db"
 
 
-def _fts_query(q: str) -> str:
-    """把契约 query 转成安全的 FTS5 表达式：各 token 加引号、隐式 AND（宽召回）。
+def _phrase(term: str) -> str:
+    """单个词条 → FTS5 引号短语（相邻匹配）。特殊字符(连字符/冒号/斜杠)安全化。
 
-    避免连字符/冒号等特殊字符让 FTS5 解析报错（text-to-video → "text" "to" "video"）。
+    "precipitation forecast" → '"precipitation forecast"'；text-to-video → '"text to video"'。
     """
-    toks = re.findall(r"[A-Za-z0-9]+", q)
-    return " ".join(f'"{t}"' for t in toks)
+    toks = re.findall(r"[A-Za-z0-9]+", term)
+    return '"' + " ".join(toks) + '"' if toks else ""
+
+
+def _net_query(contract: RetrievalContract) -> str:
+    """领域宽召回网：queries ∪ entity_terms ∪ require_any 各作短语，OR 连接。
+
+    "撒大网、相关性留给 triage"——本地 FTS 用领域词汇 OR 把近窗里沾边的全捞来，
+    再交 out_of_scope + require_any 门 + 分层精筛。比把多词 query 当 token-AND 宽得多。
+    """
+    seen: set[str] = set()
+    phrases: list[str] = []
+    for term in (*contract.queries, *contract.entity_terms, *contract.require_any):
+        p = _phrase(term)
+        if p and p.lower() not in seen:
+            seen.add(p.lower())
+            phrases.append(p)
+    return " OR ".join(phrases)
 
 
 def _row_to_paper(row: tuple, query_hit: str) -> S2Paper:
@@ -45,18 +62,22 @@ def _row_to_paper(row: tuple, query_hit: str) -> S2Paper:
 
 
 def acquire_local(
-    queries: list[str],
+    contract: RetrievalContract,
     *,
     reference_date: date,
     since_days: int,
-    limit_per_query: int,
+    limit: int = 500,
     db_path: str = DEFAULT_DB,
     log: Callable[[str], None] = lambda _m: None,
 ) -> tuple[list[S2Paper], dict[str, int]]:
-    """近窗 FTS 多查询并集。update_date >= reference_date - since_days。
+    """近窗领域宽召回（单 OR 网查询）。update_date >= reference_date - since_days。
 
-    返回 (papers 按 update_date 降序, per_query)。无网络、无限速——本地即时。
+    返回 (papers 按 update_date 降序, 计数)。无网络、无限速——本地即时。
+    宽召回构池、相关性交 triage：用 _net_query 把近窗沾边的全捞来。
     """
+    net = _net_query(contract)
+    if not net:
+        return [], {}
     cutoff = (reference_date - timedelta(days=since_days)).isoformat()
     con = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
     sql = (
@@ -65,26 +86,15 @@ def acquire_local(
         "where papers_fts match ? and p.update_date >= ? "
         "order by p.update_date desc limit ?"
     )
-    by_id: dict[str, S2Paper] = {}
-    per_query: dict[str, int] = {}
     try:
-        for q in queries:
-            try:
-                rows = con.execute(sql, (_fts_query(q), cutoff, limit_per_query)).fetchall()
-            except sqlite3.OperationalError as e:  # 畸形 FTS 表达式等
-                per_query[q] = -1
-                log(f"  query {q!r}: FTS error {e}")
-                continue
-            added = 0
-            for r in rows:
-                if r[0] in by_id:
-                    continue
-                by_id[r[0]] = _row_to_paper(r, q)
-                added += 1
-            per_query[q] = added
-            log(f"  query {q!r}: +{added} new (fetched {len(rows)})")
+        rows = con.execute(sql, (net, cutoff, limit)).fetchall()
     finally:
         con.close()
 
+    by_id: dict[str, S2Paper] = {}
+    for r in rows:
+        if r[0] not in by_id:
+            by_id[r[0]] = _row_to_paper(r, "local-net")
     papers = sorted(by_id.values(), key=lambda p: p.published_at or "", reverse=True)
-    return papers, per_query
+    log(f"  local-net: {len(papers)} 篇 (近 {since_days} 天, since {cutoff})")
+    return papers, {"local-net": len(papers)}
