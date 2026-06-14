@@ -24,8 +24,9 @@ class RetrievalContract(BaseModel):
     intent: str
     version: int = 1
 
-    # 采集源：local = 外部每日 papers.db（cs.CV/ao-ph 实时）；s2 = Semantic Scholar
-    source: str = "s2"
+    # 采集源：facts = 读 ISBE Postgres facts（默认；服务器自己 arxiv 采集填充）；
+    # local = 外部每日 papers.db（本机开发，cs.CV/ao-ph 实时）；s2 = Semantic Scholar API。
+    source: str = "facts"
 
     # human prose（LLM-judge / 阅读）
     in_scope: list[str] = Field(default_factory=list)

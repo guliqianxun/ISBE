@@ -115,15 +115,17 @@ def _digester_impl(
 
     Session = make_session_factory()
     with Session() as s:
-        if contract is not None and contract.source == "local":
-            # 本地源（cs.CV/ao-ph 实时）：从外部每日 papers.db 取近窗，不走 Postgres facts。
-            # ⚠ 此分支需服务器栈 smoke（本机无 Postgres/MinIO/Prefect 未验）。
-            # 产线 topic.yaml 无 `retrieval:` 块 → contract=None → 本分支休眠，不影响在跑域。
+        if contract is not None and contract.source in ("local", "s2"):
+            # 外部源（local=本机每日 papers.db / s2=Semantic Scholar API）：digester 直接取数，
+            # 不走 ISBE Postgres facts。⚠ 需对应源可达 + 服务器栈 smoke。
+            # 服务器默认走下面 facts 分支（自己 arxiv 采集填 Postgres）。
             raw, _ = acquire_by_source(
                 contract, reference_date=today, since_days=facts_window_days, limit=500, log=print,
             )
             papers = [s2paper_to_digest_row(p) for p in raw]
         else:
+            # facts（默认）：读 ISBE Postgres（服务器自己 arxiv 采集填充）。
+            # 产线 topic.yaml 无 `retrieval:` 块 → contract=None → triage 直通，行为不变。
             query = select(Paper).where(
                 Paper.submitted_at >= cutoff_low, Paper.submitted_at <= cutoff_high
             )

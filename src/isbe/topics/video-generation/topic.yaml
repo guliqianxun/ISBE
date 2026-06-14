@@ -22,3 +22,28 @@ digest:
 schedules:
   arxiv_collector: "10 6 * * *"          # 错峰：06:10 daily
   digester: "30 8 * * 1"                 # 周一 08:30
+
+# 检索契约：digester 对本域 facts 套相关性门(out_of_scope/require_any)。
+# source: facts = 读 ISBE Postgres(服务器自己 arxiv 采集填充)。gates 可改、偏召回，首次上线后 smoke 调。
+retrieval:
+  source: facts
+  intent: "视频生成模型科研追踪：新方法/架构、SOTA、benchmark、可控/高效/世界模型，及影响该方向判断的里程碑工作"
+  in_scope:
+    - 视频生成方法 / 模型 / 架构本身（diffusion / autoregressive / flow / 世界模型）
+    - 评测指标、benchmark、数据集；训练 / 推理效率化
+    - 可控生成（相机 / 运动 / 主体 / 音频驱动）；基座大模型、对齐 / RLHF / 物理后训练
+  out_of_scope:
+    - 视频理解 / 检索 / 重识别 / MLLM（蹭 image-to-video 字串，非生成方法）
+    - 针对生成模型的安全 / 越狱 / 防护论文
+    - 纯应用堆叠 / 无方法贡献
+  facets: [autoregressive-long, efficiency, controllable, world-model-3d, human-avatar,
+           foundation, image-to-video, subject-customization, eval-bench, physics-feedback]
+  out_of_scope_keywords: [jailbreak, re-identification, re-id, "video understanding",
+                          "adversarial attack", safeguard, misuse]
+  require_any: ["video generation", "video synthesis", "video diffusion", "text-to-video",
+                "image-to-video", "generative", "generate video", "video generative", T2V, I2V,
+                "world model", "video editing", "video prediction", "frame prediction", "talking head"]
+  must_not_miss:
+    - 任一主流实验室基座视频模型发布（Sora / Wan / Hunyuan / Open-Sora / MAGI / Kling / Veo 级）
+    - 公开 benchmark 榜首易主
+  quality_bar: "好论文 = 有方法/架构贡献或 SOTA/benchmark/公开代码；非纯应用、非视频理解/安全论文"

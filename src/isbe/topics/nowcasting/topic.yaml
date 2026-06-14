@@ -22,3 +22,35 @@ schedules:
   github_collector: "30 6 * * *"         # 每日 06:30 (nowcasting only)
   arxiv_download_pdfs: "0 7 * * 1"       # 周一 07:00
   digester: "0 8 * * 1"                  # 周一 08:00
+
+# 检索契约：digester 对本域 facts 套相关性门(out_of_scope/require_any)+优先级分层。
+# source: facts = 读 ISBE Postgres(服务器自己 arxiv 采集填充)。gates 可改、偏召回，首次上线后 smoke 调。
+retrieval:
+  source: facts
+  intent: "降水临近预报为核心(0–6h 雷达回波外推/深度学习/生成式短临)，并涵盖降水相关的降尺度/卫星估计/集合后处理/洪水/QPE/归因——核心置顶，相关次级"
+  in_scope:
+    - 降水 / 对流 0–6h 短临预报方法（核心）
+    - 雷达回波外推（光流 / 深度学习 / 生成式）
+    - 深度学习 / 扩散 / 生成式临近预报（DGMR / MetNet / NowcastNet 系）
+    - 降水降尺度、卫星 / 多源降水估计、S2S / 集合后处理、洪水 nowcasting、QPE / 归因
+    - 评测指标、benchmark、数据集
+  out_of_scope:
+    - 军用 / 传感 / 生物医学雷达（目标跟踪 / RCS / 心率 / 手势 / 无人机 / 船舶）
+    - 经济 / 金融 / 疾病 / 地震 / 藻华 nowcasting（同名异域）
+    - 纯流体力学 / 传热数值模拟
+  facets: [radar-extrapolation, deep-learning-nowcasting, generative-diffusion,
+           transformer-spatiotemporal, satellite-multisource, downscaling, flood, eval-benchmark]
+  secondary_terms: [downscaling, downscale, satellite, "inter-satellite", S2S, sub-seasonal,
+                    subseasonal, seasonal, flood, QPE, attribution, runoff, postprocessing,
+                    "ensemble post", reanalysis, climate, teleconnection]
+  out_of_scope_keywords: [GDP, economic, macroeconomic, financial, influenza, epidemic, COVID,
+                          disease, earthquake, "algal bloom", "heart rate", "vital sign", missile,
+                          "sign language", "vessel classification", RCS, "gesture recognition"]
+  require_any: [radar, rainfall, reflectivity, "echo extrapolation", "radar echo", meteorolog,
+                "precipitation forecast", "precipitation nowcast", "precipitation prediction",
+                QPE, DGMR, MetNet, NowcastNet, "convective storm", "storm-scale", "rain rate",
+                "quantitative precipitation"]
+  must_not_miss:
+    - 本期新发布的主流降水临近预报 SOTA / 新方法
+    - 公开 benchmark 榜首易主
+  quality_bar: "好论文 = 有方法/架构贡献或 SOTA/benchmark/公开代码；非纯个例应用、非同名异域 nowcasting"

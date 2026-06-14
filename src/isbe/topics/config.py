@@ -10,6 +10,8 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
+from isbe.triage.contract import RetrievalContract
+
 # ---------------------------------------------------------------------------
 # Closed-set vocabularies — extend deliberately, not by typo
 # ---------------------------------------------------------------------------
@@ -123,6 +125,9 @@ class TopicConfig(_Strict):
 
     digest: DigestConfig = Field(default_factory=DigestConfig)
     schedules: dict[str, str] = Field(default_factory=dict)
+
+    # 检索契约（triage 相关性门 + 优先级分层）。缺省 None → triage 直通（行为不变）。
+    retrieval: RetrievalContract | None = None
 
     @classmethod
     def from_yaml_file(cls, path: Path) -> "TopicConfig":
