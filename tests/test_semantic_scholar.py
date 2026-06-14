@@ -64,3 +64,12 @@ def test_acquire_carries_metadata_for_rc5():
     papers, _ = _acq(["q"], lambda q: [_raw("p", arxiv="2501.001", cite=349)])
     assert papers[0].citation_count == 349
     assert papers[0].fields_of_study == ("Computer Science",)
+
+
+def test_headers_add_api_key_when_set(monkeypatch):
+    from isbe.topics._shared.semantic_scholar import _headers
+    monkeypatch.delenv("SEMANTIC_SCHOLAR_API_KEY", raising=False)
+    monkeypatch.delenv("S2_API_KEY", raising=False)
+    assert "x-api-key" not in _headers()
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "sk-test-123")
+    assert _headers()["x-api-key"] == "sk-test-123"

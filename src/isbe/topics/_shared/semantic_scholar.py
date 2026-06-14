@@ -13,6 +13,7 @@ RC6 谱系，并用 arxiv_id 桥回现有 papers 管线。
 
 from __future__ import annotations
 
+import os
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -22,6 +23,15 @@ import httpx
 S2_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search"
 FIELDS = "title,abstract,year,publicationDate,citationCount,externalIds,fieldsOfStudy,authors"
 _UA = {"User-Agent": "ISBE-acquire/0.1 (mailto:visitorindark@gmail.com)"}
+
+
+def _headers() -> dict[str, str]:
+    """请求头。设了 SEMANTIC_SCHOLAR_API_KEY / S2_API_KEY 则带 x-api-key 提限速。"""
+    h = dict(_UA)
+    key = (os.environ.get("SEMANTIC_SCHOLAR_API_KEY") or os.environ.get("S2_API_KEY") or "").strip()
+    if key:
+        h["x-api-key"] = key
+    return h
 
 # search_fn(query) -> list[dict] | None（None = 该查询退避耗尽失败）
 SearchFn = Callable[[str], "list[dict] | None"]
@@ -44,7 +54,7 @@ def default_get(url: str, *, tries: int = 7, sleep_fn=time.sleep, log=print) -> 
     """S2 未授权限速重，退避重试清 429。失败返回 None。"""
     for i in range(tries):
         try:
-            r = httpx.get(url, headers=_UA, timeout=45.0)
+            r = httpx.get(url, headers=_headers(), timeout=45.0)
             if r.status_code == 200:
                 return r.json()
             log(f"    (try {i + 1}: HTTP {r.status_code}, backoff)")
