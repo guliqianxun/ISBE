@@ -53,6 +53,13 @@ entity_terms:
   [diffusion, autoregressive, "text-to-video", "image-to-video", transformer,
    attention, "world model", avatar, camera, motion, benchmark]
 
+# 正向信号门：核心须全文命中以下任一"生成"判别词，否则弃。
+# 挡 cs.CV 里蹭 video 的非生成噪音（rPPG 心率/抓取/导航/监控/视频理解 QA）——它们不提这些。
+require_any:
+  ["video generation", "video synthesis", "video diffusion", "text-to-video",
+   "image-to-video", "generative", "generate video", "video generative", T2V, I2V,
+   "world model", "video editing", "video prediction", "frame prediction", "talking head"]
+
 must_not_miss:
   - 任一主流实验室基座视频模型发布（Seedance / Wan / Hunyuan / Open-Sora / MAGI / Kling / Veo / Sora 级）
   - 公开 benchmark 榜首易主（VBench 等）

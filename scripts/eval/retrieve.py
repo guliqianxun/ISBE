@@ -113,12 +113,13 @@ def main() -> None:
 
     core = [it for it in tri.kept if res.tiers.get(it.id) == "core"]
     secondary = [it for it in tri.kept if res.tiers.get(it.id) == "secondary"]
-    print(f"\n== 核心：0-6h 雷达短临（{len(core)}）按时间倒序 ==")
+    print(f"\n== 核心层（{len(core)}）按时间倒序 ==")
     for it in core[:25]:
         _show(it)
-    print(f"\n== 相关次级：降尺度/卫星/S2S/洪水/QPE（{len(secondary)}）==")
-    for it in secondary[:20]:
-        _show(it)
+    if secondary:
+        print(f"\n== 相关次级层（{len(secondary)}，命中 secondary_terms）==")
+        for it in secondary[:20]:
+            _show(it)
 
     if args.dump:
         import json
