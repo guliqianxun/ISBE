@@ -37,3 +37,18 @@ def test_row_to_paper_maps_fields():
 def test_row_to_paper_empty_abstract_to_none():
     p = _row_to_paper(("id1", "T", "", "2026-06-01", None), "q")
     assert p.abstract is None
+
+
+def test_s2paper_to_digest_row_ducktypes_for_digester():
+    """本地 S2Paper → DigestRow，且能喂 paper_to_item（A 集成的关键鸭子类型）。"""
+    from datetime import datetime
+
+    from isbe.topics._shared.digester_utils import paper_to_item, s2paper_to_digest_row
+
+    p = _row_to_paper(("2606.001", "A Title", "Abs", "2026-06-12", 3), "q")
+    r = s2paper_to_digest_row(p)
+    assert r.arxiv_id == "2606.001" and r.title == "A Title"
+    assert r.primary_category == "Computer Science" and r.source_url.endswith("2606.001")
+    assert r.submitted_at == datetime(2026, 6, 12)
+    it = paper_to_item(r)  # 必须能走现有 digester triage 路径
+    assert it.id == "2606.001" and it.published_at == datetime(2026, 6, 12)

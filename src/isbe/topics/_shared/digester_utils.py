@@ -6,12 +6,47 @@ and memory loading utilities.
 import os
 import re
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
 from isbe.memory.loader import load_index
 from isbe.topics.base import PendingMemoryDraft
 from isbe.triage import Item, RetrievalContract, TriageResult, triage
+
+
+@dataclass(frozen=True)
+class DigestRow:
+    """本地源 S2Paper → digester 鸭子类型行。
+
+    暴露 _build_facts_block / paper_to_item / comparison 需要的 6 个属性，
+    使本地源论文无需 Paper ORM 即可走完现有 digester 路径。
+    """
+
+    arxiv_id: str
+    title: str
+    abstract: str | None
+    primary_category: str
+    source_url: str
+    submitted_at: datetime | None
+
+
+def s2paper_to_digest_row(p) -> DigestRow:
+    """本地源 S2Paper → DigestRow（published_at 字符串 → datetime）。"""
+    pub: datetime | None = None
+    if p.published_at:
+        try:
+            pub = datetime.fromisoformat(p.published_at)
+        except ValueError:
+            pub = None
+    return DigestRow(
+        arxiv_id=p.arxiv_id or p.id,
+        title=p.title,
+        abstract=p.abstract,
+        primary_category=(p.fields_of_study[0] if p.fields_of_study else ""),
+        source_url=p.url,
+        submitted_at=pub,
+    )
 
 
 def paper_to_item(p) -> Item:

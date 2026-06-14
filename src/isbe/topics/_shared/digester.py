@@ -34,6 +34,7 @@ from isbe.topics._shared.digester_utils import (
     parse_bracketed_reviews,
     parse_distillation_section,  # noqa: F401  — re-exported for back-compat
     parse_paper_reviews,
+    s2paper_to_digest_row,
 )
 from isbe.topics._shared.digester_utils import (
     memory_root as _memory_root,
@@ -46,6 +47,7 @@ from isbe.topics.nowcasting.facts import Paper, Repo  # shared facts tables
 from isbe.topics.registry import default_topics_root, load_topic_config
 from isbe.triage import RetrievalContract
 from isbe.triage.contract import contract_from_config
+from isbe.triage.pipeline import acquire_by_source
 
 SHARED_TEMPLATE = Path(__file__).parent / "templates" / "weekly.j2"
 
@@ -113,13 +115,22 @@ def _digester_impl(
 
     Session = make_session_factory()
     with Session() as s:
-        query = select(Paper).where(
-            Paper.submitted_at >= cutoff_low, Paper.submitted_at <= cutoff_high
-        )
-        kw_filter = papers_keyword_filter(keywords)
-        if kw_filter is not None:
-            query = query.where(kw_filter)
-        papers = list(s.scalars(query).all())
+        if contract is not None and contract.source == "local":
+            # 本地源（cs.CV/ao-ph 实时）：从外部每日 papers.db 取近窗，不走 Postgres facts。
+            # ⚠ 此分支需服务器栈 smoke（本机无 Postgres/MinIO/Prefect 未验）。
+            # 产线 topic.yaml 无 `retrieval:` 块 → contract=None → 本分支休眠，不影响在跑域。
+            raw, _ = acquire_by_source(
+                contract, reference_date=today, since_days=facts_window_days, limit=500, log=print,
+            )
+            papers = [s2paper_to_digest_row(p) for p in raw]
+        else:
+            query = select(Paper).where(
+                Paper.submitted_at >= cutoff_low, Paper.submitted_at <= cutoff_high
+            )
+            kw_filter = papers_keyword_filter(keywords)
+            if kw_filter is not None:
+                query = query.where(kw_filter)
+            papers = list(s.scalars(query).all())
         # FT triage：契约缺省（当前所有产线域）→ 直通全留，行为不变。
         n_pre_triage = len(papers)
         papers, triage_result = apply_triage(papers, contract, paper_to_item)
