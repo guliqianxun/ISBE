@@ -9,7 +9,7 @@ network 仅在 acquire 内；search_fn/sleep_fn 可注入以无网测试整条�
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from isbe.topics._shared.semantic_scholar import S2Paper, acquire
 from isbe.triage.contract import RetrievalContract
@@ -30,6 +30,28 @@ def s2paper_to_item(p: S2Paper) -> Item:
         id=p.id, source="semantic-scholar", headline=p.title, summary=p.abstract,
         url=p.url, published_at=pub, citation_count=p.citation_count,
         fields_of_study=p.fields_of_study,
+    )
+
+
+def acquire_by_source(
+    contract: RetrievalContract,
+    *,
+    reference_date: date,
+    since_days: int,
+    limit: int,
+    log=lambda _m: None,
+) -> tuple[list[S2Paper], dict[str, int]]:
+    """按 contract.source 选采集源（生产 A 用）。local=本地每日 papers.db；s2=Semantic Scholar。"""
+    if contract.source == "local":
+        from isbe.topics._shared.local_arxiv import acquire_local
+        return acquire_local(
+            contract, reference_date=reference_date, since_days=since_days,
+            limit=max(limit, 500), log=log,
+        )
+    cutoff = reference_date - timedelta(days=since_days)
+    return acquire(
+        contract.queries, year_from=reference_date.year - 1, year_to=reference_date.year,
+        limit_per_query=limit, pub_date=f"{cutoff}:{reference_date}", log=log,
     )
 
 

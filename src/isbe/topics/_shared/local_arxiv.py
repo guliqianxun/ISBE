@@ -9,6 +9,7 @@ FTS5 即时全文检索；cs.CV 完美覆盖 video-generation。附带 hf_upvote
 
 from __future__ import annotations
 
+import os
 import re
 import sqlite3
 from collections.abc import Callable
@@ -17,7 +18,8 @@ from datetime import date, timedelta
 from isbe.topics._shared.semantic_scholar import S2Paper
 from isbe.triage.contract import RetrievalContract
 
-DEFAULT_DB = r"I:\essaies\archive\arxiv-cs.CV\papers.db"
+# 生产可配：ISBE_LOCAL_ARXIV_DB 覆盖默认路径（外部每日项目的 papers.db）。
+DEFAULT_DB = os.environ.get("ISBE_LOCAL_ARXIV_DB", r"I:\essaies\archive\arxiv-cs.CV\papers.db")
 
 
 def _phrase(term: str) -> str:

@@ -10,13 +10,13 @@
 from __future__ import annotations
 
 import argparse
-from datetime import UTC, date, datetime, timedelta
+from datetime import date
 from pathlib import Path
 
 import yaml
 
 from isbe.triage.contract import RetrievalContract, load_contract
-from isbe.triage.pipeline import retrieve
+from isbe.triage.pipeline import acquire_by_source, retrieve
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -58,8 +58,8 @@ def main() -> None:
     ap.add_argument("--since-days", type=int, default=30,
                     help="实时雷达近窗：只取近 N 天发表（默认 30）")
     ap.add_argument("--limit", type=int, default=40, help="per-query S2 cap")
-    ap.add_argument("--source", choices=["s2", "local"], default="s2",
-                    help="local = 本地每日 papers.db(当天新鲜/无限速); s2 = Semantic Scholar")
+    ap.add_argument("--source", choices=["s2", "local"], default=None,
+                    help="覆盖契约 source; 缺省用 contract.source。local=本地每日 papers.db; s2=S2")
     ap.add_argument("--judge", action="store_true", help="跑 stage-2 LLM-judge 语义筛")
     ap.add_argument("--dump", type=str, default=None,
                     help="把全部判定(IN/OUT+理由)落成 jsonl，当范围参考用")
@@ -68,20 +68,13 @@ def main() -> None:
     if args.judge:
         _load_env()
     today = date.today()
-    pub_date = f"{today - timedelta(days=args.since_days)}:{today}"
     contract = _find_contract(args.topic)
-    if args.source == "local":
-        from isbe.topics._shared.local_arxiv import acquire_local
-        papers, per_query = acquire_local(
-            contract, reference_date=today, since_days=args.since_days,
-            limit=max(args.limit, 500), log=print,
-        )
-        res = retrieve(contract, reference_date=today, papers=papers, per_query=per_query)
-    else:
-        res = retrieve(
-            contract, year_from=today.year - 1, year_to=datetime.now(UTC).year,
-            limit_per_query=args.limit, reference_date=today, pub_date=pub_date, log=print,
-        )
+    if args.source:                       # --source 覆盖契约声明
+        contract = contract.model_copy(update={"source": args.source})
+    papers, per_query = acquire_by_source(
+        contract, reference_date=today, since_days=args.since_days, limit=args.limit, log=print,
+    )
+    res = retrieve(contract, reference_date=today, papers=papers, per_query=per_query)
 
     tri = res.triage
     n_acq = len(res.acquired)
@@ -93,7 +86,7 @@ def main() -> None:
 
     print(f"\n=== {args.topic} 实时检索效果（近 {args.since_days} 天）===")
     print(f"契约 intent: {contract.intent[:70]}")
-    print(f"窗口 pub_date={pub_date}  queries({len(contract.queries)})")
+    print(f"source={contract.source}  窗口=近{args.since_days}天  queries({len(contract.queries)})")
     print(f"\nACQUIRE 近窗召回: {n_acq} 篇  per_query={res.per_query}")
     nk, nd = len(tri.kept), len(tri.dropped)
     if args.judge:

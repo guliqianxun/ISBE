@@ -24,6 +24,9 @@ class RetrievalContract(BaseModel):
     intent: str
     version: int = 1
 
+    # 采集源：local = 外部每日 papers.db（cs.CV/ao-ph 实时）；s2 = Semantic Scholar
+    source: str = "s2"
+
     # human prose（LLM-judge / 阅读）
     in_scope: list[str] = Field(default_factory=list)
     out_of_scope: list[str] = Field(default_factory=list)

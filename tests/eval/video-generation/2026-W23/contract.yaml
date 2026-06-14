@@ -3,6 +3,7 @@
 # >>> 待用户增删确认 <<<  改任一字段请 bump version，并刷新同目录 qrels 回归基线。
 intent: "视频生成模型科研追踪：新方法/架构、SOTA、benchmark、可控/高效/世界模型，及影响该方向判断的里程碑工作"
 version: 1
+source: local        # cs.CV/ao-ph 走本地每日 papers.db（当天新鲜/无限速）
 
 in_scope:
   - 视频生成方法 / 模型 / 架构本身（diffusion / autoregressive / flow / 世界模型）

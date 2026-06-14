@@ -3,6 +3,7 @@
 # 相关次级(降尺度/卫星估计/S2S后处理/洪水/QPE/归因)靠后。分层用透明规则(secondary_terms)，不靠 judge。
 intent: "降水临近预报为核心(0–6h 雷达回波外推/深度学习/生成式短临)，并涵盖降水相关的降尺度、卫星估计、集合后处理、洪水、QPE/归因——核心置顶，相关次级"
 version: 2
+source: local        # cs.CV/ao-ph 走本地每日 papers.db（当天新鲜/无限速）
 
 in_scope:
   - 降水 / 对流 0–6h 短临预报方法（核心）
