@@ -65,8 +65,7 @@ def main() -> None:
                     help="把全部判定(IN/OUT+理由)落成 jsonl，当范围参考用")
     args = ap.parse_args()
 
-    if args.judge:
-        _load_env()
+    _load_env()   # 载入 .env：S2 key / DeepSeek key / 本地 DB 路径
     today = date.today()
     contract = _find_contract(args.topic)
     if args.source:                       # --source 覆盖契约声明
