@@ -436,3 +436,24 @@ uv run radar topics run nowcasting --digest
 2. 清掉 `papers/legacy/` 5 个旧 PDF
 3. （可选）china-tech 加更多专栏：搜罗"创投/金融/产业"向活跃 slug，目前只有 AI 两个
 4. （可选）知乎 /topic + /people：用 Copy-as-cURL 完整 cookie jar 再试一次，A 不成立刻退
+
+---
+
+## 2026-06-02 → 06-14 检索/事实层重构（分支 `refactor/architecture-cleanup`）
+
+**起点**：用户指出"对任意域，该搜什么/怎么搜/搜了多少/质量如何"没有清晰、隔离、可测的概念——
+相关性散在 collector 关键词 + LLM digester + 用户脑中，不可 TDD；且"随便问个 AI 都比现在检索好"。
+
+**做了什么**（纯增量，未碰现有产线；设计见 `docs/refactor/`）：
+
+- 三份设计文档：功能架构基线 / 检索契约+eval（锚 Cranfield/TREC/pytrec_eval）/ 科研检索能力集 RC1–RC8。
+- **检索 reframe**：检索从"SQL 时间窗+ilike"升级为可评估子系统 **Acquire(宽网近窗) → Triage(透明双门) → Rank(显著性) → Tier(分层)**。
+- 建成 `isbe.triage` 子系统（contract/scorer/judge/significance/priority/pipeline/eval）+ 两个源 adapter（semantic_scholar / local_arxiv），**29 tests 全绿**。
+- **时效性解决**：接外部每日 `I:\essaies\...\papers.db`（cs.CV+ao-ph，当天新鲜、无限速、FTS5）作 cs.CV/ao-ph 生产实时源。
+- **关键决策**（用户拍板，已固化进 `docs/refactor/2026-06-13-*.md` §6/§8）：实时优先非找里程碑；
+  召回/κ 不作 gate（用户判为假指标/不实用）；相关性靠**透明规则双门**（out_of_scope 标题 + require_any 正向），
+  **judge 降级**为可选（用户不信任：跑两次不一致、偶误杀核心）；"都算+显示优先级"→ 优先级分层。
+- **一条硬限**：`radar`/`precipitation` 一词多义是纯关键词的最后一公里，本质需语义判；niche 周报靠眼筛可接受。
+
+**下一步**：C 文档固化（本条✅）→ B 本地源设为 cs.CV/ao-ph 生产默认 → A 接进真实 digester
+（前置架构选择见 §9：本地 DB→facts 导入[守红线，建议] vs digester 直读[破单向流]；A 需服务器 smoke）。

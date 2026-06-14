@@ -5,6 +5,7 @@ supersedes: 2026-06-03-retrieval-contract-and-eval.md 的"triage = 仅过滤"框
 revisions:
   - r1 2026-06-13 检索 scope 扩张：从"facts 后加一道过滤"扩为"检索 = 可评估子系统(宽召回→语义筛→显著性排)"
   - r2 2026-06-13 实时雷达纠正（见 §7）：这是实时信息系统、优先最新；采集近窗化、显著性主序改新鲜度、绝对引用降级、锚点改"新发布"
+  - r3 2026-06-14 step-E 固化（见 §8）：透明双门（out_of_scope 标题 + require_any 正向）、优先级分层、judge 降级、本地源 adapter 解时效、关键词一词多义硬限；§9 B+A 集成计划
 ---
 
 # 智能检索管道（检索 scope 扩张）
@@ -96,3 +97,79 @@ arxiv recent listings（服务器侧可达，本机被 WAF 封）。生产应 ar
 
 - Acquire 的 K（每面截多少）、judge 保守方向（拿不准宁留/宁弃）——定检索工作点。
 - facets 增删（contract.yaml 待确认）、bootstrap 标 88 条 qrels（解锁 Step C/D）。
+
+## 8. step-E 固化（r3，2026-06-14 实跑沉淀）
+
+经 nowcasting / video-generation 多轮实跑，检索子系统定型如下。
+
+### 8.1 管线终态
+
+```
+源(本地 papers.db / S2) → ACQUIRE 宽网近窗 → out_of_scope(标题) → require_any(正向门)
+   → 优先级分层(core/secondary) → 时间倒序 [→ 可选 stage-2 LLM-judge]
+```
+
+### 8.2 透明双门（不靠 judge 的相关性，规则可改）
+
+实跑逼出两条**透明规则门**，配合用：
+
+1. **out_of_scope 负向门（只匹配标题）**：命中即弃。**只看标题**——摘要动机句（"reduce
+   economic losses"）全文匹配会误杀真域论文（nowcasting 实测 7/7 误杀）。规则须高精度 recall-safe。
+2. **require_any 正向门（匹配全文）**：词被一词多义严重占用时（`precipitation`=化学沉淀、
+   `convective`=热对流、`radar`=LiDAR/SAR/车载），负向穷举列不完——改要求**正向命中领域判别词**，
+   没有即弃。这是**精度/召回旋钮**：用户改一行 `require_any` 即调，偏召回 + 周表眼筛。
+
+### 8.3 优先级分层（"都算 + 显示优先级"）
+
+`secondary_terms` 命中 → 次级层（靠后），其余 in_scope → 核心层（置顶）。in_scope 全保留、
+只是分层。规则驱动、透明可改。
+
+### 8.4 judge 降级（用户不信任）
+
+LLM-judge（`judge.py`）实测能做语义筛（nowcasting 131→48、video-gen 162→71），但
+**跑两次结果不同**（同篇 kept→OUT）、偶尔误杀核心、且解析有串行风险。用户明确不信任、不投入加固。
+故 **judge 不作默认门**；相关性靠 §8.2 透明双门，judge 仅作可选项（`--judge`）。
+qrels/κ 校准用户判为"不是很用"，不作 gate（仅留 anchor/precision，召回不 gate）。
+
+### 8.5 时效性解决：本地源
+
+S2 索引滞后几天 + 未授权限速（常 3/6 查询挂）→ 不适合实时。改接外部每日项目
+`I:\essaies\archive\arxiv-cs.CV\papers.db`（195k cs.CV + 4k physics.ao-ph，FTS5，每日 harvest，
+当天新鲜，本地秒回无限速）。**这是 cs.CV/ao-ph 域的生产实时源。** 带 `hf_upvotes`（HF 社区热度，
+新论文显著性信号，惜当前富集滞后 ~2 周）。
+
+### 8.6 一条不可消除的硬限
+
+`radar`/`precipitation`/`convective` 一词多义 = 纯关键词的最后一公里，**本质需语义判**。
+透明门把噪音从大头清掉，但残留少量同词异义（气象雷达 vs LiDAR）只能靠 judge 或眼筛。
+对 niche 周报（~12 条），眼筛可接受。
+
+### 8.7 模块清单（isbe.triage + 源 adapter，均纯增量、29 tests）
+
+| 模块 | 职责 |
+|---|---|
+| `contract.py` | RetrievalContract（intent/in·out_scope/facets/queries/entity_terms/require_any/secondary_terms/must_not_miss） |
+| `scorer.py` | stage-1 级联：out_of_scope(标题) + require_any(全文) 双门 |
+| `judge.py` | stage-2 LLM-judge（可选，默认不启用） |
+| `significance.py` | RC5 显著性（citation+速度+锚点；实时下退为辅助） |
+| `priority.py` | core/secondary 分层 |
+| `pipeline.py` | retrieve() 组合 Acquire→Triage→Rank→Tier；接受预取 papers |
+| `eval.py` | P/R/F1/anchor（对 qrels；非 gate） |
+| `_shared/semantic_scholar.py` | S2 源 adapter（退避抗 429） |
+| `_shared/local_arxiv.py` | 本地 papers.db 源 adapter（宽 OR 网、近窗、FTS5） |
+| `scripts/eval/{freeze_papers,freeze_collection,retrieve}.py` | 冻结 fixture + 端到端 demo runner（--source/--judge/--dump） |
+
+## 9. B + A 集成计划（待施工）
+
+**B 本地源设为 cs.CV/ao-ph 生产默认**：① `local_arxiv.DEFAULT_DB` 改环境变量
+`ISBE_LOCAL_ARXIV_DB` 可配；② topic.yaml 加 `source: local`，dispatch 据此选 adapter。
+
+**A 接进真实 digester**：digester 取 facts 处改调 `retrieve()`（已预留 apply_triage 接缝，
+契约缺省直通保证向后兼容），周报正文按 core/secondary 分层渲染、时间倒序。
+
+**⚠ 待用户拍板的架构选择（A 的前置）**：本地 DB 是外部读源，与 ISBE facts 层（Postgres）关系两种模型——
+- **模型一**：本地 DB → 一个 collector upsert 进 ISBE `papers` facts，digester 照旧读 facts。**守 facts=单一事实源红线**，但多一个导入 flow。
+- **模型二**：digester 直接读本地 DB（绕过 facts 层）。简单，但破"采集→存储→检索"单向流红线。
+**建议模型一**（守红线）。需用户确认后再写生产代码。
+
+**验证现实**：A 触生产 digester（Prefect+Postgres+MinIO），本机栈未起，只能单元测 + 服务器 smoke。
