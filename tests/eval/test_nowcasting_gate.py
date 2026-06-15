@@ -20,7 +20,7 @@ _JUNK = {
     "ode": "Learning to Solve Generative ODEs Beyond the Linear Span",
     "atn3d": "ATN3D: Density-Aware LiDAR-Radar Early 3D Object Detection Under Extreme Sparsity",  # noqa: E501
     "heat": "Urban Heat MiniCubes: An AI-Ready dataset for urban heat research",
-    "wave": "Physics-Guided Spatiotemporal Learning for Coastal Wave Peak Period Estimation from Video",
+    "wave": "Physics-Guided Spatiotemporal Learning for Coastal Wave Peak Period Estimation from Video",  # noqa: E501
 }
 
 
