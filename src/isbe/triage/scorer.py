@@ -50,10 +50,11 @@ def triage(items: list[Item], contract: RetrievalContract) -> TriageResult:
             result.dropped.append((it, reason))
             continue
 
-        # 正向信号门：词被一词多义严重占用时（precipitation=化学沉淀、convective=热对流），
-        # 负向穷举列不完——改要求**全文**正向命中判别词（radar/rainfall/reflectivity…），
-        # 没有任一即弃。透明可改，不靠 LLM。空 require_any 则跳过此门（向后兼容）。
-        if require_any and _first_hit(low, require_any) is None:
+        # 正向信号门：要求**标题**命中领域判别词（radar echo/rainfall/...），否则弃。
+        # 只看标题不看摘要——真研究该方向的论文会把它写进标题；摘要里"名提"当应用的
+        # （如 Generative ODEs 名提 precipitation nowcasting）是假阳性，正该被弃。
+        # 透明可改、不靠 LLM。空 require_any 则跳过此门（向后兼容）。
+        if require_any and _first_hit(it.headline.lower(), require_any) is None:
             reason = "no in-domain signal (require_any)"
             result.scores[it.id] = RelevanceScore(
                 item_id=it.id, relevant=False, score=0.0, reason=reason, stage="rule",

@@ -60,10 +60,10 @@ entity_terms:
 # 去掉过宽的 weather/atmospheric/meteorolog（放进了 YOLO 交通"weather conditions"、
 # standoff"atmospheric compensation"、空气质量）；只留对降水短临判别性强的。
 require_any:
-  [radar, rainfall, reflectivity, "echo extrapolation", "radar echo", meteorolog,
+  [precipitation, rainfall, reflectivity, "radar echo", "echo extrapolation", "weather radar",
    "precipitation forecast", "precipitation nowcast", "precipitation prediction",
-   QPE, DGMR, MetNet, NowcastNet, "convective storm", "storm-scale", "rain rate",
-   "quantitative precipitation"]
+   QPE, DGMR, MetNet, NowcastNet, "convective storm", "rain rate",
+   "quantitative precipitation", meteorolog]
 
 must_not_miss:
   - 本期新发布的主流降水临近预报 SOTA / 新方法

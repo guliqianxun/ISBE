@@ -46,10 +46,11 @@ retrieval:
   out_of_scope_keywords: [GDP, economic, macroeconomic, financial, influenza, epidemic, COVID,
                           disease, earthquake, "algal bloom", "heart rate", "vital sign", missile,
                           "sign language", "vessel classification", RCS, "gesture recognition"]
-  require_any: [radar, rainfall, reflectivity, "echo extrapolation", "radar echo", meteorolog,
-                "precipitation forecast", "precipitation nowcast", "precipitation prediction",
-                QPE, DGMR, MetNet, NowcastNet, "convective storm", "storm-scale", "rain rate",
-                "quantitative precipitation"]
+  # 匹配标题(scorer)。去掉裸 radar(LiDAR/车载多义)，锚定 precipitation/rainfall/radar-echo。
+  require_any: [precipitation, rainfall, reflectivity, "radar echo", "echo extrapolation",
+                "weather radar", "precipitation forecast", "precipitation nowcast",
+                "precipitation prediction", QPE, DGMR, MetNet, NowcastNet, "convective storm",
+                "rain rate", "quantitative precipitation", meteorolog]
   must_not_miss:
     - 本期新发布的主流降水临近预报 SOTA / 新方法
     - 公开 benchmark 榜首易主
