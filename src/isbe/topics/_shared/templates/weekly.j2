@@ -8,38 +8,67 @@
 {% for b in comparison.buckets %}
 - {{ b.label }}：本期 {{ b.current_n }} → 上期 {{ b.prior_n }} ({{ "+" if b.delta_n >= 0 else "" }}{{ b.delta_n }})
 {%- if b.new %}
-  - 新增（{{ b.new | length }}）: {{ b.new | join(", ") }}
+    - 新增（{{ b.new | length }}）: {{ b.new | join(", ") }}
 {%- endif %}
 {%- if b.carried %}
-  - 延续（{{ b.carried | length }}）: {{ b.carried | join(", ") }}
+    - 延续（{{ b.carried | length }}）: {{ b.carried | join(", ") }}
 {%- endif %}
 {%- if b.dropped %}
-  - 已出窗口（{{ b.dropped | length }}）: {{ b.dropped | join(", ") }}
+    - 已出窗口（{{ b.dropped | length }}）: {{ b.dropped | join(", ") }}
 {%- endif %}
 {% endfor %}
 {%- if comparison.active_repos %}
 - 仓库活跃（自 {{ comparison.prior_period }} digest 后有 commit）:
 {%- for r in comparison.active_repos %}
-  - [{{ r.title }}]({{ r.github_url }}) — {{ r.last_commit_at.strftime("%Y-%m-%d") }}
+    - [{{ r.title | e }}]({{ r.github_url | e }}) — {{ r.last_commit_at.strftime("%Y-%m-%d") }}
 {%- endfor %}
 {%- endif %}
 {% endif %}
 {% if papers -%}
 ## 重点论文（{{ papers | length }}）
-{% for p in papers %}
-### [{{ p.arxiv_id }}] {{ p.title }}
-
-- **作者**: {{ p.authors | join(", ") }}
-- **分类**: {{ p.primary_category }}
-- **提交**: {{ p.submitted_at.strftime("%Y-%m-%d") }}
-- **arXiv**: {{ p.source_url }}{% if p.pdf_uri %} · 本地 `papers/{{ topic_id }}/{{ period_label }}/{{ p.arxiv_id }}.pdf`{% endif %}
-{% if paper_reviews.get(p.arxiv_id) %}
-> **本期评价**：{{ paper_reviews[p.arxiv_id] }}
+{% for p in papers %}{% set blk = paper_blocks.get(p.arxiv_id) %}
+### [{{ p.arxiv_id }}] {{ p.title | e }}
+{% if blk and blk.verdict %}
+> **本期评价**：{{ blk.verdict | e }}
 {% endif %}
+{%- if blk and blk.plain %}
+> 速览（入门）：{{ blk.plain | e }}
+{%- endif %}
 
-**摘要**：
+{% if blk and blk.provenance %}- **来源**: {{ blk.provenance | e }}
+{% endif %}{% if blk and blk.method %}- **方法/背景**: {{ blk.method | e }}
+{% endif %}{% if blk and blk.data %}- **数据**: {{ blk.data | e }}
+{% endif %}- **作者**: {{ p.authors | join(", ") | e }} · {{ p.primary_category | e }} · 提交 {{ p.submitted_at.strftime("%Y-%m-%d") if p.submitted_at else "—" }}
+- **原文**: {{ p.source_url | e }}{% if p.pdf_uri %} · 本地 `papers/{{ topic_id }}/{{ period_label }}/{{ p.arxiv_id }}.pdf`{% endif %}
+{%- if blk and blk.code %}
+- **代码**: {{ blk.code | e }}
+{%- endif %}
+{%- if blk and blk.repro %}
+- **复现**: {% for k in ["开源", "权重", "算力", "代码完整度"] %}{% if blk.repro.get(k) %}{{ k }}={{ blk.repro[k] | e }}{% if not loop.last %} · {% endif %}{% endif %}{% endfor %}
+{%- endif %}
+{%- if blk and blk.sota %}
 
-{{ p.abstract | truncate(800, true, "...") }}
+{% set structured = blk.sota | selectattr("structured") | list %}
+{%- set notes = blk.sota | rejectattr("structured") | list %}
+{%- if structured %}
+效果（参考指标，非排名结论）：
+
+| 指标 | 数据集 | 对照基线 | 基线 | 新值 | Δ |
+| --- | --- | --- | ---: | ---: | ---: |
+{% for c in structured -%}
+| {{ c.metric | e }} | {{ (c.dataset or "—") | e }} | {{ (c.baseline_model or "—") | e }} | {{ c.baseline | e }} | {{ c.new | e }} | {{ c.delta_pct or "—" }} |
+{% endfor %}
+{%- endif %}
+{%- for c in notes %}
+- 效果: {{ c.raw | e }}
+{%- endfor %}
+{%- endif %}
+
+<details markdown="1"><summary>摘要原文</summary>
+
+{{ p.abstract | truncate(800, true, "...") | e }}
+
+</details>
 
 {% endfor %}
 {% endif %}
@@ -49,10 +78,19 @@
 | Repo | Stars | 最近提交 | 评价 |
 | --- | ---: | --- | --- |
 {% for r in repos -%}
-| [{{ r.title }}]({{ r.github_url }}) | {{ r.stars }} | {{ r.last_commit_at.strftime("%Y-%m-%d") if r.last_commit_at else "—" }} | {{ repo_reviews.get(r.title) or "—" }} |
+| [{{ r.title | e }}]({{ r.github_url | e }}) | {{ r.stars }} | {{ r.last_commit_at.strftime("%Y-%m-%d") if r.last_commit_at else "—" }} | {{ (repo_reviews.get(r.title) or "—") | e }} |
 {% endfor %}
 {% endif %}
 
+{% if glossary -%}
+## 名词（入门）
+
+| 术语 | 一句话解释 |
+| --- | --- |
+{% for term, gloss in glossary -%}
+| {{ term | e }} | {{ gloss | e }} |
+{% endfor %}
+{% endif %}
 ## 分析
 {{ analysis }}
 
@@ -64,7 +102,7 @@
 
 ---
 
-<details>
+<details markdown="1">
 <summary>Audit & 追溯</summary>
 
 - **generated_at**: {{ generated_at }}

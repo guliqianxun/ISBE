@@ -6,7 +6,7 @@ and memory loading utilities.
 import os
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
@@ -174,6 +174,8 @@ def split_sections(text: str) -> dict[str, str]:
         "品牌动态": "brand_notes",
         # china-tech-weekly
         "公司动态": "company_notes",
+        # research-weekly beginner lens
+        "名词": "glossary",
         "分析": "analysis",
         "蒸馏": "distillation",
     }
@@ -206,6 +208,238 @@ def parse_paper_reviews(text: str) -> dict[str, str]:
             continue
         aid = m.group(1).split("v")[0]
         out[aid] = m.group(2).strip()
+    return out
+
+
+@dataclass(frozen=True)
+class SotaClaim:
+    """One SOTA-increment claim.
+
+    Canonical (table-renderable) shape::
+
+        <指标>@<数据集>[ vs <基线模型>]: <基线>→<新值>
+
+    `delta_pct` is computed (not from the LLM) when baseline/new are numeric, so
+    a specialist can read the increment without expanding the abstract. A claim
+    that isn't canonical but still carries a number + arrow is kept in `raw` as a
+    note; junk / placeholders are dropped upstream (`_parse_sota`)."""
+
+    metric: str
+    dataset: str
+    baseline: str
+    new: str
+    raw: str
+    baseline_model: str = ""
+    delta_pct: str = ""
+
+    @property
+    def structured(self) -> bool:
+        return bool(self.metric and self.new)
+
+
+@dataclass(frozen=True)
+class PaperBlock:
+    """Structured per-paper payload for the research weekly card.
+
+    Verifiability-first (what a researcher can check / reproduce, not a bare
+    rank): `provenance` (作者/机构 + 本文自述的前作血统), `method` (方法 + 背景/
+    所基于的工作), `data` (数据集来源 + 公开/自采), `repro` (复现风险). Judgment:
+    `verdict` (≤2 句). Beginner: `plain` (大白话). `sota` is a *secondary*
+    reference signal (effect numbers), not the headline.
+
+    All fields degrade gracefully to empty — a paper the LLM under-fills still
+    renders its title + abstract, so the report never loses an item to a parse
+    miss.
+    """
+
+    arxiv_id: str
+    verdict: str = ""
+    plain: str = ""
+    provenance: str = ""
+    method: str = ""
+    data: str = ""
+    code: str = ""
+    sota: tuple[SotaClaim, ...] = ()
+    repro: dict[str, str] = field(default_factory=dict)
+
+
+_BLOCK_HEADER_RE = re.compile(r"^\s*#{2,4}\s*\[?([0-9]+\.[0-9]+(?:v\d+)?)\]?")
+_FIELD_RE = re.compile(
+    r"^\s*-?\s*(评价|速览|来源|方法|数据|代码|复现|SOTA|效果)\s*[:：]\s*(.+)$", re.IGNORECASE
+)
+# LLM-facing label → internal field key (collapses synonyms / latin case).
+_FIELD_KEY = {"sota": "SOTA", "效果": "SOTA"}
+_ARROW_RE = re.compile(r"→|->")
+_VS_RE = re.compile(r"\bvs\.?\b|对比", re.IGNORECASE)
+_NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
+_REPRO_KEYS = ("开源", "权重", "算力", "代码完整度")
+
+
+def _delta_pct(baseline: str, new: str) -> str:
+    """Relative increment as a signed percent string, or '' if non-numeric.
+
+    Pulls the first number out of each cell so `0.41` / `41.2M` / `12.3 FID`
+    all reduce to a float; division-by-zero and parse failure both yield ''."""
+    bm, nm = _NUM_RE.search(baseline), _NUM_RE.search(new)
+    if not bm or not nm:
+        return ""
+    try:
+        b, n = float(bm.group()), float(nm.group())
+    except ValueError:
+        return ""
+    if b == 0:
+        return ""
+    return f"{(n - b) / abs(b) * 100:+.1f}%"
+
+
+def _parse_one_sota(part: str) -> SotaClaim | None:
+    """Parse one `<指标>@<数据集>[ vs <基线模型>]: <基线>→<新值>` claim.
+
+    Procedural (not one mega-regex) so each segment is robust: metric may itself
+    contain `@` (e.g. `CSI@8mm/h`), so dataset is taken after the LAST `@`; the
+    optional `vs <模型>` is split off the dataset segment. Returns None if the
+    shape isn't canonical (caller decides whether to keep a raw note or drop)."""
+    head_tail = re.split(r"[:：]", part, maxsplit=1)
+    if len(head_tail) != 2:
+        return None
+    head, tail = head_tail
+    if "@" not in head:
+        return None
+    metric, _, rest = head.rpartition("@")
+    metric = metric.strip()
+    vs_split = _VS_RE.split(rest, maxsplit=1)
+    dataset = vs_split[0].strip()
+    model = vs_split[1].strip() if len(vs_split) > 1 else ""
+    arrow = _ARROW_RE.split(tail, maxsplit=1)
+    if len(arrow) != 2:
+        return None
+    baseline, new = arrow[0].strip(), arrow[1].strip()
+    if not metric or not new:
+        return None
+    return SotaClaim(
+        metric=metric, dataset=dataset, baseline=baseline, new=new, raw=part.strip(),
+        baseline_model=model, delta_pct=_delta_pct(baseline, new),
+    )
+
+
+def _parse_sota(raw: str) -> tuple[SotaClaim, ...]:
+    """Parse a `- SOTA:` field into claims, **structured-or-drop**.
+
+    Each `;`-separated part is parsed canonically; a non-canonical part is kept
+    as a raw note ONLY if it contains both a number and an increment arrow (a
+    real-but-loosely-formatted metric). Everything else — placeholders like
+    `(无明确 SOTA 声明)`, `暂无`, prose without numbers — is dropped, so the
+    template never renders a junk bullet under the "SOTA 增量" heading."""
+    raw = raw.strip()
+    if not raw:
+        return ()
+    claims: list[SotaClaim] = []
+    for part in re.split(r"[;；]", raw):
+        part = part.strip().strip("|").strip()  # tolerate stray markdown-table pipes
+        if not part:
+            continue
+        claim = _parse_one_sota(part)
+        if claim is not None:
+            claims.append(claim)
+        elif _NUM_RE.search(part) and _ARROW_RE.search(part):
+            claims.append(
+                SotaClaim(metric="", dataset="", baseline="", new="", raw=part)
+            )
+        # else: placeholder / prose without a metric → dropped
+    return tuple(claims)
+
+
+_REPRO_SEP_RE = re.compile(r"[=:：]")
+
+
+def _parse_repro(raw: str) -> dict[str, str]:
+    """Parse `开源=是 · 权重=否 · 算力=1×A100 · 代码完整度=中` into a keyed dict.
+
+    Tolerates `·,，、` separators between pairs and `=`/`:`/`：` between key and
+    value (LLM drift). Unknown keys are ignored."""
+    out: dict[str, str] = {}
+    for part in re.split(r"[·,，、]", raw):
+        kv = _REPRO_SEP_RE.split(part.strip(), maxsplit=1)
+        if len(kv) != 2:
+            continue
+        k, v = kv[0].strip(), kv[1].strip()
+        if k in _REPRO_KEYS and v:
+            out[k] = v
+    return out
+
+
+def parse_paper_blocks(text: str) -> dict[str, "PaperBlock"]:
+    """Parse the structured `## 论文逐篇` section into `{arxiv_id: PaperBlock}`.
+
+    Block format (per paper)::
+
+        ### [<arxiv_id>]
+        - 评价: <≤2 句价值判断>
+        - 速览: <大白话 1 句>
+        - 来源: <作者/机构 + 本文自述的前作血统>
+        - 方法: <核心方法 + 所基于的工作（背景）>
+        - 数据: <数据集 + 公开/自采 + 来源>
+        - 复现: 开源=是 · 权重=否 · 算力=1×A100 · 代码完整度=中
+        - 效果: <指标>@<数据集> vs <基线模型>: <基线>→<新值>  | (无明确数字)
+
+    Tolerant by design: full/half-width colons, optional leading `-`, missing
+    fields, and the legacy one-line `- [<id>] <verdict>` shape (mapped to
+    `verdict` only) all parse without raising. Unknown lines are ignored.
+    """
+    blocks: dict[str, PaperBlock] = {}
+    cur_id: str | None = None
+    fields: dict[str, str] = {}
+
+    def _flush() -> None:
+        if cur_id is None:
+            return
+        blocks[cur_id] = PaperBlock(
+            arxiv_id=cur_id,
+            verdict=fields.get("评价", ""),
+            plain=fields.get("速览", ""),
+            provenance=fields.get("来源", ""),
+            method=fields.get("方法", ""),
+            data=fields.get("数据", ""),
+            code=fields.get("代码", ""),
+            sota=_parse_sota(fields.get("SOTA", "")),
+            repro=_parse_repro(fields.get("复现", "")),
+        )
+
+    for line in text.splitlines():
+        hm = _BLOCK_HEADER_RE.match(line)
+        if hm:
+            _flush()
+            cur_id = hm.group(1).split("v")[0]
+            fields = {}
+            continue
+        # legacy one-line form: `- [<id>] <verdict>`
+        lm = PAPER_REVIEW_RE.match(line)
+        if lm and cur_id is None:
+            aid = lm.group(1).split("v")[0]
+            blocks[aid] = PaperBlock(arxiv_id=aid, verdict=lm.group(2).strip())
+            continue
+        fm = _FIELD_RE.match(line)
+        if fm and cur_id is not None:
+            label = fm.group(1)
+            key = _FIELD_KEY.get(label.lower(), label)
+            fields[key] = fm.group(2).strip()
+    _flush()
+    return blocks
+
+
+def parse_glossary(text: str) -> list[tuple[str, str]]:
+    """Parse a `## 名词` glossary block into ordered `(term, gloss)` pairs.
+
+    Line format: `- <术语>: <一句解释>`. Beginner-lens content; empty/placeholder
+    sections yield `[]` so the template can omit the section entirely.
+    """
+    out: list[tuple[str, str]] = []
+    for line in text.splitlines():
+        m = re.match(r"^\s*-\s*(.+?)\s*[:：]\s*(.+)$", line)
+        if m:
+            term, gloss = m.group(1).strip(), m.group(2).strip()
+            if term and gloss:
+                out.append((term, gloss))
     return out
 
 

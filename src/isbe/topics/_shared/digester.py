@@ -33,7 +33,9 @@ from isbe.topics._shared.digester_utils import (
     paper_to_item,
     parse_bracketed_reviews,
     parse_distillation_section,  # noqa: F401  — re-exported for back-compat
-    parse_paper_reviews,
+    parse_glossary,
+    parse_paper_blocks,
+    parse_paper_reviews,  # noqa: F401  — re-exported for back-compat
     s2paper_to_digest_row,
 )
 from isbe.topics._shared.digester_utils import (
@@ -166,7 +168,8 @@ def _digester_impl(
         DigestSection(kind="distillation", body=parts.get("distillation", "")),
     ]
     drafts = parse_distillation_section(parts.get("distillation", ""))
-    paper_reviews = parse_paper_reviews(parts.get("paper_reviews", ""))
+    paper_blocks = parse_paper_blocks(parts.get("paper_reviews", ""))
+    glossary = parse_glossary(parts.get("glossary", ""))
     repo_reviews = parse_bracketed_reviews(parts.get("repo_reviews", ""))
     for d in drafts:
         write_pending(mroot, d)
@@ -192,7 +195,8 @@ def _digester_impl(
         memory_refs=", ".join(f"{k}@rev{v}" for k, v in memory_index.items()),
         trace_id=resp.trace_id or "(none)",
         papers=papers,
-        paper_reviews=paper_reviews,
+        paper_blocks=paper_blocks,
+        glossary=glossary,
         repos=repos or [],
         repo_reviews=repo_reviews,
         comparison=comparison,
@@ -218,6 +222,12 @@ def _digester_impl(
             "pre_triage": n_pre_triage,
         }
     run.payload["n_repos"] = len(repos) if repos is not None else 0
+    # Parse-yield: detect a silent LLM-format regression (e.g. whole 论文逐篇
+    # section drifting off-contract → bare title+abstract cards) without
+    # inspecting artifacts. n_paper_blocks << n_papers signals a parse miss.
+    run.payload["n_paper_blocks"] = len(paper_blocks)
+    run.payload["n_blocks_with_sota"] = sum(1 for b in paper_blocks.values() if b.sota)
+    run.payload["n_glossary"] = len(glossary)
     run.payload["n_drafts"] = len(drafts)
     run.payload["artifact_id"] = str(artifact_id)
     run.payload["llm_input_tokens"] = resp.input_tokens

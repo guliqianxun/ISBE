@@ -58,7 +58,7 @@ def render_html(
     """
     body_html = markdown.markdown(
         artifact_md,
-        extensions=["tables", "fenced_code", "footnotes"],
+        extensions=["tables", "fenced_code", "footnotes", "md_in_html"],
     )
 
     template = _jinja_env.get_template(_TEMPLATE_NAME)

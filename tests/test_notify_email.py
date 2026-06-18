@@ -345,6 +345,32 @@ def test_render_html_banner_contains_period():
     assert "2026-W21" in html
 
 
+def test_render_html_converts_markdown_inside_details():
+    """`md_in_html` must re-parse markdown inside `<details markdown="1">` so the
+    collapsed abstract / audit footer render as HTML, not leaked raw markdown.
+    Regression guard for the footer-leak bug (`- **generated_at**:` shipped raw)."""
+    md = (
+        "## 重点论文\n\n"
+        '<details markdown="1"><summary>摘要</summary>\n\n'
+        "This is **bold** abstract text.\n\n"
+        "</details>\n\n"
+        "---\n\n"
+        '<details markdown="1">\n<summary>Audit</summary>\n\n'
+        "- **generated_at**: 2026-06-16\n"
+        "- **trace_id**: t1\n\n"
+        "</details>\n"
+    )
+    html = render_html(
+        topic_label="nowcasting", period_label="2026-W24",
+        artifact_md=md, artifact_path=None,
+    )
+    assert "<details" in html
+    # markdown converted: bold → <strong>, bullets → <li>; no raw leak
+    assert "<strong>bold</strong>" in html
+    assert "<strong>generated_at</strong>" in html
+    assert "- **generated_at**" not in html  # the exact bug we fixed
+
+
 def test_render_html_footer_dots_and_tagline():
     """Footer must contain '· · ·' dots and the ISBE tagline."""
     html = render_html(
