@@ -4,12 +4,15 @@ cadence: weekly
 active: true
 
 arxiv:
-  categories: [cs.LG]
+  # physics.ao-ph 是降水临近预报论文的主阵地；cs.LG/eess.IV 补充方法/影像向。
+  categories: [physics.ao-ph, cs.LG, eess.IV]
   include_keywords:
     - nowcasting
     - precipitation
-    - radar
-  max_results: 50
+    - rainfall
+    - "radar echo"   # 气象雷达专指；去掉裸 radar（军用/车载 LiDAR 多义污染采集）
+    - QPE
+  max_results: 100
 
 digest:
   flavor: weekly
