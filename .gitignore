@@ -33,6 +33,9 @@ papers/
 llm_raw_response.md
 .prefect/
 
+# Local scratch (email-test renders etc.)
+tmp/
+
 # OS
 .DS_Store
 Thumbs.db
