@@ -64,9 +64,25 @@
 {%- endfor %}
 {%- endif %}
 
+{%- set asset = paper_assets.get(p.arxiv_id) if paper_assets else None %}
+{%- if asset and asset.figure %}
+
+**框架图**：{{ asset.figure.caption | e }}
+
+![framework]({{ asset.figure.datauri }})
+{%- endif %}
+{%- if asset and asset.tables %}
+{%- for t in asset.tables %}
+
+**性能表**：{{ t.caption | e }}
+
+{{ t.markdown }}
+{%- endfor %}
+{%- endif %}
+
 <details markdown="1"><summary>摘要原文</summary>
 
-{{ p.abstract | truncate(800, true, "...") | e }}
+{{ p.abstract | e }}
 
 </details>
 
