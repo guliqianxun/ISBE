@@ -47,8 +47,13 @@ def main() -> None:
     to = os.environ["ISBE_SMTP_TO"]
 
     html = REPORT.read_text(encoding="utf-8")
+    label = "科研周报"
+    pool = REPO / "tmp" / "pool.json"
+    if pool.is_file():
+        import json
+        label = json.loads(pool.read_text(encoding="utf-8")).get("label", label)
     msg = EmailMessage()
-    msg["Subject"] = "[ISBE] 临近降水预报科研周报（可核实版 · 含框架图/性能表）"
+    msg["Subject"] = f"[ISBE] {label}（可核实版 · 含框架图/性能表）"
     msg["From"] = sender
     msg["To"] = to
     msg.set_content(

@@ -28,11 +28,17 @@ OUT.parent.mkdir(parents=True, exist_ok=True)
 
 
 def main() -> None:
-    since_days = int(sys.argv[1]) if len(sys.argv) > 1 else 14
-    ref = date(2026, 6, 20)  # fixed reference date (deterministic; matches DB freshness)
-    cfg = load_topic_config(default_topics_root(), "nowcasting")
+    # args: [topic] [window] in any order (window = digits). Defaults: nowcasting / 14.
+    topic, since_days = "nowcasting", 14
+    for a in sys.argv[1:]:
+        if a.isdigit():
+            since_days = int(a)
+        else:
+            topic = a
+    ref = date.today()
+    cfg = load_topic_config(default_topics_root(), topic)
     contract = contract_from_config(cfg)
-    assert contract is not None, "nowcasting must declare a retrieval contract"
+    assert contract is not None, f"{topic} must declare a retrieval contract"
 
     net = _net_query(contract)
     cutoff = (ref - timedelta(days=since_days)).isoformat()
@@ -77,7 +83,7 @@ def main() -> None:
 
     # Editorial curation (last-mile cases the title-only gate cannot decide):
     # apply the Coverage Auditor's semantic verdict explicitly + transparently.
-    curate_path = REPO / "tmp" / "curate.json"
+    curate_path = REPO / "tmp" / f"curate_{topic}.json"
     curate = json.loads(curate_path.read_text(encoding="utf-8")) if curate_path.exists() else {}
     force_in = set(curate.get("force_include", []))
     force_out = set(curate.get("force_exclude", []))
@@ -104,8 +110,8 @@ def main() -> None:
     kept.sort(key=lambda r: r["tier"] != "core")
 
     out = {
-        "topic": "nowcasting",
-        "label": cfg.get("label", "nowcasting"),
+        "topic": topic,
+        "label": cfg.get("label", topic),
         "reference_date": ref.isoformat(),
         "since_days": since_days,
         "window_cutoff": cutoff,

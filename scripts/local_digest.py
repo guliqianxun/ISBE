@@ -94,13 +94,15 @@ def gen_cards(pool: dict) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--topic", default="nowcasting")
     ap.add_argument("--window", type=int, default=7)
     ap.add_argument("--no-email", action="store_true")
     ap.add_argument("--one", action="store_true", help="smoke: 1 paper, no email")
     args = ap.parse_args()
 
-    print("== 1/5 acquire+triage (local arXiv DB) =="); sys.stdout.flush()
-    subprocess.run([sys.executable, str(REPO / "scripts" / "build_pool.py"), str(args.window)], check=True)
+    print(f"== 1/5 acquire+triage (local arXiv DB) — topic={args.topic} =="); sys.stdout.flush()
+    subprocess.run([sys.executable, str(REPO / "scripts" / "build_pool.py"),
+                    args.topic, str(args.window)], check=True)
 
     print("== 2/5 docling extract (full-text + figures/tables) =="); sys.stdout.flush()
     subprocess.run([EXPLORE_PY, str(REPO / "scripts" / "extract_docs.py")], check=True)
