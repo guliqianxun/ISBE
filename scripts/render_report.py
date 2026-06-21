@@ -36,7 +36,8 @@ def _load_wf() -> dict:
         cards.append({"arxiv_id": a["arxiv_id"], "clean": a.get("clean", True),
                       "card": a["corrected_card"], "verdicts": a.get("field_verdicts", [])})
     cov_path = WFDIR / "coverage.json"
-    coverage = json.loads(cov_path.read_text(encoding="utf-8")) if cov_path.exists() else {}
+    audit_run = cov_path.exists()
+    coverage = json.loads(cov_path.read_text(encoding="utf-8")) if audit_run else {}
     n_kept = len(POOL["kept"])
     faith = len(cards) == n_kept and all(c["clean"] for c in cards)
     # Provenance is verifiable against the arXiv byline (a resolvable anchor per
@@ -70,14 +71,15 @@ def _load_wf() -> dict:
         return True
 
     trace = all(_traced(c["card"]) for c in cards)
-    cov_ok = coverage.get("severity", "fail") != "fail"
+    cov_ok = (coverage.get("severity", "fail") != "fail") if audit_run else True
     gates = {
         "faithfulness": "pass" if faith else "fail",
         "traceability": "pass" if trace else "fail",
-        "coverage": ("pass" if coverage.get("severity") == "pass" else
-                     "pass-minor" if coverage.get("severity") == "minor" else "fail"),
+        "coverage": (("pass" if coverage.get("severity") == "pass" else
+                      "pass-minor" if coverage.get("severity") == "minor" else "fail")
+                     if audit_run else "rule-only(未审计)"),
     }
-    return {"pass": faith and trace and cov_ok, "gates": gates,
+    return {"pass": faith and trace and cov_ok, "gates": gates, "audit_run": audit_run,
             "coverage": coverage, "cards": cards}
 
 
@@ -210,12 +212,16 @@ def _paper_assets() -> dict:
 def _coverage_section() -> str:
     cov = WF.get("coverage") or {}
     g = WF.get("gates", {})
-    out = ["", "## 覆盖与门禁审计", "",
+    out = ["", "## 覆盖与门禁", "",
            f"- **门禁**：coverage={g.get('coverage')} · faithfulness={g.get('faithfulness')} · "
            f"traceability={g.get('traceability')} · **{'PASS' if WF.get('pass') else 'FAIL'}**",
            f"- 采集池 {POOL['counts']['pool']} 篇 → 保留 {POOL['counts']['kept']} / 丢弃 {POOL['counts']['dropped']}"
-           f"（窗口 {POOL['since_days']} 天，截至 {POOL['reference_date']}）",
-           f"- 覆盖判定：**{cov.get('severity','?')}** — {cov.get('category_check','')} {cov.get('window_check','')}"]
+           f"（窗口 {POOL['since_days']} 天，截至 {POOL['reference_date']}）"]
+    if not WF.get("audit_run"):
+        out.append("- 本次为**本地常规投递**：经透明规则门（out_of_scope/require_any）筛选 + 每字段证据锚点；"
+                   "多智能体覆盖审计（coverage gate）为单独 QA 工具，未在本次投递运行。")
+    else:
+        out.append(f"- 覆盖判定：**{cov.get('severity','?')}** — {cov.get('category_check','')} {cov.get('window_check','')}")
     if cov.get("wrongly_dropped"):
         out.append("- **疑似误弃（应在但被丢）**：")
         for w in cov["wrongly_dropped"]:
