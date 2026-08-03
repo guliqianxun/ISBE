@@ -18,6 +18,10 @@ name: isbe
 
 services:
   postgres:
+    environment:
+      # Server deployment must not run with the dev default password —
+      # postgres is published on the LAN below. Fail at `compose config` time.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set for the server deployment}
     ports:
       - "192.168.0.156:5432:5432"
 
@@ -59,11 +63,13 @@ services:
 
   # Browser-based file manager — serves /mnt/nas_iscsi/isbe over HTTP so the
   # homepage hub can deep-link to PDFs / artifacts / memory without smb://.
-  # First-login: admin / admin (change password in UI immediately).
+  # Auth REQUIRED: this tree contains memory/ (private theses) and possibly
+  # .env. First login is admin / admin — change the password immediately.
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: isbe-filebrowser
-    user: "0:0"
+    # user: "1000:1000"  # uncomment & match /mnt/nas_iscsi/isbe ownership if
+    #                      the default non-root user can't read the NAS files
     volumes:
       - /mnt/nas_iscsi/isbe:/srv
       - ./infra/filebrowser:/config
@@ -71,14 +77,14 @@ services:
       FB_DATABASE: /config/filebrowser.db
       FB_ROOT: /srv
       FB_PORT: "80"
-      FB_NOAUTH: "true"
     ports:
       - "192.168.0.156:8084:80"
     restart: unless-stopped
     networks: [isbe-net]
 
-  # Browser-based SQL UI for postgres — no install on the laptop, just open
-  # http://192.168.0.156:8083 from any device on the LAN.
+  # Browser-based SQL UI for postgres. pgweb has no auth of its own, so it is
+  # bound to the server's loopback only — access via SSH tunnel:
+  #   ssh -L 8083:127.0.0.1:8083 <server> ; then open http://localhost:8083
   # (8081 is taken by zotero-webdav on this host; 8082 is homepage.)
   pgweb:
     image: sosedoff/pgweb:latest
@@ -87,9 +93,9 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      PGWEB_DATABASE_URL: postgres://${POSTGRES_USER:-isbe}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-isbe}?sslmode=disable
+      PGWEB_DATABASE_URL: postgres://${POSTGRES_USER:-isbe}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-isbe}?sslmode=disable
     ports:
-      - "192.168.0.156:8083:8081"
+      - "127.0.0.1:8083:8081"
     restart: unless-stopped
     networks: [isbe-net]
 

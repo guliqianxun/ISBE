@@ -127,7 +127,9 @@ services:
   # Route shape: GET /zhihuzhuanlan/<column-slug>  (note: no slash between
   # "zhihu" and "zhuanlan"). Upstream listens on :8000.
   morerssplz:
-    build: https://github.com/lilydjwg/morerssplz.git
+    # Pinned to a commit: an unpinned git build would execute whatever is on
+    # upstream HEAD at image-build time, inside this network.
+    build: https://github.com/lilydjwg/morerssplz.git#4f34f7c3ab256059559f328b1cb7e94b73165db4
     container_name: isbe-morerssplz
     restart: unless-stopped
     networks: [isbe-net]
