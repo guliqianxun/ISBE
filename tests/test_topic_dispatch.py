@@ -126,6 +126,53 @@ def test_per_topic_collector_for_topic_that_lacks_it_raises() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Broken imports must surface, not silently fall back (the old behavior
+# substituted the generic weekly digester for a topic whose digester.py
+# merely had a typo'd import)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture()
+def broken_topic(tmp_path, monkeypatch):
+    """Inject a temp topic package whose digester/collector modules exist but
+    contain a broken import (missing dependency)."""
+    import importlib
+    import sys
+
+    import isbe.topics as topics_pkg
+    from isbe.topics import dispatch
+
+    pkg = tmp_path / "broken_topic"
+    (pkg / "collectors").mkdir(parents=True)
+    (pkg / "__init__.py").write_text("")
+    (pkg / "digester.py").write_text("import nonexistent_pkg_xyz\n")
+    (pkg / "collectors" / "__init__.py").write_text("")
+    (pkg / "collectors" / "broken.py").write_text("import nonexistent_pkg_xyz\n")
+
+    topics_pkg.__path__.append(str(tmp_path))
+    monkeypatch.setattr(dispatch, "_topics_root", lambda: tmp_path)
+    importlib.invalidate_caches()
+    yield "broken-topic"
+    topics_pkg.__path__.remove(str(tmp_path))
+    for name in list(sys.modules):
+        if "broken_topic" in name:
+            del sys.modules[name]
+
+
+def test_broken_digester_import_raises_dispatch_error(broken_topic) -> None:
+    with pytest.raises(DispatchError) as exc:
+        resolve_flow(broken_topic, "digester")
+    assert "broken import" in str(exc.value)
+    assert "nonexistent_pkg_xyz" in str(exc.value)
+
+
+def test_broken_collector_import_raises_dispatch_error(broken_topic) -> None:
+    with pytest.raises(DispatchError) as exc:
+        resolve_flow(broken_topic, "some_collector")
+    assert "broken import" in str(exc.value)
+
+
+# ---------------------------------------------------------------------------
 # Bulk enumeration helpers (used by status_cmd to classify rows)
 # ---------------------------------------------------------------------------
 

@@ -18,15 +18,30 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import logging
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 DIGESTER_KEY = "digester"
 
+logger = logging.getLogger(__name__)
+
 
 class DispatchError(KeyError):
     """No flow resolves for the given (topic_id, schedule_key)."""
+
+
+def _module_absent(e: ModuleNotFoundError, probed: str) -> bool:
+    """True iff the error means `probed` (or a parent package) does not exist.
+
+    Distinguishes "topic has no such module" (legitimate fallback) from
+    "the module exists but an import *inside* it is broken" (must surface —
+    swallowing it used to silently substitute the generic digester).
+    Parent-package matching matters for hyphen-named topic dirs
+    (video-generation → isbe.topics.video_generation is the missing name).
+    """
+    return e.name is not None and (probed == e.name or probed.startswith(e.name + "."))
 
 
 # ---------------------------------------------------------------------------
@@ -73,10 +88,15 @@ def _find_per_topic_collector(topic_id: str, schedule_key: str) -> Callable[...,
     for py in sorted(pkg_dir.glob("*.py")):
         if py.name.startswith("_"):
             continue
+        probed = f"isbe.topics.{mod_name}.collectors.{py.stem}"
         try:
-            mod = importlib.import_module(f"isbe.topics.{mod_name}.collectors.{py.stem}")
-        except ImportError:
-            continue
+            mod = importlib.import_module(probed)
+        except ModuleNotFoundError as e:
+            if _module_absent(e, probed):
+                continue
+            raise DispatchError(f"broken import inside {probed}: {e}") from e
+        except ImportError as e:
+            raise DispatchError(f"broken import inside {probed}: {e}") from e
         fn = getattr(mod, schedule_key, None)
         if callable(fn):
             return fn
@@ -90,10 +110,15 @@ def _find_per_topic_collector(topic_id: str, schedule_key: str) -> Callable[...,
 
 def _find_per_topic_digester(topic_id: str) -> Callable[..., Any] | None:
     mod_name = _topic_module(topic_id)
+    probed = f"isbe.topics.{mod_name}.digester"
     try:
-        mod = importlib.import_module(f"isbe.topics.{mod_name}.digester")
-    except ImportError:
-        return None
+        mod = importlib.import_module(probed)
+    except ModuleNotFoundError as e:
+        if _module_absent(e, probed):
+            return None
+        raise DispatchError(f"broken import inside {probed}: {e}") from e
+    except ImportError as e:
+        raise DispatchError(f"broken import inside {probed}: {e}") from e
     digest = getattr(mod, "digest", None)
     return digest if callable(digest) else None
 
@@ -159,11 +184,17 @@ def collect_flow_names() -> set[str]:
         for py in pkg_dir.glob("*.py"):
             if py.name.startswith("_"):
                 continue
+            probed = f"isbe.topics.{_topic_module(topic_id)}.collectors.{py.stem}"
             try:
-                mod = importlib.import_module(
-                    f"isbe.topics.{_topic_module(topic_id)}.collectors.{py.stem}"
-                )
-            except ImportError:
+                mod = importlib.import_module(probed)
+            except ModuleNotFoundError as e:
+                if not _module_absent(e, probed):
+                    # Unlike resolve_flow, enumeration is for status display —
+                    # a broken module shouldn't crash `radar status`, just warn.
+                    logger.warning("collect_flow_names: broken import inside %s: %s", probed, e)
+                continue
+            except ImportError as e:
+                logger.warning("collect_flow_names: broken import inside %s: %s", probed, e)
                 continue
             for attr in dir(mod):
                 if attr.startswith("_"):
@@ -180,7 +211,11 @@ def digest_flow_names() -> set[str]:
 
     names = {_flow_name(weekly_digester)}
     for topic_id in _all_topic_ids():
-        custom = _find_per_topic_digester(topic_id)
+        try:
+            custom = _find_per_topic_digester(topic_id)
+        except DispatchError as e:
+            logger.warning("digest_flow_names: %s", e)
+            continue
         if custom is not None:
             names.add(_flow_name(custom))
     return names

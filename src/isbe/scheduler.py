@@ -5,14 +5,19 @@ isbe.topics.dispatch, so adding a topic or a custom digester touches only the
 topic's own directory.
 """
 
+import logging
+
 from prefect import serve
 
 from isbe.topics.dispatch import DispatchError, resolve_flow
 from isbe.topics.registry import default_topics_root, discover_topics, load_topic_config_typed
 
+logger = logging.getLogger(__name__)
+
 
 def _build_deployments():
     deployments = []
+    skipped: list[tuple[str, str, str]] = []
     root = default_topics_root()
     for meta in discover_topics(root):
         if not meta.active:
@@ -22,7 +27,8 @@ def _build_deployments():
             try:
                 flow_fn, params = resolve_flow(meta.id, schedule_key)
             except DispatchError as e:
-                print(f"[scheduler] WARN topic {meta.id}: {e}")
+                logger.error("topic %s schedule %s failed to resolve: %s", meta.id, schedule_key, e)
+                skipped.append((meta.id, schedule_key, str(e)))
                 continue
             deployments.append(
                 flow_fn.to_deployment(
@@ -31,6 +37,12 @@ def _build_deployments():
                     parameters=params,
                 )
             )
+    if skipped:
+        logger.warning(
+            "scheduler: %d schedule(s) skipped and will NEVER run: %s",
+            len(skipped),
+            "; ".join(f"{t}::{k}" for t, k, _ in skipped),
+        )
     return deployments
 
 
