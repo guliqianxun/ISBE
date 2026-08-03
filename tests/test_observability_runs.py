@@ -1,6 +1,8 @@
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from isbe.observability.runs import topic_run
 
 
@@ -38,3 +40,24 @@ def test_topic_run_records_failed_on_exception():
     added = fake_session.add.call_args[0][0]
     assert added.status == "failed"
     assert "boom" in added.payload.get("error", "")
+
+
+def test_persist_failure_does_not_mask_flow_exception(caplog):
+    """DB down while the flow also failed: the flow's exception must propagate,
+    not the persist error (the old finally-block replaced it)."""
+    with patch(
+        "isbe.observability.runs._persist_run", side_effect=ConnectionError("db down")
+    ):
+        with pytest.raises(ValueError, match="real failure"):
+            with topic_run("nowcasting", "test-flow"):
+                raise ValueError("real failure")
+    assert any("persist failed" in r.message for r in caplog.records)
+
+
+def test_persist_failure_raises_when_flow_succeeded():
+    with patch(
+        "isbe.observability.runs._persist_run", side_effect=ConnectionError("db down")
+    ):
+        with pytest.raises(ConnectionError, match="db down"):
+            with topic_run("nowcasting", "test-flow"):
+                pass
