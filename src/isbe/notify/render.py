@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import markdown
+import nh3
 import premailer
 from jinja2 import Environment, FileSystemLoader
 
@@ -22,6 +23,31 @@ _jinja_env = Environment(
     loader=FileSystemLoader(str(_TEMPLATE_DIR)),
     autoescape=False,  # HTML content injected intentionally
 )
+
+# The artifact markdown embeds LLM output, which in turn embeds crawled/RSS
+# text — untrusted. nh3 defaults already allow the tags the templates rely on
+# (tables, details/summary, img, sup for footnotes); we extend attributes with
+# class/id (footnote anchors, styling hooks) and allow data: URLs because
+# scripts/render_report.py inlines figures as base64 data URIs.
+_ALLOWED_ATTRIBUTES = {
+    tag: set(attrs) for tag, attrs in nh3.ALLOWED_ATTRIBUTES.items()
+}
+_ALLOWED_ATTRIBUTES.setdefault("*", set()).update({"class", "id"})
+_ALLOWED_URL_SCHEMES = {"http", "https", "mailto", "data"}
+
+
+def _sanitize(body_html: str) -> str:
+    return nh3.clean(
+        body_html,
+        attributes=_ALLOWED_ATTRIBUTES,
+        url_schemes=_ALLOWED_URL_SCHEMES,
+    )
+
+
+def _inline_css(html: str) -> str:
+    # allow_network=False: untrusted HTML must never cause premailer to fetch
+    # <link rel=stylesheet> URLs from inside the worker's network (SSRF).
+    return premailer.transform(html, allow_network=False)
 
 
 def render_html(
@@ -56,9 +82,11 @@ def render_html(
     Any exception from ``markdown``, ``jinja2``, or ``premailer`` propagates
     to the caller — no swallowing.
     """
-    body_html = markdown.markdown(
-        artifact_md,
-        extensions=["tables", "fenced_code", "footnotes", "md_in_html"],
+    body_html = _sanitize(
+        markdown.markdown(
+            artifact_md,
+            extensions=["tables", "fenced_code", "footnotes", "md_in_html"],
+        )
     )
 
     template = _jinja_env.get_template(_TEMPLATE_NAME)
@@ -68,5 +96,4 @@ def render_html(
         body_html=body_html,
     )
 
-    inlined = premailer.transform(rendered)
-    return inlined
+    return _inline_css(rendered)

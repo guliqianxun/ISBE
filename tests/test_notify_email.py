@@ -384,6 +384,67 @@ def test_render_html_footer_dots_and_tagline():
 
 
 # ---------------------------------------------------------------------------
+# sanitization tests — LLM output (which embeds crawled/RSS text) is untrusted
+# ---------------------------------------------------------------------------
+
+
+def test_render_html_strips_script_tags():
+    html = render_html(
+        topic_label="nowcasting", period_label="2026-W21",
+        artifact_md='# T\n\n<script>alert("xss")</script>\n\nok\n',
+        artifact_path=None,
+    )
+    assert "<script" not in html
+    assert "alert(" not in html
+
+
+def test_render_html_strips_stylesheet_links():
+    """A <link rel=stylesheet> in the artifact must not survive to the email —
+    combined with premailer network access it would be an SSRF vector."""
+    html = render_html(
+        topic_label="nowcasting", period_label="2026-W21",
+        artifact_md="# T\n\n<link rel=\"stylesheet\" href=\"http://minio:9000/x.css\">\n\nok\n",
+        artifact_path=None,
+    )
+    assert "minio:9000" not in html
+
+
+def test_render_html_keeps_data_uri_images():
+    """scripts/render_report.py inlines figures as base64 data URIs — they must
+    survive sanitization."""
+    md = '# T\n\n<img src="data:image/png;base64,iVBORw0KGgo=" alt="fig">\n'
+    html = render_html(
+        topic_label="nowcasting", period_label="2026-W21",
+        artifact_md=md, artifact_path=None,
+    )
+    assert "data:image/png;base64,iVBORw0KGgo=" in html
+
+
+def test_render_html_strips_javascript_urls():
+    html = render_html(
+        topic_label="nowcasting", period_label="2026-W21",
+        artifact_md='# T\n\n<a href="javascript:alert(1)">click</a>\n',
+        artifact_path=None,
+    )
+    assert "javascript:" not in html
+
+
+def test_inline_css_disables_network(monkeypatch):
+    """premailer must run with allow_network=False regardless of input."""
+    from isbe.notify import render as render_mod
+
+    seen: dict = {}
+
+    def fake_transform(html, **kwargs):
+        seen.update(kwargs)
+        return html
+
+    monkeypatch.setattr(render_mod.premailer, "transform", fake_transform)
+    render_mod._inline_css("<html><body>x</body></html>")
+    assert seen.get("allow_network") is False
+
+
+# ---------------------------------------------------------------------------
 # multipart integration tests
 # ---------------------------------------------------------------------------
 
