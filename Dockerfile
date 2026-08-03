@@ -5,8 +5,12 @@ FROM python:3.12-slim
 #   docker compose build --build-arg PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 ARG PIP_INDEX_URL=""
 ENV PIP_INDEX_URL=${PIP_INDEX_URL}
-ENV UV_INDEX_URL=${PIP_INDEX_URL}
-ENV UV_HTTP_TIMEOUT=120
+# uv reads UV_DEFAULT_INDEX (UV_INDEX_URL is the deprecated alias — keep both).
+# Empty build-arg falls back to upstream PyPI explicitly (uv rejects "").
+ENV UV_DEFAULT_INDEX=${PIP_INDEX_URL:-https://pypi.org/simple}
+ENV UV_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
+# Generous timeout: CN routes to pythonhosted/mirrors stall intermittently
+ENV UV_HTTP_TIMEOUT=600
 
 # uv installer (pin to match host)
 RUN pip install --no-cache-dir uv==0.10.4
