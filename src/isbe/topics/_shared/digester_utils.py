@@ -492,7 +492,7 @@ def parse_distillation_section(text: str) -> list[PendingMemoryDraft]:
             f"type: {target_type}\n"
             f"created: {date.today().isoformat()}\n"
             f"updated: {date.today().isoformat()}\n"
-            f"source: agent-inferred\n---\n{content}\n"
+            f"source: agent-inferred\nrevision: 1\n---\n{content}\n"
         )
         drafts.append(
             PendingMemoryDraft(
