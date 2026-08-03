@@ -54,10 +54,55 @@ from isbe.triage.pipeline import acquire_by_source
 SHARED_TEMPLATE = Path(__file__).parent / "templates" / "weekly.j2"
 
 
-def _build_facts_block(papers: list, repos: list | None) -> str:
+def _load_fulltext(paper) -> str | None:
+    """Read the metrail-extracted markdown for a paper, or None.
+
+    fulltext_uri is stored relative to the papers mirror root; a wrong or
+    missing mirror silently yields None — the digest must never fail because
+    an extraction file is absent (fail-open to abstract-only).
+    """
+    uri = getattr(paper, "fulltext_uri", None)
+    if not uri:
+        return None
+    path = Path(os.getenv("ISBE_PAPERS_MIRROR", "papers")) / uri
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
+def _build_facts_block(
+    papers: list,
+    repos: list | None,
+    *,
+    include_abstract: bool = True,
+    fulltext_for=None,
+    per_paper_chars: int = 3000,
+    total_chars: int = 24000,
+) -> str:
+    """Render papers (+repos) for the prompt.
+
+    The SYSTEM_PROMPT grounds every field in "what the abstract says" — so the
+    abstract must actually be in the prompt (it wasn't, historically). Fulltext
+    excerpts are additive and budgeted: per_paper_chars caps each paper,
+    total_chars caps the sum; when the budget runs out later papers keep their
+    abstract but lose the excerpt.
+    """
     lines = [f"近窗 papers ({len(papers)}):"]
+    fulltext_budget = total_chars
     for p in papers:
         lines.append(f"- [{p.arxiv_id}] {p.title} ({p.primary_category}) — {p.source_url}")
+        if include_abstract:
+            abstract = (getattr(p, "abstract", "") or "").strip()
+            if abstract:
+                lines.append(f"  摘要: {abstract}")
+        if fulltext_for is not None and fulltext_budget > 0:
+            fulltext = fulltext_for(p)
+            if fulltext:
+                excerpt = fulltext[: min(per_paper_chars, fulltext_budget)].strip()
+                if excerpt:
+                    lines.append(f"  全文摘录: {excerpt}")
+                    fulltext_budget -= len(excerpt)
     if repos is not None:
         lines.append(f"\nTracked repos ({len(repos)}):")
         for r in repos:
@@ -85,6 +130,9 @@ def weekly_digester(
     label = cfg.get("label", topic_id)
     facts_window_days = int(digest_cfg.get("facts_window_days", 7))
     include_repos = bool(digest_cfg.get("include_repos", False))
+    include_abstract = bool(digest_cfg.get("include_abstract", True))
+    fulltext_per_paper_chars = int(digest_cfg.get("fulltext_per_paper_chars", 3000))
+    fulltext_total_chars = int(digest_cfg.get("fulltext_total_chars", 24000))
     keywords = arxiv_cfg.get("include_keywords", [])
 
     with topic_run(topic_id, "weekly-digester") as run:
@@ -96,6 +144,9 @@ def weekly_digester(
             facts_window_days=facts_window_days,
             keywords=keywords,
             include_repos=include_repos,
+            include_abstract=include_abstract,
+            fulltext_per_paper_chars=fulltext_per_paper_chars,
+            fulltext_total_chars=fulltext_total_chars,
             contract=contract_from_config(cfg),
             run=run,
         )
@@ -110,6 +161,9 @@ def _digester_impl(
     facts_window_days: int,
     keywords: list[str],
     include_repos: bool,
+    include_abstract: bool = True,
+    fulltext_per_paper_chars: int = 3000,
+    fulltext_total_chars: int = 24000,
     contract: RetrievalContract | None = None,
     run=None,
 ) -> DigestResult:
@@ -148,7 +202,14 @@ def _digester_impl(
             repos=repos,
         )
 
-    facts_block = _build_facts_block(papers, repos)
+    facts_block = _build_facts_block(
+        papers,
+        repos,
+        include_abstract=include_abstract,
+        fulltext_for=_load_fulltext,
+        per_paper_chars=fulltext_per_paper_chars,
+        total_chars=fulltext_total_chars,
+    )
     mroot = _memory_root()
     memory_block, memory_index = build_memory_block(mroot, topic_id=topic_id)
 
