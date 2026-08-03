@@ -76,7 +76,7 @@ def topics_run(
         # collector. Run each one; report row counts.
         counts: list[str] = []
         for key in cfg.schedules:
-            if key == DIGESTER_KEY or key == "arxiv_download_pdfs":
+            if key == DIGESTER_KEY or key in ("arxiv_download_pdfs", "metrail_enrich"):
                 continue
             try:
                 flow_fn, params = resolve_flow(topic_id, key)
@@ -105,6 +105,17 @@ def topics_run(
                 extra["period_label"] = period_label
             n = flow_fn(**{**base, **extra})
             typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
+
+        # metrail full-text chain: runs after the PDF chain, same yaml-driven
+        # opt-in. The flow itself no-ops when METRAIL_API_URL is unset.
+        if "metrail_enrich" in cfg.schedules and not no_pdfs:
+            flow_fn, base = resolve_flow(topic_id, "metrail_enrich")
+            import inspect
+
+            sig = inspect.signature(flow_fn).parameters
+            extra = {"limit": pdf_limit} if "limit" in sig else {}
+            n = flow_fn(**{**base, **extra})
+            typer.echo(f"fulltext extracted: {n}")
 
     if digest:
         today = date.fromisoformat(today_str) if today_str else date.today()

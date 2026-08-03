@@ -100,6 +100,21 @@ class DigestConfig(_Strict):
     # NVDA-specific windows
     news_window_days: int | None = None
     filings_window_days: int | None = None
+    # Prompt budget for the weekly paper digester. Extraction parameters live
+    # in the metrail: block; these answer "how much of it enters the prompt".
+    include_abstract: bool = True
+    fulltext_per_paper_chars: int = 3000
+    fulltext_total_chars: int = 24000
+
+
+class MetrailConfig(_Strict):
+    """LAN PDF-extraction service (metrail-web). Global default via METRAIL_API_URL."""
+
+    enabled: bool = True
+    base_url: str | None = None
+    poll_timeout_s: int = 120
+    backend: str = "pdfplumber"
+    ocr: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -124,6 +139,7 @@ class TopicConfig(_Strict):
     sec_edgar: SecEdgarConfig | None = None
 
     digest: DigestConfig = Field(default_factory=DigestConfig)
+    metrail: MetrailConfig | None = None
     schedules: dict[str, str] = Field(default_factory=dict)
 
     # 检索契约（triage 相关性门 + 优先级分层）。缺省 None → triage 直通（行为不变）。

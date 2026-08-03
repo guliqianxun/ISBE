@@ -18,6 +18,10 @@ class Paper(Base):
     submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     pdf_uri: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    # Path of the metrail-extracted markdown, RELATIVE to the papers mirror
+    # root (ISBE_PAPERS_MIRROR) — e.g. "nowcasting/2026-W31/2507.12345.metrail.md".
+    # Relative because the mirror root differs host vs container.
+    fulltext_uri: Mapped[str | None] = mapped_column(String(512), nullable=True)
     source_url: Mapped[str] = mapped_column(String(512))
 
 

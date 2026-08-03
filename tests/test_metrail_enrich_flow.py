@@ -1,0 +1,120 @@
+"""Tests for the metrail-enrich flow — DB, service, and run-recording all stubbed."""
+
+from datetime import UTC, datetime
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from isbe.topics._shared import metrail_enrich as flow_mod
+from isbe.topics._shared.metrail import MetrailTimeout
+from isbe.topics.config import TopicConfig
+from isbe.topics.nowcasting.facts import Paper
+
+
+def _paper(arxiv_id: str, pdf_uri: str | None) -> Paper:
+    return Paper(
+        arxiv_id=arxiv_id,
+        title=f"paper {arxiv_id}",
+        authors=["A"],
+        abstract="abs",
+        primary_category="cs.LG",
+        submitted_at=datetime(2026, 7, 1, tzinfo=UTC),
+        updated_at=datetime(2026, 7, 1, tzinfo=UTC),
+        pdf_uri=pdf_uri,
+        source_url=f"https://arxiv.org/abs/{arxiv_id}",
+    )
+
+
+def _cfg(metrail_block: dict | None) -> TopicConfig:
+    raw: dict = {"id": "nowcasting", "label": "t", "cadence": "weekly"}
+    if metrail_block is not None:
+        raw["metrail"] = metrail_block
+    return TopicConfig.model_validate(raw)
+
+
+def _fake_session(papers: list[Paper]) -> MagicMock:
+    s = MagicMock()
+    s.__enter__ = MagicMock(return_value=s)
+    s.__exit__ = MagicMock(return_value=False)
+    s.scalars.return_value.all.return_value = papers
+    return s
+
+
+@pytest.fixture(autouse=True)
+def _no_run_persistence():
+    with patch("isbe.observability.runs._persist_run"):
+        yield
+
+
+@pytest.fixture()
+def mirror(tmp_path, monkeypatch):
+    monkeypatch.setenv("ISBE_PAPERS_MIRROR", str(tmp_path))
+    return tmp_path
+
+
+def test_noop_when_no_base_url(monkeypatch, mirror):
+    monkeypatch.delenv("METRAIL_API_URL", raising=False)
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=_cfg(None)):
+        with patch.object(flow_mod, "extract_pdf_to_markdown") as extract:
+            assert flow_mod.metrail_enrich("nowcasting") == 0
+    extract.assert_not_called()
+
+
+def test_noop_when_disabled_in_yaml(monkeypatch, mirror):
+    monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
+    cfg = _cfg({"enabled": False})
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=cfg):
+        with patch.object(flow_mod, "extract_pdf_to_markdown") as extract:
+            assert flow_mod.metrail_enrich("nowcasting") == 0
+    extract.assert_not_called()
+
+
+def test_enriches_and_skips_missing_local_pdf(monkeypatch, mirror):
+    monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
+    have = _paper("2604.11111", "minio://papers-nowcasting/2026-W31/2604.11111.pdf")
+    missing = _paper("2604.22222", "minio://papers-nowcasting/2026-W31/2604.22222.pdf")
+    pdf = mirror / "nowcasting" / "2026-W31" / "2604.11111.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF fake")
+
+    session = _fake_session([have, missing])
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=_cfg({})):
+        with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
+            with patch.object(flow_mod, "extract_pdf_to_markdown", return_value="## corpus"):
+                assert flow_mod.metrail_enrich("nowcasting") == 1
+
+    assert have.fulltext_uri == "nowcasting/2026-W31/2604.11111.metrail.md"
+    assert (mirror / have.fulltext_uri).read_text(encoding="utf-8") == "## corpus"
+    assert missing.fulltext_uri is None
+
+
+def test_timeout_on_one_paper_does_not_block_others(monkeypatch, mirror):
+    monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
+    p1 = _paper("2604.33333", "minio://papers-nowcasting/2026-W31/2604.33333.pdf")
+    p2 = _paper("2604.44444", "minio://papers-nowcasting/2026-W31/2604.44444.pdf")
+    for p in (p1, p2):
+        f = mirror / "nowcasting" / "2026-W31" / f"{p.arxiv_id}.pdf"
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_bytes(b"%PDF fake")
+
+    def extract(path, **kwargs):
+        if "33333" in path.name:
+            raise MetrailTimeout("stuck")
+        return "## corpus"
+
+    session = _fake_session([p1, p2])
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=_cfg({})):
+        with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
+            with patch.object(flow_mod, "extract_pdf_to_markdown", side_effect=extract):
+                assert flow_mod.metrail_enrich("nowcasting") == 1
+
+    assert p1.fulltext_uri is None  # retried next run
+    assert p2.fulltext_uri == "nowcasting/2026-W31/2604.44444.metrail.md"
+
+
+def test_dispatch_resolves_metrail_enrich():
+    from isbe.topics.dispatch import resolve_flow
+
+    flow, params = resolve_flow("nowcasting", "metrail_enrich")
+    assert flow.name == "metrail-enrich"
+    assert params == {"topic_id": "nowcasting"}

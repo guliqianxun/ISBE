@@ -19,11 +19,16 @@ digest:
   facts_window_days: 7
   include_repos: true   # 唯一启用 github repo 跟踪的 topic
 
+# metrail-web 全文提取（局域网服务，METRAIL_API_URL 未设时自动跳过）。
+metrail:
+  enabled: true
+
 # Cron schedules (used by scheduler.py to register Prefect deployments).
 schedules:
   arxiv_collector: "0 6 * * *"           # 每日 06:00
   github_collector: "30 6 * * *"         # 每日 06:30 (nowcasting only)
   arxiv_download_pdfs: "0 7 * * 1"       # 周一 07:00
+  metrail_enrich: "20 7 * * 1"           # 周一 07:20（PDF 下载后、digest 前）
   digester: "0 8 * * 1"                  # 周一 08:00
 
 # 检索契约：digester 对本域 facts 套相关性门(out_of_scope/require_any)+优先级分层。
