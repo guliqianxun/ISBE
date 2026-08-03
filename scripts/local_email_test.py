@@ -296,7 +296,7 @@ def main() -> None:
         ISBE_SMTP_HOST="127.0.0.1",
         ISBE_SMTP_PORT="8025",
         ISBE_SMTP_FROM="isbe@localhost",
-        ISBE_SMTP_TO="visitorindark@gmail.com",
+        ISBE_SMTP_TO="digest-recipient@example.com",
         ISBE_SMTP_ALLOW_PLAINTEXT="1",  # local relay, no STARTTLS
     )
     # import AFTER env set is irrelevant (env read at call time), but keep clean
