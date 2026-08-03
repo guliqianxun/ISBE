@@ -45,7 +45,8 @@ uv run pre-commit install
 ## Adding a new topic
 
 A new topic is one `src/isbe/topics/<name>/topic.yaml` plus a built-in
-collector preset, then one dispatch line in `scheduler.py`. See the README
+collector preset — no Python required. Dispatch is resolved automatically by
+`src/isbe/topics/dispatch.py` from the schedule keys. See the README
 "加一个新 topic" section for the template. Do not change the shared 5-section
 digest contract — that uniform interface is the core of the project.
 

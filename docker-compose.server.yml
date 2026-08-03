@@ -6,9 +6,9 @@ name: isbe
 # Layout assumptions:
 #   - Repo cloned to /mnt/nas_iscsi/isbe/
 #   - Docker daemon data-root is already on /mnt/nas_iscsi/docker/, so named
-#     volumes (pgdata / miniodata / phoenixdata / qdrantdata / uptimekumadata)
-#     automatically live on the iSCSI LUN — we only need to bind-mount the
-#     human-visible directories (memory / papers / artifacts) here.
+#     volumes (pgdata / miniodata / phoenixdata) automatically live on the
+#     iSCSI LUN — we only need to bind-mount the human-visible directories
+#     (memory / papers / artifacts) here.
 #   - All UIs are bound to 192.168.0.156 explicitly so they're reachable from
 #     LAN but not from the public internet (assumes server has no public IP).
 #
@@ -25,10 +25,6 @@ services:
     ports:
       - "192.168.0.156:5432:5432"
 
-  qdrant:
-    ports:
-      - "192.168.0.156:6333:6333"
-
   minio:
     ports:
       - "192.168.0.156:9000:9000"
@@ -40,10 +36,6 @@ services:
 
   # prefect-server already publishes 4200:4200 from the base compose file
   # (default 0.0.0.0) — fine on a LAN-only server with no public IP.
-
-  uptime-kuma:
-    ports:
-      - "192.168.0.156:3001:3001"
 
   # Single-page hub linking all ISBE services. Open http://192.168.0.156:8082
   # as the daily landing page; everything else is one click away.

@@ -7,13 +7,56 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **metrail-web integration**: new shared `metrail_enrich` flow extracts full
+  text from downloaded arXiv PDFs via the LAN metrail-web service
+  (`METRAIL_API_URL`; unset = disabled). `papers.fulltext_uri` (migration 005)
+  points at the mirror-relative `<id>.metrail.md`. The weekly digester now
+  includes **abstracts** (always) and **budgeted fulltext excerpts**
+  (`digest.include_abstract` / `fulltext_per_paper_chars` /
+  `fulltext_total_chars`) in the prompt — previously the facts block was
+  title-only while the prompt demanded abstract-grounded output.
+- Shared HTTP retry helper `isbe/http_retry.py` (extracted from the pattern
+  duplicated in `llm/client.py` and `_shared/arxiv.py`).
+- Prefect DB bootstrap: `infra/initdb/create-prefect-db.sql` auto-creates the
+  `prefect` database on a fresh postgres volume (existing deployments: run
+  `CREATE DATABASE prefect;` once by hand).
 - Open-source project scaffolding: CI (GitHub Actions), issue/PR templates,
   `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, this changelog,
   pre-commit config, and an English `README.en.md`.
 
 ### Fixed
+- **Memory accept no longer destroys the thesis file**: `accept_pending` merges
+  into an existing target (frontmatter kept, `revision` bumped, draft body
+  appended under a dated heading) instead of overwriting it wholesale;
+  duplicate drafts in one run uniquify (`-2`, `-3`) instead of clobbering.
+- **DB engine leak**: one cached SQLAlchemy engine per DB URL instead of a new
+  engine (and connection pool) per session-factory call — previously leaked
+  per RSS feed / crawled page / flow run.
+- **Dispatch no longer swallows broken imports**: a typo'd import inside a
+  topic's digester/collector now raises `DispatchError` instead of silently
+  substituting the generic weekly digester; the scheduler logs skipped
+  schedules via `logging.error` + summary instead of a bare `print`.
+- **topic_run persist failure no longer masks the flow's own exception**.
+- **Email HTML sanitized** (nh3) — LLM/crawled content can no longer inject
+  script/stylesheet tags into digest emails; `premailer` runs with
+  `allow_network=False` (SSRF fix).
 - License mismatch: project is MIT-licensed; the `LICENSE` file now contains the
   MIT text (previously Apache-2.0 while the README claimed MIT).
+
+### Changed
+- Server compose hardened: filebrowser requires auth and drops root; pgweb is
+  loopback-only (SSH tunnel); `POSTGRES_PASSWORD` is required (no `changeme`
+  default on the server); morerssplz git build pinned to a commit.
+- `.env.example` now documents all env vars actually read by the code
+  (`POSTGRES_HOST/PORT`, `MINIO_ENDPOINT`, mirror paths, LLM tier models,
+  `METRAIL_API_URL`); dead `OPENAI_API_KEY` removed.
+- `AGENTS.md` rewritten to describe the actual architecture (the previous
+  version described an abandoned hermes-based design with dead links).
+
+### Removed
+- Dead containers `qdrant` and `uptime-kuma` (zero code references; base stack
+  is now 6 services). Old volumes can be dropped manually:
+  `docker volume rm isbe_qdrantdata isbe_uptimekumadata`.
 
 ## [0.1.0] - 2026-06-02
 

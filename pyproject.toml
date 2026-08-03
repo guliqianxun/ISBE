@@ -1,6 +1,8 @@
 [project]
 name = "isbe"
-version = "0.0.1"
+# 0.1.0 matches CHANGELOG.md's first consolidated release (no git tag exists
+# for it; tag future releases going forward).
+version = "0.1.0"
 description = "Information System with Backbone of Evolution"
 requires-python = ">=3.11"
 dependencies = [

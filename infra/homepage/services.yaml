@@ -18,10 +18,9 @@
 
 - Data:
     - pgweb (SQL):
-        href: http://192.168.0.156:8083
-        description: 查论文 / repo / topic_run / artifact 索引
+        href: http://localhost:8083
+        description: 仅服务器本机（SSH 隧道 ssh -L 8083:127.0.0.1:8083 后打开）
         icon: postgres.png
-        ping: 192.168.0.156
     - MinIO (对象存储):
         href: http://192.168.0.156:9001
         description: papers + artifacts 镜像（按 .env 凭据登录）
@@ -34,9 +33,5 @@
         icon: mdi-radar
     - Prefect (调度):
         href: http://192.168.0.156:4200
-        description: 4 个 cron deployment + flow run 历史
+        description: cron deployments + flow run 历史
         icon: mdi-calendar-clock
-    - Uptime Kuma (监活):
-        href: http://192.168.0.156:3001
-        description: 服务在线状态 / 告警
-        icon: uptime-kuma.png

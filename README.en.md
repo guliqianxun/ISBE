@@ -138,7 +138,7 @@ The shared 5-section digest contract (all topics): TL;DR, per-item review, cross
 
 ### Self-hosted, one stack
 
-Postgres (facts DB) · MinIO (blobs) · Prefect (cron orchestration) · Phoenix (LLM tracing) · RSSHub · morerssplz · Qdrant (reserved for semantic retrieval) · Uptime Kuma (health).
+Postgres (facts DB) · MinIO (blobs) · Prefect (cron orchestration) · Phoenix (LLM tracing) · RSSHub · morerssplz.
 
 ### Switchable LLM provider
 
@@ -152,7 +152,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md) (red lines & 
 
 ## Known gaps
 
-- Qdrant not yet enabled (MVP filters facts by time window, no semantic retrieval).
+- No semantic retrieval yet (MVP filters facts by time window + keywords).
 - `radar review accept` does not yet run frontmatter lint.
 - No one-click deploy image yet.
 

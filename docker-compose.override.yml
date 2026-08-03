@@ -11,11 +11,6 @@ services:
     ports:
       - "5432:5432"
 
-  qdrant:
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-
   minio:
     ports:
       - "9000:9000"
@@ -24,10 +19,6 @@ services:
   phoenix:
     ports:
       - "6006:6006"
-
-  uptime-kuma:
-    ports:
-      - "3001:3001"
 
   rsshub:
     ports:

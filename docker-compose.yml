@@ -3,7 +3,7 @@ name: isbe
 # Server / prod-like layout: only Prefect :4200 is published to the host.
 # All other services talk over the internal `isbe-net` bridge network.
 #
-# For local dev on Windows that needs MinIO/Langfuse/Qdrant/Uptime-Kuma UIs,
+# For local dev on Windows that needs the MinIO/Phoenix/RSSHub UIs,
 # `docker-compose.override.yml` re-publishes those ports automatically.
 # Disable the override on the server with:
 #   docker compose -f docker-compose.yml up -d
@@ -23,19 +23,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-isbe}
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Creates the `prefect` database on first boot of a fresh volume.
+      - ./infra/initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-isbe}"]
       interval: 5s
       timeout: 5s
       retries: 10
-    restart: unless-stopped
-    networks: [isbe-net]
-
-  qdrant:
-    image: qdrant/qdrant:v1.11.0
-    container_name: isbe-qdrant
-    volumes:
-      - qdrantdata:/qdrant/storage
     restart: unless-stopped
     networks: [isbe-net]
 
@@ -95,14 +89,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    networks: [isbe-net]
-
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: isbe-uptime-kuma
-    volumes:
-      - uptimekumadata:/app/data
-    restart: unless-stopped
     networks: [isbe-net]
 
   # RSSHub — turns sites without native RSS (知乎/微博/B站/小红书/微信公众号/...)
@@ -196,7 +182,5 @@ services:
 
 volumes:
   pgdata:
-  qdrantdata:
   miniodata:
   phoenixdata:
-  uptimekumadata:

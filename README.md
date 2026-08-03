@@ -72,9 +72,9 @@ cp .env.example .env
 #   GITHUB_TOKEN=...          # 可选，给 5000 req/hr 余量
 
 uv sync --all-extras
-docker compose up -d                 # 启 8 个基础设施容器
+docker compose up -d                 # 启 6 个基础设施容器
 uv run alembic upgrade head          # 建表
-uv run pytest                         # 应 73 全绿
+uv run pytest                         # 应全绿
 ```
 
 ### 立即试一份周报
@@ -136,7 +136,15 @@ schedules:
   my_topic_digester: "0 9 * * 1"
 ```
 
-`scheduler.py` 里加一行 dispatch，跑 `radar topics run my-topic --collect --digest` 即可。
+无需改任何 Python —— dispatch 由 `src/isbe/topics/dispatch.py` 按 schedule key 自动解析，
+直接跑 `radar topics run my-topic --collect --digest` 即可。
+
+> 注：Prefect 需要独立的 `prefect` 数据库。全新 `docker compose up` 会由
+> `infra/initdb/` 自动创建；存量部署手动执行一次：
+> `docker exec isbe-postgres psql -U isbe -c "CREATE DATABASE prefect;"`
+>
+> 可选：局域网部署了 metrail-web（PDF 全文提取）时，设 `METRAIL_API_URL`
+> 即可让周报附带论文全文摘录（不设则自动降级为摘要-only）。
 
 ### 产出在哪
 
@@ -226,7 +234,7 @@ UI 端口：Prefect `:4200` / Phoenix `:6006` / MinIO console `:9001` / Uptime K
 
 ## 已知短板
 
-- Qdrant 未启用（MVP 用时间窗筛 facts，没接语义检索）
+- 语义检索未接（MVP 用时间窗 + 关键词筛 facts）
 - 知乎 `/topic` 和 `/people/answers` 暂无可靠 OSS 路径（专栏可用，详见 [`docs/howto/zhihu-cookies.md`](docs/howto/zhihu-cookies.md)）
 - `radar review accept` 不跑 frontmatter lint
 - 一键部署 image 还没做
