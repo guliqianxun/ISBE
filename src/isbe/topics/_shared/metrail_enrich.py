@@ -30,6 +30,7 @@ from isbe.topics._shared.arxiv import papers_keyword_filter
 from isbe.topics._shared.metrail import (
     MetrailError,
     download_asset,
+    fetch_atoms,
     fetch_corpus_markdown,
     fetch_figure_atoms,
     metrail_base_url,
@@ -47,6 +48,17 @@ _FRAMEWORK_RE = re.compile(
     r"架构|框架|总体|流程",
     re.IGNORECASE,
 )
+# Core-table heuristic: main results / comparison / ablation tables
+_CORE_TABLE_RE = re.compile(
+    r"comparison|ablation|result|performance|state[- ]of[- ]the[- ]art|sota|"
+    r"quantitative|benchmark|对比|消融|结果|性能",
+    re.IGNORECASE,
+)
+_MAX_TABLES = 2
+_MAX_TABLE_CHARS = 2500
+# Low threshold: small ablation tables carry few numbers; the core-caption
+# ranking (comparison/ablation first) keeps junk tables out of the top slots.
+_MIN_TABLE_NUMBERS = 3
 # Email-friendly cap: figures above this are skipped (data-URI inlining)
 _MAX_FIGURE_BYTES = 500_000
 
@@ -134,29 +146,62 @@ def _extract(local_pdf: Path, *, base_url: str, poll_timeout_s: float, backend: 
     return fetch_corpus_markdown(doc_id, base_url=base_url), doc_id
 
 
-def _save_framework_figure(doc_id: str, local_pdf: Path, *, base_url: str) -> bool:
-    """Pick the paper's framework figure (caption heuristic, fallback: first
-    captioned, then first) and save it as `<id>.metrail.fig.png` + a caption
-    sidecar. Best-effort: returns False when there's nothing suitable."""
+def _pick_core_tables(atoms: list[dict]) -> list[dict]:
+    """Rank table atoms toward the paper's evidence core: caption/text hit on
+    comparison/ablation/results first, then numeric density. Tables are kept
+    as the GFM markdown metrail produced — verbatim, never paraphrased."""
+
+    def n_numbers(text: str) -> int:
+        return len(re.findall(r"\d+\.?\d*", text))
+
+    scored = []
+    for a in atoms:
+        if not isinstance(a, dict):
+            continue
+        text = (a.get("text") or "").strip()
+        if not text or n_numbers(text) < _MIN_TABLE_NUMBERS:
+            continue
+        caption = ((a.get("metadata") or {}).get("caption") or "").strip()
+        core_hit = bool(_CORE_TABLE_RE.search(caption or text[:200]))
+        scored.append((not core_hit, -n_numbers(text), caption, text, a.get("page")))
+    scored.sort(key=lambda s: (s[0], s[1]))
+    tables = []
+    for _, _, caption, text, page in scored[:_MAX_TABLES]:
+        label = caption or (f"表（p{page}，自动提取）" if page is not None else "表（自动提取）")
+        tables.append({"caption": label[:300], "markdown": text[:_MAX_TABLE_CHARS]})
+    return tables
+
+
+def _save_assets(doc_id: str, local_pdf: Path, *, base_url: str) -> tuple[bool, int]:
+    """Save the framework figure PNG + core result/ablation tables as sidecars.
+
+    Returns (figure_saved, n_tables). Best-effort throughout — assets are a
+    bonus on top of the committed corpus.
+    """
+    meta: dict = {}
+    figure_saved = False
+
     atoms = fetch_figure_atoms(doc_id, base_url=base_url)
-    if not atoms:
-        return False
     atom = next(
         (a for a in atoms if _FRAMEWORK_RE.search(a.get("text") or "")),
-        next((a for a in atoms if (a.get("text") or "").strip()), atoms[0]),
+        next((a for a in atoms if (a.get("text") or "").strip()), atoms[0] if atoms else None),
     )
-    image_url = atom.get("image_url")
-    if not image_url:
-        return False
-    png = download_asset(image_url, base_url=base_url)
-    if not png or len(png) > _MAX_FIGURE_BYTES:
-        return False
-    local_pdf.with_suffix(".metrail.fig.png").write_bytes(png)
-    caption = (atom.get("text") or "").strip()[:300]
-    local_pdf.with_suffix(".metrail.assets.json").write_text(
-        json.dumps({"caption": caption}, ensure_ascii=False), encoding="utf-8"
-    )
-    return True
+    if atom and atom.get("image_url"):
+        png = download_asset(atom["image_url"], base_url=base_url)
+        if png and len(png) <= _MAX_FIGURE_BYTES:
+            local_pdf.with_suffix(".metrail.fig.png").write_bytes(png)
+            meta["figure"] = {"caption": (atom.get("text") or "").strip()[:300]}
+            figure_saved = True
+
+    tables = _pick_core_tables(fetch_atoms(doc_id, "table", base_url=base_url))
+    if tables:
+        meta["tables"] = tables
+
+    if meta:
+        local_pdf.with_suffix(".metrail.assets.json").write_text(
+            json.dumps(meta, ensure_ascii=False), encoding="utf-8"
+        )
+    return figure_saved, len(tables)
 
 
 @flow(name="metrail-enrich")
@@ -186,6 +231,7 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
 
         enriched = 0
         figures = 0
+        tables = 0
         skipped: list[dict] = []
         Session = make_session_factory()
         with Session() as s:
@@ -246,15 +292,18 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": f"{type(e).__name__}: {e}"})
                     continue
                 enriched += 1
-                # Figure is a bonus — never fails the paper (corpus is committed)
+                # Assets are a bonus — never fail the paper (corpus is committed)
                 try:
-                    if _save_framework_figure(doc_id, local_pdf, base_url=base_url):
+                    fig_saved, n_tables = _save_assets(doc_id, local_pdf, base_url=base_url)
+                    if fig_saved:
                         figures += 1
+                    tables += n_tables
                 except (MetrailError, OSError, httpx.HTTPError, ValueError):
                     pass
 
         run.payload["enriched"] = enriched
         run.payload["figures"] = figures
+        run.payload["tables"] = tables
         run.payload["skipped"] = len(skipped)
         if skipped:
             run.payload["skipped_papers"] = skipped

@@ -183,6 +183,7 @@ services:
       ISBE_SMTP_USER: ${ISBE_SMTP_USER:-}
       ISBE_SMTP_PASS: ${ISBE_SMTP_PASS:-}
       ISBE_SMTP_ALLOW_PLAINTEXT: ${ISBE_SMTP_ALLOW_PLAINTEXT:-}
+      ISBE_EMAIL_IMAGE_BUDGET: ${ISBE_EMAIL_IMAGE_BUDGET:-}
     volumes:
       - ./memory:/app/memory
       - ./papers:/app/papers

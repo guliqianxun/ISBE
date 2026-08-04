@@ -104,6 +104,49 @@ def test_load_paper_assets_builds_template_shape(monkeypatch, tmp_path):
     assert fig["datauri"].startswith("data:image/png;base64,")
 
 
+def test_load_paper_assets_includes_tables(monkeypatch, tmp_path):
+    import json
+
+    from isbe.topics._shared.digester import _load_paper_assets
+
+    monkeypatch.setenv("ISBE_PAPERS_MIRROR", str(tmp_path))
+    d = tmp_path / "nowcasting" / "2026-W32"
+    d.mkdir(parents=True)
+    (d / "4.4.metrail.md").write_text("## corpus", encoding="utf-8")
+    (d / "4.4.metrail.assets.json").write_text(
+        json.dumps(
+            {
+                "figure": {"caption": "Fig 1. framework"},
+                "tables": [{"caption": "Table 2: Comparison", "markdown": "| m | 0.47 |"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (d / "4.4.metrail.fig.png").write_bytes(b"\x89PNG ok")
+    assets = _load_paper_assets([_paper("4.4", fulltext_uri="nowcasting/2026-W32/4.4.metrail.md")])
+    entry = assets["4.4"]
+    assert entry["figure"]["caption"] == "Fig 1. framework"
+    assert entry["tables"][0]["markdown"] == "| m | 0.47 |"
+
+
+def test_load_paper_assets_tables_without_figure(monkeypatch, tmp_path):
+    import json
+
+    from isbe.topics._shared.digester import _load_paper_assets
+
+    monkeypatch.setenv("ISBE_PAPERS_MIRROR", str(tmp_path))
+    d = tmp_path / "nowcasting" / "2026-W32"
+    d.mkdir(parents=True)
+    (d / "5.5.metrail.md").write_text("## corpus", encoding="utf-8")
+    (d / "5.5.metrail.assets.json").write_text(
+        json.dumps({"tables": [{"caption": "Ablation", "markdown": "| x | 1 |"}]}),
+        encoding="utf-8",
+    )
+    assets = _load_paper_assets([_paper("5.5", fulltext_uri="nowcasting/2026-W32/5.5.metrail.md")])
+    assert "figure" not in assets["5.5"]
+    assert assets["5.5"]["tables"][0]["caption"] == "Ablation"
+
+
 def test_load_paper_assets_skips_missing_and_oversized(monkeypatch, tmp_path):
     from isbe.topics._shared.digester import _load_paper_assets
 

@@ -117,16 +117,20 @@ def wait_until_done(
 
 
 @HTTP_RETRY
-def fetch_figure_atoms(doc_id: str, *, base_url: str, timeout_s: float = 30.0) -> list[dict]:
-    """List the document's figure atoms: {id, page, text (caption), image_url, ...}."""
+def fetch_atoms(doc_id: str, kind: str, *, base_url: str, timeout_s: float = 30.0) -> list[dict]:
+    """List the document's atoms of one kind (figure/table/text/param)."""
     resp = httpx.get(
         f"{base_url}/api/documents/{doc_id}/atoms",
-        params={"kind": "figure"},
+        params={"kind": kind},
         timeout=timeout_s,
     )
     resp.raise_for_status()
     data = resp.json()
     return data if isinstance(data, list) else []
+
+
+def fetch_figure_atoms(doc_id: str, *, base_url: str, timeout_s: float = 30.0) -> list[dict]:
+    return fetch_atoms(doc_id, "figure", base_url=base_url, timeout_s=timeout_s)
 
 
 @HTTP_RETRY

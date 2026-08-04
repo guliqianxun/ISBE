@@ -87,7 +87,7 @@ def test_enriches_and_skips_missing_local_pdf(monkeypatch, mirror):
         with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
             with (
                 patch.object(flow_mod, "_extract", return_value=("## corpus", "d1")),
-                patch.object(flow_mod, "_save_framework_figure", return_value=False),
+                patch.object(flow_mod, "_save_assets", return_value=(False, 0)),
                 patch.object(flow_mod, "_fetch_pdf_from_minio", return_value=False),
             ):
                 assert flow_mod.metrail_enrich("nowcasting") == 1
@@ -113,7 +113,7 @@ def test_minio_fallback_recovers_missing_local_pdf(monkeypatch, mirror):
         with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
             with (
                 patch.object(flow_mod, "_extract", return_value=("## corpus", "d1")),
-                patch.object(flow_mod, "_save_framework_figure", return_value=False),
+                patch.object(flow_mod, "_save_assets", return_value=(False, 0)),
                 patch.object(flow_mod, "_fetch_pdf_from_minio", side_effect=fake_minio_fetch),
             ):
                 assert flow_mod.metrail_enrich("nowcasting") == 1
@@ -141,7 +141,7 @@ def test_timeout_on_one_paper_does_not_block_others(monkeypatch, mirror):
         with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
             with (
                 patch.object(flow_mod, "_extract", side_effect=extract),
-                patch.object(flow_mod, "_save_framework_figure", return_value=False),
+                patch.object(flow_mod, "_save_assets", return_value=(False, 0)),
             ):
                 assert flow_mod.metrail_enrich("nowcasting") == 1
 
@@ -169,7 +169,7 @@ def test_timeout_strikes_lead_to_blacklist(monkeypatch, mirror):
         with patch.object(flow_mod, "make_session_factory", return_value=session_factory):
             with (
                 patch.object(flow_mod, "_extract", side_effect=extract),
-                patch.object(flow_mod, "_save_framework_figure", return_value=False),
+                patch.object(flow_mod, "_save_assets", return_value=(False, 0)),
             ):
                 for _ in range(4):  # 3 strikes + 1 blacklisted run
                     assert flow_mod.metrail_enrich("nowcasting") == 0
@@ -190,7 +190,7 @@ def test_figure_counter_in_payload(monkeypatch, mirror):
         with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
             with (
                 patch.object(flow_mod, "_extract", return_value=("## corpus", "d1")),
-                patch.object(flow_mod, "_save_framework_figure", return_value=True) as fig,
+                patch.object(flow_mod, "_save_assets", return_value=(True, 1)) as fig,
             ):
                 assert flow_mod.metrail_enrich("nowcasting") == 1
     fig.assert_called_once()
@@ -219,28 +219,69 @@ def test_save_framework_figure_prefers_caption_match(mirror):
 
     with (
         patch.object(flow_mod, "fetch_figure_atoms", return_value=atoms),
+        patch.object(flow_mod, "fetch_atoms", return_value=[]),
         patch.object(flow_mod, "download_asset", side_effect=fake_download),
     ):
-        assert flow_mod._save_framework_figure("d", pdf, base_url="http://x") is True
+        fig_saved, n_tables = flow_mod._save_assets("d", pdf, base_url="http://x")
+    assert fig_saved is True and n_tables == 0
 
     assert downloaded == ["/api/documents/d/assets/f1.png"]  # architecture wins
     assert pdf.with_suffix(".metrail.fig.png").read_bytes() == b"\x89PNG fake bytes"
     import json
 
     meta = json.loads(pdf.with_suffix(".metrail.assets.json").read_text(encoding="utf-8"))
-    assert "architecture" in meta["caption"]
+    assert "architecture" in meta["figure"]["caption"]
 
 
-def test_save_framework_figure_skips_oversized(mirror):
+def test_save_assets_skips_oversized_figure(mirror):
     pdf = mirror / "2604.77777.pdf"
     pdf.write_bytes(b"%PDF fake")
     atoms = [{"id": "f0", "text": "architecture", "image_url": "/a.png"}]
     with (
         patch.object(flow_mod, "fetch_figure_atoms", return_value=atoms),
+        patch.object(flow_mod, "fetch_atoms", return_value=[]),
         patch.object(flow_mod, "download_asset", return_value=b"x" * 600_000),
     ):
-        assert flow_mod._save_framework_figure("d", pdf, base_url="http://x") is False
+        fig_saved, n_tables = flow_mod._save_assets("d", pdf, base_url="http://x")
+    assert fig_saved is False and n_tables == 0
     assert not pdf.with_suffix(".metrail.fig.png").exists()
+
+
+def test_save_assets_picks_core_tables(mirror):
+    """Result/ablation tables win over dense-but-uncaptioned ones; markdown is
+    kept verbatim; cap at 2 tables."""
+    pdf = mirror / "2604.12321.pdf"
+    pdf.write_bytes(b"%PDF fake")
+    tables = [
+        {"kind": "table", "page": 3, "text": "| a | b |\n| 1 | 2 |",  # too few numbers
+         "metadata": {}},
+        {"kind": "table", "page": 5,
+         "text": "| model | CSI | POD |\n| DGMR | 0.41 | 0.55 |\n| ours | 0.47 | 0.61 |",
+         "metadata": {"caption": "Table 2: Comparison with state-of-the-art"}},
+        {"kind": "table", "page": 6,
+         "text": "| variant | CSI |\n| w/o wavelet | 0.43 |\n| w/o flow | 0.44 |\n| full | 0.47 |",
+         "metadata": {"caption": "Table 3: Ablation study"}},
+        {"kind": "table", "page": 9,
+         "text": "| id | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |",
+         "metadata": {"caption": "Table A1: hyperparameters"}},
+    ]
+    with (
+        patch.object(flow_mod, "fetch_figure_atoms", return_value=[]),
+        patch.object(flow_mod, "fetch_atoms", return_value=tables),
+        patch.object(flow_mod, "download_asset", return_value=b""),
+    ):
+        fig_saved, n_tables = flow_mod._save_assets("d", pdf, base_url="http://x")
+    assert fig_saved is False and n_tables == 2
+
+    import json
+
+    meta = json.loads(pdf.with_suffix(".metrail.assets.json").read_text(encoding="utf-8"))
+    captions = [t["caption"] for t in meta["tables"]]
+    assert any("Comparison" in c for c in captions)
+    assert any("Ablation" in c for c in captions)
+    assert all("hyperparameters" not in c for c in captions)
+    assert "| DGMR | 0.41 | 0.55 |" in meta["tables"][0]["markdown"] or \
+           "| DGMR | 0.41 | 0.55 |" in meta["tables"][1]["markdown"]
 
 
 def test_topic_without_keywords_refuses_unscoped_enrich(monkeypatch, mirror):

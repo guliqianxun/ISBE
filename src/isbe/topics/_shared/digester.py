@@ -79,11 +79,13 @@ _MAX_FIGURE_BYTES = 500_000
 
 
 def _load_paper_assets(papers: list) -> dict:
-    """Collect per-paper framework figures saved by metrail_enrich.
+    """Collect per-paper assets saved by metrail_enrich: the framework figure
+    and the paper's core result/ablation tables (verbatim GFM markdown).
 
     Returns the weekly.j2 `paper_assets` shape:
-    {arxiv_id: {"figure": {"caption", "datauri"}}}. Fail-open everywhere —
-    a missing/oversized/corrupt figure just means no image for that paper.
+    {arxiv_id: {"figure": {"caption", "datauri"}, "tables": [{"caption","markdown"}]}}.
+    Fail-open everywhere — a missing/oversized/corrupt asset just means that
+    asset is absent for that paper.
     """
     assets: dict = {}
     mirror = Path(os.getenv("ISBE_PAPERS_MIRROR", "papers"))
@@ -95,21 +97,30 @@ def _load_paper_assets(papers: list) -> dict:
         fig_path = md_path.with_name(md_path.name.replace(".metrail.md", ".metrail.fig.png"))
         meta_path = md_path.with_name(md_path.name.replace(".metrail.md", ".metrail.assets.json"))
         try:
-            if not fig_path.is_file():
-                continue
-            png = fig_path.read_bytes()
-            if not png or len(png) > _MAX_FIGURE_BYTES:
-                continue
-            caption = ""
+            meta: dict = {}
             if meta_path.is_file():
-                caption = json.loads(meta_path.read_text(encoding="utf-8")).get("caption", "")
-            assets[p.arxiv_id] = {
-                "figure": {
-                    "caption": caption or "框架图（自动提取）",
-                    "datauri": "data:image/png;base64,"
-                    + base64.b64encode(png).decode("ascii"),
-                }
-            }
+                loaded = json.loads(meta_path.read_text(encoding="utf-8"))
+                if isinstance(loaded, dict):
+                    meta = loaded
+            entry: dict = {}
+            if fig_path.is_file():
+                png = fig_path.read_bytes()
+                if png and len(png) <= _MAX_FIGURE_BYTES:
+                    caption = (meta.get("figure") or {}).get("caption") or meta.get("caption", "")
+                    entry["figure"] = {
+                        "caption": caption or "框架图（自动提取）",
+                        "datauri": "data:image/png;base64,"
+                        + base64.b64encode(png).decode("ascii"),
+                    }
+            tables = [
+                t
+                for t in (meta.get("tables") or [])
+                if isinstance(t, dict) and t.get("markdown")
+            ]
+            if tables:
+                entry["tables"] = tables
+            if entry:
+                assets[p.arxiv_id] = entry
         except (OSError, ValueError):
             continue
     return assets

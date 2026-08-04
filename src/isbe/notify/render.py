@@ -9,6 +9,7 @@ Contract:
 """
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -45,14 +46,24 @@ def _sanitize(body_html: str) -> str:
     )
 
 
-# Mail clients clip large HTML (Gmail ~102KB); inline data-URI figures blow
-# that fast. Keep figures up to this total, drop the rest with a note — the
-# artifact file keeps every figure regardless.
-_EMAIL_IMAGE_BUDGET = 250_000
+# Some mail clients clip large HTML (Gmail ~102KB) — but content display wins
+# by default: generous budget, tunable via ISBE_EMAIL_IMAGE_BUDGET for
+# clip-prone recipients. Figures over budget become a note; the artifact file
+# keeps every figure regardless.
+_EMAIL_IMAGE_BUDGET_DEFAULT = 800_000
 _DATAURI_IMG_RE = re.compile(r"!\[[^\]]*\]\((data:image/[^)]+)\)")
 
 
-def _cap_inline_images(artifact_md: str, budget: int = _EMAIL_IMAGE_BUDGET) -> str:
+def _email_image_budget() -> int:
+    try:
+        return int(os.getenv("ISBE_EMAIL_IMAGE_BUDGET", str(_EMAIL_IMAGE_BUDGET_DEFAULT)))
+    except ValueError:
+        return _EMAIL_IMAGE_BUDGET_DEFAULT
+
+
+def _cap_inline_images(artifact_md: str, budget: int | None = None) -> str:
+    if budget is None:
+        budget = _email_image_budget()
     spent = 0
 
     def _repl(m: re.Match) -> str:

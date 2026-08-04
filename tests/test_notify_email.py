@@ -464,9 +464,10 @@ def test_plaintext_part_strips_datauri_images(monkeypatch, tmp_path):
     assert "图片见 HTML 版" in plain
 
 
-def test_render_html_caps_inline_image_budget():
+def test_render_html_caps_inline_image_budget(monkeypatch):
     """Figures beyond the per-email data-URI budget are replaced with a note
     so mail clients don't clip the digest; the artifact keeps them all."""
+    monkeypatch.setenv("ISBE_EMAIL_IMAGE_BUDGET", "250000")
     big = "data:image/png;base64," + "A" * 200_000
     md = f"# T\n\n![fig1]({big})\n\ntext\n\n![fig2]({big})\n"
     html = render_html(
