@@ -14,7 +14,9 @@ flow is a no-op — schedule-safe on hosts without the service.
 
 from __future__ import annotations
 
+import json
 import os
+import re
 from pathlib import Path
 
 import httpx
@@ -26,13 +28,26 @@ from isbe.observability.runs import topic_run
 from isbe.topics._shared.arxiv import papers_keyword_filter
 from isbe.topics._shared.metrail import (
     MetrailError,
-    extract_pdf_to_markdown,
+    download_asset,
+    fetch_corpus_markdown,
+    fetch_figure_atoms,
     metrail_base_url,
+    submit_pdf,
+    wait_until_done,
 )
 from isbe.topics.nowcasting.facts import Paper
 from isbe.topics.registry import default_topics_root, load_topic_config_typed
 
 _MIRROR_ENV = "ISBE_PAPERS_MIRROR"
+
+# Framework-figure caption heuristic (same spirit as scripts/extract_assets.py)
+_FRAMEWORK_RE = re.compile(
+    r"architecture|framework|overview|pipeline|network|schematic|workflow|"
+    r"架构|框架|总体|流程",
+    re.IGNORECASE,
+)
+# Email-friendly cap: figures above this are skipped (data-URI inlining)
+_MAX_FIGURE_BYTES = 500_000
 
 
 def _mirror_root() -> Path:
@@ -53,6 +68,38 @@ def _local_pdf_path(pdf_uri: str) -> Path | None:
         return None
     owning_topic = bucket[len("papers-") :]
     return _mirror_root() / owning_topic / object_name
+
+
+def _extract(local_pdf: Path, *, base_url: str, poll_timeout_s: float, backend: str, ocr: bool):
+    """Upload → poll → corpus markdown. Returns (corpus_md, doc_id)."""
+    doc_id = submit_pdf(local_pdf, base_url=base_url, backend=backend, ocr=ocr)
+    wait_until_done(doc_id, base_url=base_url, timeout_s=poll_timeout_s)
+    return fetch_corpus_markdown(doc_id, base_url=base_url), doc_id
+
+
+def _save_framework_figure(doc_id: str, local_pdf: Path, *, base_url: str) -> bool:
+    """Pick the paper's framework figure (caption heuristic, fallback: first
+    captioned, then first) and save it as `<id>.metrail.fig.png` + a caption
+    sidecar. Best-effort: returns False when there's nothing suitable."""
+    atoms = fetch_figure_atoms(doc_id, base_url=base_url)
+    if not atoms:
+        return False
+    atom = next(
+        (a for a in atoms if _FRAMEWORK_RE.search(a.get("text") or "")),
+        next((a for a in atoms if (a.get("text") or "").strip()), atoms[0]),
+    )
+    image_url = atom.get("image_url")
+    if not image_url:
+        return False
+    png = download_asset(image_url, base_url=base_url)
+    if not png or len(png) > _MAX_FIGURE_BYTES:
+        return False
+    local_pdf.with_suffix(".metrail.fig.png").write_bytes(png)
+    caption = (atom.get("text") or "").strip()[:300]
+    local_pdf.with_suffix(".metrail.assets.json").write_text(
+        json.dumps({"caption": caption}, ensure_ascii=False), encoding="utf-8"
+    )
+    return True
 
 
 @flow(name="metrail-enrich")
@@ -76,6 +123,7 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
         ocr = metrail_cfg.ocr if metrail_cfg else False
 
         enriched = 0
+        figures = 0
         skipped: list[dict] = []
         Session = make_session_factory()
         with Session() as s:
@@ -93,7 +141,7 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": "pdf not in local mirror"})
                     continue
                 try:
-                    corpus_md = extract_pdf_to_markdown(
+                    corpus_md, doc_id = _extract(
                         local_pdf,
                         base_url=base_url,
                         poll_timeout_s=poll_timeout_s,
@@ -109,8 +157,15 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                 s.add(p)
                 s.commit()
                 enriched += 1
+                # Figure is a bonus — never fails the paper (corpus is committed)
+                try:
+                    if _save_framework_figure(doc_id, local_pdf, base_url=base_url):
+                        figures += 1
+                except (MetrailError, OSError, httpx.HTTPError, ValueError):
+                    pass
 
         run.payload["enriched"] = enriched
+        run.payload["figures"] = figures
         run.payload["skipped"] = len(skipped)
         if skipped:
             run.payload["skipped_papers"] = skipped

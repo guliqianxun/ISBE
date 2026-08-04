@@ -104,6 +104,28 @@ def wait_until_done(
 
 
 @HTTP_RETRY
+def fetch_figure_atoms(doc_id: str, *, base_url: str, timeout_s: float = 30.0) -> list[dict]:
+    """List the document's figure atoms: {id, page, text (caption), image_url, ...}."""
+    resp = httpx.get(
+        f"{base_url}/api/documents/{doc_id}/atoms",
+        params={"kind": "figure"},
+        timeout=timeout_s,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    return data if isinstance(data, list) else []
+
+
+@HTTP_RETRY
+def download_asset(image_url: str, *, base_url: str, timeout_s: float = 60.0) -> bytes:
+    """Download an atom asset; image_url from the API is service-relative."""
+    url = image_url if image_url.startswith("http") else f"{base_url}{image_url}"
+    resp = httpx.get(url, timeout=timeout_s)
+    resp.raise_for_status()
+    return resp.content
+
+
+@HTTP_RETRY
 def fetch_corpus_markdown(doc_id: str, *, base_url: str, timeout_s: float = 60.0) -> str:
     """Fetch the whole-document markdown export (## [kind] page N · id sections)."""
     resp = httpx.get(

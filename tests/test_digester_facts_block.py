@@ -76,3 +76,39 @@ def test_load_fulltext_reads_mirror_relative_path(monkeypatch, tmp_path):
     md.write_text("## corpus", encoding="utf-8")
     p = _paper("1.1", fulltext_uri="nowcasting/2026-W31/1.1.metrail.md")
     assert _load_fulltext(p) == "## corpus"
+
+
+def _mirror_with_figure(
+    tmp_path, arxiv_id="1.1", png=b"\x89PNG fake", caption="Fig 1. architecture"
+):
+    import json
+
+    d = tmp_path / "nowcasting" / "2026-W31"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / f"{arxiv_id}.metrail.md").write_text("## corpus", encoding="utf-8")
+    (d / f"{arxiv_id}.metrail.fig.png").write_bytes(png)
+    (d / f"{arxiv_id}.metrail.assets.json").write_text(
+        json.dumps({"caption": caption}), encoding="utf-8"
+    )
+    return f"nowcasting/2026-W31/{arxiv_id}.metrail.md"
+
+
+def test_load_paper_assets_builds_template_shape(monkeypatch, tmp_path):
+    from isbe.topics._shared.digester import _load_paper_assets
+
+    monkeypatch.setenv("ISBE_PAPERS_MIRROR", str(tmp_path))
+    uri = _mirror_with_figure(tmp_path)
+    assets = _load_paper_assets([_paper("1.1", fulltext_uri=uri)])
+    fig = assets["1.1"]["figure"]
+    assert fig["caption"] == "Fig 1. architecture"
+    assert fig["datauri"].startswith("data:image/png;base64,")
+
+
+def test_load_paper_assets_skips_missing_and_oversized(monkeypatch, tmp_path):
+    from isbe.topics._shared.digester import _load_paper_assets
+
+    monkeypatch.setenv("ISBE_PAPERS_MIRROR", str(tmp_path))
+    no_fig = _paper("2.2", fulltext_uri="nowcasting/2026-W31/2.2.metrail.md")  # no files
+    big_uri = _mirror_with_figure(tmp_path, arxiv_id="3.3", png=b"x" * 600_000)
+    assets = _load_paper_assets([no_fig, _paper("3.3", fulltext_uri=big_uri)])
+    assert assets == {}

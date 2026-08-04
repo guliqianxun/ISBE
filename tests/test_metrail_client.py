@@ -110,6 +110,38 @@ def test_wait_until_done_deadline_raises_timeout():
             wait_until_done("d1", base_url=BASE, timeout_s=0.0, sleep=lambda s: None)
 
 
+def test_fetch_figure_atoms_returns_list():
+    atoms = [
+        {
+            "id": "f0",
+            "kind": "figure",
+            "text": "Fig 1",
+            "image_url": "/api/documents/d1/assets/f0.png",
+        }
+    ]
+
+    def fake_get(url, **k):
+        assert url.endswith("/atoms") and k.get("params", {}).get("kind") == "figure"
+        return _resp(200, json_body=atoms)
+
+    with patch.object(metrail.httpx, "get", side_effect=fake_get):
+        assert metrail.fetch_figure_atoms("d1", base_url=BASE) == atoms
+
+
+def test_download_asset_joins_relative_url():
+    seen: list[str] = []
+
+    def fake_get(url, **k):
+        seen.append(url)
+        req = httpx.Request("GET", url)
+        return httpx.Response(200, content=b"\x89PNG", request=req)
+
+    with patch.object(metrail.httpx, "get", side_effect=fake_get):
+        body = metrail.download_asset("/api/documents/d1/assets/f0.png", base_url=BASE)
+    assert body == b"\x89PNG"
+    assert seen == [f"{BASE}/api/documents/d1/assets/f0.png"]
+
+
 def test_extract_pdf_to_markdown_composes(pdf):
     def fake_get(url, **k):
         if url.endswith("/export"):

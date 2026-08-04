@@ -9,6 +9,8 @@ Each digest run:
   5. Writes artifact + .pending memory drafts.
 """
 
+import base64
+import json
 import os
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -69,6 +71,46 @@ def _load_fulltext(paper) -> str | None:
         return path.read_text(encoding="utf-8")
     except OSError:
         return None
+
+
+_MAX_FIGURE_BYTES = 500_000
+
+
+def _load_paper_assets(papers: list) -> dict:
+    """Collect per-paper framework figures saved by metrail_enrich.
+
+    Returns the weekly.j2 `paper_assets` shape:
+    {arxiv_id: {"figure": {"caption", "datauri"}}}. Fail-open everywhere —
+    a missing/oversized/corrupt figure just means no image for that paper.
+    """
+    assets: dict = {}
+    mirror = Path(os.getenv("ISBE_PAPERS_MIRROR", "papers"))
+    for p in papers:
+        uri = getattr(p, "fulltext_uri", None)
+        if not uri:
+            continue
+        md_path = mirror / uri
+        fig_path = md_path.with_name(md_path.name.replace(".metrail.md", ".metrail.fig.png"))
+        meta_path = md_path.with_name(md_path.name.replace(".metrail.md", ".metrail.assets.json"))
+        try:
+            if not fig_path.is_file():
+                continue
+            png = fig_path.read_bytes()
+            if not png or len(png) > _MAX_FIGURE_BYTES:
+                continue
+            caption = ""
+            if meta_path.is_file():
+                caption = json.loads(meta_path.read_text(encoding="utf-8")).get("caption", "")
+            assets[p.arxiv_id] = {
+                "figure": {
+                    "caption": caption or "框架图（自动提取）",
+                    "datauri": "data:image/png;base64,"
+                    + base64.b64encode(png).decode("ascii"),
+                }
+            }
+        except (OSError, ValueError):
+            continue
+    return assets
 
 
 def _build_facts_block(
@@ -257,6 +299,7 @@ def _digester_impl(
         trace_id=resp.trace_id or "(none)",
         papers=papers,
         paper_blocks=paper_blocks,
+        paper_assets=_load_paper_assets(papers),
         glossary=glossary,
         repos=repos or [],
         repo_reviews=repo_reviews,
