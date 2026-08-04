@@ -85,6 +85,11 @@ def _arxiv_pdf_base_urls() -> list[str]:
     return ["https://export.arxiv.org", "https://arxiv.org"]
 
 
+def _is_arxiv_host(url: str) -> bool:
+    host = httpx.URL(url).host or ""
+    return host == "arxiv.org" or host.endswith(".arxiv.org")
+
+
 def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float | None = None) -> bytes:
     """Fetch one PDF: arxiv mirrors first, Semantic Scholar OA link as fallback.
 
@@ -107,6 +112,13 @@ def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float | Non
             try:
                 resp = httpx.get(url, follow_redirects=True, timeout=http_timeout)
                 resp.raise_for_status()
+                if not resp.content.startswith(b"%PDF-"):
+                    # 200 with an HTML body ("PDF being generated", WAF page):
+                    # storing it would permanently poison pdf_uri and burn
+                    # metrail strikes. Treat as a failed attempt.
+                    raise httpx.HTTPStatusError(
+                        f"non-PDF 200 from {url}", request=resp.request, response=resp
+                    )
                 return resp.content
             except (httpx.TimeoutException, httpx.HTTPError) as e:
                 last_exc = e
@@ -114,6 +126,12 @@ def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float | Non
                     time.sleep(2 * (attempt + 1))  # 2s, 4s backoff
 
     s2_url = open_access_pdf_url(arxiv_id)
+    if s2_url and _is_arxiv_host(s2_url):
+        # S2's OA link for arXiv papers is usually arxiv.org itself — the host
+        # whose mirrors just failed. Refetching it directly guarantees another
+        # stall; a fallback only helps when it's a different CDN.
+        print(f"[arxiv-pdfs] {arxiv_id}: S2 OA link is arxiv itself, skipping", flush=True)
+        s2_url = None
     if s2_url:
         print(f"[arxiv-pdfs] {arxiv_id}: mirrors failed, trying S2 OA link", flush=True)
         try:

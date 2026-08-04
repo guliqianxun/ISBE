@@ -69,7 +69,9 @@ def _load_fulltext(paper) -> str | None:
     path = Path(os.getenv("ISBE_PAPERS_MIRROR", "papers")) / uri
     try:
         return path.read_text(encoding="utf-8")
-    except OSError:
+    except (OSError, ValueError):
+        # ValueError covers UnicodeDecodeError from a torn concurrent write
+        # (enrich uses non-atomic write_text on a NAS mount) — fail open.
         return None
 
 

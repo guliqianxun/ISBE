@@ -22,6 +22,7 @@ from pathlib import Path
 import httpx
 from prefect import flow
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from isbe.facts.db import make_session_factory
 from isbe.observability.runs import topic_run
@@ -174,6 +175,11 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
             return 0
 
         keywords = cfg.arxiv.include_keywords if cfg.arxiv else []
+        if not keywords:
+            # Without keywords the select would span EVERY topic's papers —
+            # refuse rather than silently enrich the whole table.
+            run.payload["disabled"] = "no arxiv include_keywords; refusing unscoped enrich"
+            return 0
         poll_timeout_s = float(metrail_cfg.poll_timeout_s) if metrail_cfg else 120.0
         backend = metrail_cfg.backend if metrail_cfg else "pdfplumber"
         ocr = metrail_cfg.ocr if metrail_cfg else False
@@ -199,14 +205,14 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                 if local_pdf is None:
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": "unparseable pdf_uri"})
                     continue
+                if _strikes(local_pdf) >= _MAX_STRIKES:
+                    reason = f"blacklisted after {_MAX_STRIKES} strikes"
+                    skipped.append({"arxiv_id": p.arxiv_id, "reason": reason})
+                    continue
                 if not local_pdf.is_file() and not _fetch_pdf_from_minio(p.pdf_uri, local_pdf):
                     skipped.append(
                         {"arxiv_id": p.arxiv_id, "reason": "pdf not in local mirror or minio"}
                     )
-                    continue
-                if _strikes(local_pdf) >= _MAX_STRIKES:
-                    reason = f"blacklisted after {_MAX_STRIKES} strikes"
-                    skipped.append({"arxiv_id": p.arxiv_id, "reason": reason})
                     continue
                 print(f"[metrail] ({idx}/{total}) {p.arxiv_id} extracting...", flush=True)
                 try:
@@ -217,7 +223,20 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                         backend=backend,
                         ocr=ocr,
                     )
-                except (MetrailError, OSError, httpx.HTTPError) as e:
+                    md_path = local_pdf.with_suffix(".metrail.md")
+                    md_path.write_text(corpus_md, encoding="utf-8")
+                    p.fulltext_uri = md_path.relative_to(_mirror_root()).as_posix()
+                    s.add(p)
+                    s.commit()
+                except (MetrailError, ValueError, OSError, httpx.HTTPError, SQLAlchemyError) as e:
+                    # per-paper skip contract: nothing here may abort the batch.
+                    # ValueError: relative_to mismatch / stray parse errors;
+                    # SQLAlchemyError: commit on a connection idled through
+                    # n_papers × poll_timeout — roll back and move on.
+                    try:
+                        s.rollback()
+                    except SQLAlchemyError:
+                        pass
                     _add_strike(local_pdf)
                     print(
                         f"[metrail] ({idx}/{total}) SKIP {p.arxiv_id} "
@@ -226,11 +245,6 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                     )
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": f"{type(e).__name__}: {e}"})
                     continue
-                md_path = local_pdf.with_suffix(".metrail.md")
-                md_path.write_text(corpus_md, encoding="utf-8")
-                p.fulltext_uri = md_path.relative_to(_mirror_root()).as_posix()
-                s.add(p)
-                s.commit()
                 enriched += 1
                 # Figure is a bonus — never fails the paper (corpus is committed)
                 try:

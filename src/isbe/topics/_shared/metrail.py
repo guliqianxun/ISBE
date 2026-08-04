@@ -64,17 +64,30 @@ def submit_pdf(
     if resp.status_code == 422:
         raise MetrailError(f"metrail rejected {pdf_path.name}: {resp.text[:200]}")
     resp.raise_for_status()
-    doc_id = resp.json().get("id")
+    doc_id = _as_dict(resp, context=pdf_path.name).get("id")
     if not doc_id:
         raise MetrailError(f"metrail returned no id for {pdf_path.name}")
     return doc_id
+
+
+def _as_dict(resp: httpx.Response, *, context: str) -> dict:
+    """Parse a JSON object body; anything else (proxy interstitial, half-up
+    uvicorn returning HTML with a 200) becomes MetrailError, not a stray
+    ValueError/AttributeError escaping the per-paper handler."""
+    try:
+        data = resp.json()
+    except ValueError as e:
+        raise MetrailError(f"metrail returned non-JSON for {context}: {resp.text[:120]}") from e
+    if not isinstance(data, dict):
+        raise MetrailError(f"metrail returned non-object JSON for {context}")
+    return data
 
 
 @HTTP_RETRY
 def _get_doc(doc_id: str, *, base_url: str, timeout_s: float = 30.0) -> dict:
     resp = httpx.get(f"{base_url}/api/documents/{doc_id}", timeout=timeout_s)
     resp.raise_for_status()
-    return resp.json()
+    return _as_dict(resp, context=doc_id)
 
 
 def wait_until_done(

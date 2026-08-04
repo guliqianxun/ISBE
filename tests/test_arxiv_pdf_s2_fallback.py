@@ -65,6 +65,43 @@ def test_no_oa_link_raises_original_error():
                 arxiv_mod.fetch_pdf_bytes("2604.11111", max_retries=0, timeout=1.0)
 
 
+def test_mirror_200_with_html_body_is_rejected():
+    """A 200 whose body isn't %PDF- (WAF page, 'PDF being generated') must not
+    be stored — it would poison pdf_uri permanently and burn metrail strikes."""
+
+    def fake_httpx_get(url, **kwargs):
+        if "arxiv.org" in url:
+            return _resp(200, b"<html>PDF is being generated</html>")
+        return _resp(200, PDF)
+
+    with patch.object(arxiv_mod.httpx, "get", side_effect=fake_httpx_get):
+        with patch.object(
+            arxiv_mod, "open_access_pdf_url", return_value="https://cdn.example/oa.pdf"
+        ):
+            body = arxiv_mod.fetch_pdf_bytes("2604.11111", max_retries=0, timeout=1.0)
+    assert body == PDF  # served by the S2 fallback, not the HTML
+
+
+def test_s2_fallback_skips_arxiv_host():
+    """S2's OA link for arXiv papers is usually arxiv.org itself — refetching
+    the host that just failed guarantees another stall; skip it."""
+    fetched: list[str] = []
+
+    def fake_httpx_get(url, **kwargs):
+        fetched.append(url)
+        raise httpx.ConnectError("stalled")
+
+    with patch.object(arxiv_mod.httpx, "get", side_effect=fake_httpx_get):
+        with patch.object(
+            arxiv_mod, "open_access_pdf_url", return_value="https://arxiv.org/pdf/2604.11111"
+        ):
+            with pytest.raises(httpx.ConnectError):
+                arxiv_mod.fetch_pdf_bytes("2604.11111", max_retries=0, timeout=1.0)
+    assert not any("cdn" in u for u in fetched)
+    # only the mirror attempts hit the network; the S2 URL was never fetched
+    assert len(fetched) == 2  # two default mirrors, one attempt each
+
+
 def test_non_pdf_oa_content_raises_original_error():
     def fake_httpx_get(url, **kwargs):
         if "arxiv.org" in url:

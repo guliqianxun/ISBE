@@ -26,7 +26,12 @@ def _paper(arxiv_id: str, pdf_uri: str | None) -> Paper:
 
 
 def _cfg(metrail_block: dict | None) -> TopicConfig:
-    raw: dict = {"id": "nowcasting", "label": "t", "cadence": "weekly"}
+    raw: dict = {
+        "id": "nowcasting",
+        "label": "t",
+        "cadence": "weekly",
+        "arxiv": {"categories": ["cs.LG"], "include_keywords": ["paper"]},
+    }
     if metrail_block is not None:
         raw["metrail"] = metrail_block
     return TopicConfig.model_validate(raw)
@@ -236,6 +241,17 @@ def test_save_framework_figure_skips_oversized(mirror):
     ):
         assert flow_mod._save_framework_figure("d", pdf, base_url="http://x") is False
     assert not pdf.with_suffix(".metrail.fig.png").exists()
+
+
+def test_topic_without_keywords_refuses_unscoped_enrich(monkeypatch, mirror):
+    """No arxiv include_keywords → the select would span every topic's papers;
+    the flow must refuse instead."""
+    monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
+    cfg = TopicConfig.model_validate({"id": "x", "label": "x", "cadence": "weekly"})
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=cfg):
+        with patch.object(flow_mod, "_extract") as extract:
+            assert flow_mod.metrail_enrich("x") == 0
+    extract.assert_not_called()
 
 
 def test_dispatch_resolves_metrail_enrich():

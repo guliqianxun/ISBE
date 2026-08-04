@@ -16,6 +16,9 @@ RETRYABLE_HTTPX_EXC = (
     httpx.TimeoutException,
     httpx.RemoteProtocolError,
     httpx.ConnectError,
+    # mid-response resets — routine when the metrail service restarts
+    httpx.ReadError,
+    httpx.WriteError,
 )
 
 

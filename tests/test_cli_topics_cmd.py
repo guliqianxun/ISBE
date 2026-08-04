@@ -43,5 +43,6 @@ def test_collect_chains_metrail_enrich_after_pdfs(monkeypatch):
     calls.clear()
     result = runner.invoke(app, ["topics", "run", "nowcasting", "--collect", "--no-pdfs"])
     assert result.exit_code == 0, result.output
-    assert "metrail_enrich" not in calls
     assert "arxiv_download_pdfs" not in calls
+    # extraction needs no downloads — --no-pdfs must NOT suppress it
+    assert "metrail_enrich" in calls

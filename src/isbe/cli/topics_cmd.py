@@ -106,15 +106,13 @@ def topics_run(
             n = flow_fn(**{**base, **extra})
             typer.echo(f"pdfs downloaded: {n} (rate-limited 1 per 3s per arXiv ToS)")
 
-        # metrail full-text chain: runs after the PDF chain, same yaml-driven
-        # opt-in. The flow itself no-ops when METRAIL_API_URL is unset.
-        if "metrail_enrich" in cfg.schedules and not no_pdfs:
+        # metrail full-text chain: yaml-driven opt-in. Runs even with --no-pdfs
+        # (extraction needs no downloads) and without a limit (limited, dead
+        # rows could starve the batch; the strike blacklist handles
+        # pathological PDFs). No-ops when METRAIL_API_URL is unset.
+        if "metrail_enrich" in cfg.schedules:
             flow_fn, base = resolve_flow(topic_id, "metrail_enrich")
-            import inspect
-
-            sig = inspect.signature(flow_fn).parameters
-            extra = {"limit": pdf_limit} if "limit" in sig else {}
-            n = flow_fn(**{**base, **extra})
+            n = flow_fn(**base)
             typer.echo(f"fulltext extracted: {n}")
 
     if digest:

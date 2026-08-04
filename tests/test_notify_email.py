@@ -429,6 +429,19 @@ def test_render_html_strips_javascript_urls():
     assert "javascript:" not in html
 
 
+def test_render_html_caps_inline_image_budget():
+    """Figures beyond the per-email data-URI budget are replaced with a note
+    so mail clients don't clip the digest; the artifact keeps them all."""
+    big = "data:image/png;base64," + "A" * 200_000
+    md = f"# T\n\n![fig1]({big})\n\ntext\n\n![fig2]({big})\n"
+    html = render_html(
+        topic_label="nowcasting", period_label="2026-W21",
+        artifact_md=md, artifact_path=None,
+    )
+    assert html.count("data:image/png;base64,") == 1  # first kept, second dropped
+    assert "邮件中省略" in html
+
+
 def test_inline_css_disables_network(monkeypatch):
     """premailer must run with allow_network=False regardless of input."""
     from isbe.notify import render as render_mod

@@ -9,6 +9,7 @@ Contract:
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import markdown
@@ -42,6 +43,27 @@ def _sanitize(body_html: str) -> str:
         attributes=_ALLOWED_ATTRIBUTES,
         url_schemes=_ALLOWED_URL_SCHEMES,
     )
+
+
+# Mail clients clip large HTML (Gmail ~102KB); inline data-URI figures blow
+# that fast. Keep figures up to this total, drop the rest with a note — the
+# artifact file keeps every figure regardless.
+_EMAIL_IMAGE_BUDGET = 250_000
+_DATAURI_IMG_RE = re.compile(r"!\[[^\]]*\]\((data:image/[^)]+)\)")
+
+
+def _cap_inline_images(artifact_md: str, budget: int = _EMAIL_IMAGE_BUDGET) -> str:
+    spent = 0
+
+    def _repl(m: re.Match) -> str:
+        nonlocal spent
+        uri = m.group(1)
+        if spent + len(uri) <= budget:
+            spent += len(uri)
+            return m.group(0)
+        return "*（图片过大，邮件中省略——见 artifact 原文）*"
+
+    return _DATAURI_IMG_RE.sub(_repl, artifact_md)
 
 
 def _inline_css(html: str) -> str:
@@ -84,7 +106,7 @@ def render_html(
     """
     body_html = _sanitize(
         markdown.markdown(
-            artifact_md,
+            _cap_inline_images(artifact_md),
             extensions=["tables", "fenced_code", "footnotes", "md_in_html"],
         )
     )
