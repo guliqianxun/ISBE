@@ -1,0 +1,12 @@
+name = "isbe-gateway"
+main = "arxiv-mirror-worker.js"
+compatibility_date = "2026-01-01"
+
+# Custom domain binding — created automatically on `wrangler deploy`.
+# The domain must not be attached to any other CF product (Pages etc.).
+routes = [
+  { pattern = "arxiv.moxunzhi.com", custom_domain = true },
+]
+
+# SECRET is set separately (never in this file):
+#   echo <value> | npx wrangler secret put SECRET

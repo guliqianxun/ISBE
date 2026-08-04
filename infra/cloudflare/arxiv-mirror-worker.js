@@ -57,7 +57,7 @@ export default {
     // Back-compat: bare /pdf/<id> → arxiv PDFs
     if (path.startsWith("/pdf/")) path = "/arxiv" + path;
 
-    const m = path.match(/^\/([a-z-]+)(\/.*)$/);
+    const m = path.match(/^\/([a-z0-9-]+)(\/.*)$/);
     const upstream = m && UPSTREAMS[m[1]];
     if (!upstream) {
       return new Response("unknown route; see UPSTREAMS", { status: 403 });
