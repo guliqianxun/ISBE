@@ -30,6 +30,7 @@ from isbe.topics._shared.arxiv import (
     parse_atom_entry,  # noqa: F401  — used by tests
     upsert_papers,  # noqa: F401  — used by tests
 )
+from isbe.topics._shared.semantic_scholar import open_access_pdf_url
 from isbe.topics.nowcasting.facts import Paper
 from isbe.topics.registry import default_topics_root, load_topic_config
 
@@ -85,31 +86,44 @@ def _arxiv_pdf_base_urls() -> list[str]:
 
 
 def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float | None = None) -> bytes:
-    """Fetch one PDF, trying configured mirrors with retries.
+    """Fetch one PDF: arxiv mirrors first, Semantic Scholar OA link as fallback.
 
     Per-attempt read timeout defaults to 180s, tunable via ARXIV_PDF_TIMEOUT_S
     (CN routes often stall — a lower value fails over to the next mirror
     faster). Connect timeout is a tight 10s regardless.
-    Raises the LAST exception if all mirrors+retries fail.
+
+    When every mirror+retry fails, S2's `openAccessPdf` direct link is tried —
+    it usually sits on a different CDN than arxiv.org. The response must start
+    with %PDF- (OA links occasionally point at publisher landing pages).
+    Raises the LAST exception if everything fails.
     """
     if timeout is None:
         timeout = float(os.getenv("ARXIV_PDF_TIMEOUT_S", "180"))
+    http_timeout = httpx.Timeout(timeout, connect=10.0)
     last_exc: Exception | None = None
     for base in _arxiv_pdf_base_urls():
         url = f"{base}/pdf/{arxiv_id}"
         for attempt in range(max_retries + 1):
             try:
-                resp = httpx.get(
-                    url,
-                    follow_redirects=True,
-                    timeout=httpx.Timeout(timeout, connect=10.0),
-                )
+                resp = httpx.get(url, follow_redirects=True, timeout=http_timeout)
                 resp.raise_for_status()
                 return resp.content
             except (httpx.TimeoutException, httpx.HTTPError) as e:
                 last_exc = e
                 if attempt < max_retries:
                     time.sleep(2 * (attempt + 1))  # 2s, 4s backoff
+
+    s2_url = open_access_pdf_url(arxiv_id)
+    if s2_url:
+        print(f"[arxiv-pdfs] {arxiv_id}: mirrors failed, trying S2 OA link", flush=True)
+        try:
+            resp = httpx.get(s2_url, follow_redirects=True, timeout=http_timeout)
+            resp.raise_for_status()
+            if resp.content[:5] == b"%PDF-":
+                return resp.content
+            print(f"[arxiv-pdfs] {arxiv_id}: S2 link is not a PDF, giving up", flush=True)
+        except (httpx.TimeoutException, httpx.HTTPError) as e:
+            last_exc = e
     assert last_exc is not None
     raise last_exc
 

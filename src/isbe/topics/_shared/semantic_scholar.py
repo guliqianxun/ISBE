@@ -21,6 +21,7 @@ from dataclasses import dataclass
 import httpx
 
 S2_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search"
+S2_PAPER = "https://api.semanticscholar.org/graph/v1/paper"
 FIELDS = "title,abstract,year,publicationDate,citationCount,externalIds,fieldsOfStudy,authors"
 _UA = {"User-Agent": "ISBE-acquire/0.1 (mailto:visitorindark@gmail.com)"}
 
@@ -62,6 +63,23 @@ def default_get(url: str, *, tries: int = 7, sleep_fn=time.sleep, log=print) -> 
             log(f"    (try {i + 1}: {type(ex).__name__}, backoff)")
         sleep_fn(4 * (i + 1))
     return None
+
+
+def open_access_pdf_url(arxiv_id: str, *, tries: int = 3, get_fn=None) -> str | None:
+    """arXiv id → S2 `openAccessPdf` direct link, or None.
+
+    Used as a PDF-download fallback: the OA link usually sits on a different
+    CDN than arxiv.org, so it often works when arxiv routes stall. `tries`
+    stays small — this runs per paper inside the download loop.
+    """
+    if get_fn is None:
+        def get_fn(url: str) -> dict | None:
+            return default_get(url, tries=tries)
+    d = get_fn(f"{S2_PAPER}/arXiv:{arxiv_id}?fields=openAccessPdf")
+    if not d:
+        return None
+    url = ((d.get("openAccessPdf") or {}).get("url") or "").strip()
+    return url or None
 
 
 def _to_paper(p: dict, query_hit: str) -> S2Paper | None:
