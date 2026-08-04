@@ -1,0 +1,34 @@
+# {{ topic_label }} — {{ month_label }} 月报
+
+> 覆盖周报：{{ weeks | join("、") }}
+
+## 月度总览
+{{ overview }}
+
+## 本月必读
+{{ must_read }}
+
+## 论点演化
+{{ thesis_evolution }}
+
+## 下月关注
+{{ watch_next }}
+
+{% if distillation -%}
+## Memory 草稿（待 review）
+
+{{ distillation }}
+{% endif %}
+
+---
+
+<details markdown="1">
+<summary>Audit & 追溯</summary>
+
+- **generated_at**: {{ generated_at }}
+- **artifact_id**: {{ artifact_id }}
+- **trace_id**: {{ trace_id }}
+- **memory snapshot**: {{ memory_refs }}
+- **weeks**: {{ weeks | join(", ") }}
+
+</details>

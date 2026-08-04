@@ -54,6 +54,7 @@ def _shared_collectors() -> dict[str, Callable[..., Any]]:
     from isbe.topics._shared.arxiv import arxiv_collector
     from isbe.topics._shared.crawl4ai_collector import crawl4ai_collector
     from isbe.topics._shared.metrail_enrich import metrail_enrich
+    from isbe.topics._shared.monthly import monthly_digester
     from isbe.topics._shared.rss import rss_collector
 
     return {
@@ -61,6 +62,7 @@ def _shared_collectors() -> dict[str, Callable[..., Any]]:
         "rss_collector": rss_collector,
         "crawl4ai_collector": crawl4ai_collector,
         "metrail_enrich": metrail_enrich,
+        "monthly_digester": monthly_digester,
     }
 
 

@@ -50,6 +50,7 @@ def topics_run(
     topic_id: str,
     collect: bool = typer.Option(False, "--collect", help="Run collectors"),
     digest: bool = typer.Option(False, "--digest", help="Run digester"),
+    monthly: bool = typer.Option(False, "--monthly", help="Run the monthly rollup digester"),
     no_pdfs: bool = typer.Option(
         False, "--no-pdfs", help="Skip the auto-PDF-download chained after --collect"
     ),
@@ -65,8 +66,8 @@ def topics_run(
         typer.echo(f"unknown topic: {topic_id}", err=True)
         raise typer.Exit(code=1)
 
-    if not (collect or digest):
-        typer.echo("specify --collect / --digest", err=True)
+    if not (collect or digest or monthly):
+        typer.echo("specify --collect / --digest / --monthly", err=True)
         raise typer.Exit(code=1)
 
     cfg = load_topic_config_typed(root, topic_id)
@@ -76,7 +77,11 @@ def topics_run(
         # collector. Run each one; report row counts.
         counts: list[str] = []
         for key in cfg.schedules:
-            if key == DIGESTER_KEY or key in ("arxiv_download_pdfs", "metrail_enrich"):
+            if key == DIGESTER_KEY or key in (
+                "arxiv_download_pdfs",
+                "metrail_enrich",
+                "monthly_digester",
+            ):
                 continue
             try:
                 flow_fn, params = resolve_flow(topic_id, key)
@@ -121,3 +126,14 @@ def topics_run(
         flow_fn, params = _digester_params(topic_id, label, today)
         result = flow_fn(**params)
         typer.echo(f"digest done: {len(result.pending_drafts)} drafts pending")
+
+    if monthly:
+        flow_fn, params = resolve_flow(topic_id, "monthly_digester")
+        # --period-label doubles as the month label here (e.g. 2026-08)
+        if period_label:
+            params = {**params, "month_label": period_label}
+        result = flow_fn(**params)
+        typer.echo(
+            f"monthly digest done: {result.period_label}, "
+            f"{len(result.pending_drafts)} drafts pending"
+        )

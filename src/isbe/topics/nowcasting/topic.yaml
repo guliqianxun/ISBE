@@ -30,6 +30,7 @@ schedules:
   arxiv_download_pdfs: "0 7 * * 1"       # 周一 07:00
   metrail_enrich: "20 7 * * 1"           # 周一 07:20（PDF 下载后、digest 前）
   digester: "0 8 * * 1"                  # 周一 08:00
+  monthly_digester: "0 9 1 * *"          # 每月 1 号 09:00（汇总上个月）
 
 # 检索契约：digester 对本域 facts 套相关性门(out_of_scope/require_any)+优先级分层。
 # source: facts = 读 ISBE Postgres(服务器自己 arxiv 采集填充)。gates 可改、偏召回，首次上线后 smoke 调。
