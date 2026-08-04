@@ -49,6 +49,28 @@ _FRAMEWORK_RE = re.compile(
 # Email-friendly cap: figures above this are skipped (data-URI inlining)
 _MAX_FIGURE_BYTES = 500_000
 
+# A paper that times out / fails this many times is blacklisted: a stuck PDF
+# re-uploaded every run clogs metrail's small worker pool and starves everyone
+# else. The strike counter lives in a `<id>.metrail.skip` sidecar next to the
+# PDF — delete the file to retry the paper.
+_MAX_STRIKES = 3
+
+
+def _strikes(local_pdf: Path) -> int:
+    marker = local_pdf.with_suffix(".metrail.skip")
+    try:
+        return int(marker.read_text(encoding="utf-8").strip() or "0")
+    except (OSError, ValueError):
+        return 0
+
+
+def _add_strike(local_pdf: Path) -> None:
+    marker = local_pdf.with_suffix(".metrail.skip")
+    try:
+        marker.write_text(str(_strikes(local_pdf) + 1), encoding="utf-8")
+    except OSError:
+        pass
+
 
 def _mirror_root() -> Path:
     return Path(os.getenv(_MIRROR_ENV, "papers"))
@@ -182,6 +204,11 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                         {"arxiv_id": p.arxiv_id, "reason": "pdf not in local mirror or minio"}
                     )
                     continue
+                if _strikes(local_pdf) >= _MAX_STRIKES:
+                    skipped.append(
+                        {"arxiv_id": p.arxiv_id, "reason": f"blacklisted after {_MAX_STRIKES} strikes"}
+                    )
+                    continue
                 print(f"[metrail] ({idx}/{total}) {p.arxiv_id} extracting...", flush=True)
                 try:
                     corpus_md, doc_id = _extract(
@@ -192,8 +219,10 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                         ocr=ocr,
                     )
                 except (MetrailError, OSError, httpx.HTTPError) as e:
+                    _add_strike(local_pdf)
                     print(
-                        f"[metrail] ({idx}/{total}) SKIP {p.arxiv_id}: {type(e).__name__}: {e}",
+                        f"[metrail] ({idx}/{total}) SKIP {p.arxiv_id} "
+                        f"(strike {_strikes(local_pdf)}/{_MAX_STRIKES}): {type(e).__name__}: {e}",
                         flush=True,
                     )
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": f"{type(e).__name__}: {e}"})

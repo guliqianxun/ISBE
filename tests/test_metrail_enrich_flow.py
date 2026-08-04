@@ -144,6 +144,34 @@ def test_timeout_on_one_paper_does_not_block_others(monkeypatch, mirror):
     assert p2.fulltext_uri == "nowcasting/2026-W31/2604.44444.metrail.md"
 
 
+def test_timeout_strikes_lead_to_blacklist(monkeypatch, mirror):
+    """3 timeouts → .metrail.skip sidecar reaches the cap → paper no longer
+    submitted (a stuck PDF must not clog metrail's worker pool every run)."""
+    monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
+    p = _paper("2604.99999", "minio://papers-nowcasting/2026-W31/2604.99999.pdf")
+    pdf = mirror / "nowcasting" / "2026-W31" / "2604.99999.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF fake")
+
+    calls = {"n": 0}
+
+    def extract(path, **kwargs):
+        calls["n"] += 1
+        raise MetrailTimeout("stuck")
+
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=_cfg({})):
+        with patch.object(flow_mod, "make_session_factory", return_value=lambda: _fake_session([p])):
+            with (
+                patch.object(flow_mod, "_extract", side_effect=extract),
+                patch.object(flow_mod, "_save_framework_figure", return_value=False),
+            ):
+                for _ in range(4):  # 3 strikes + 1 blacklisted run
+                    assert flow_mod.metrail_enrich("nowcasting") == 0
+
+    assert calls["n"] == 3  # 4th run never submitted
+    assert pdf.with_suffix(".metrail.skip").read_text() == "3"
+
+
 def test_figure_counter_in_payload(monkeypatch, mirror):
     monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
     p = _paper("2604.55555", "minio://papers-nowcasting/2026-W31/2604.55555.pdf")
