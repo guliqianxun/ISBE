@@ -70,6 +70,40 @@ def _local_pdf_path(pdf_uri: str) -> Path | None:
     return _mirror_root() / owning_topic / object_name
 
 
+def _fetch_pdf_from_minio(pdf_uri: str, local_pdf: Path) -> bool:
+    """Pull a PDF from MinIO into the local mirror.
+
+    LAN fallback for PDFs downloaded by another host (e.g. a proxy-equipped
+    dev machine writing straight to server MinIO) or predating the
+    unconditional mirror write. Best-effort: False on any failure.
+    """
+    try:
+        from minio import Minio  # lazy: not needed on the happy path
+
+        bucket, _, object_name = pdf_uri[len("minio://") :].partition("/")
+        if not bucket or not object_name:
+            return False
+        client = Minio(
+            os.getenv("MINIO_ENDPOINT", "localhost:9000"),
+            access_key=os.getenv("MINIO_ROOT_USER", "isbe"),
+            secret_key=os.getenv("MINIO_ROOT_PASSWORD", "changeme123"),
+            secure=False,
+        )
+        resp = client.get_object(bucket, object_name)
+        try:
+            data = resp.read()
+        finally:
+            resp.close()
+            resp.release_conn()
+        if not data.startswith(b"%PDF-"):
+            return False
+        local_pdf.parent.mkdir(parents=True, exist_ok=True)
+        local_pdf.write_bytes(data)
+        return True
+    except Exception:
+        return False
+
+
 def _extract(local_pdf: Path, *, base_url: str, poll_timeout_s: float, backend: str, ocr: bool):
     """Upload → poll → corpus markdown. Returns (corpus_md, doc_id)."""
     doc_id = submit_pdf(local_pdf, base_url=base_url, backend=backend, ocr=ocr)
@@ -137,8 +171,13 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                 stmt = stmt.limit(limit)
             for p in s.scalars(stmt).all():
                 local_pdf = _local_pdf_path(p.pdf_uri or "")
-                if local_pdf is None or not local_pdf.is_file():
-                    skipped.append({"arxiv_id": p.arxiv_id, "reason": "pdf not in local mirror"})
+                if local_pdf is None:
+                    skipped.append({"arxiv_id": p.arxiv_id, "reason": "unparseable pdf_uri"})
+                    continue
+                if not local_pdf.is_file() and not _fetch_pdf_from_minio(p.pdf_uri, local_pdf):
+                    skipped.append(
+                        {"arxiv_id": p.arxiv_id, "reason": "pdf not in local mirror or minio"}
+                    )
                     continue
                 try:
                     corpus_md, doc_id = _extract(

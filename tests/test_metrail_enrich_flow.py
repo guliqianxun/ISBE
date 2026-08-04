@@ -83,12 +83,38 @@ def test_enriches_and_skips_missing_local_pdf(monkeypatch, mirror):
             with (
                 patch.object(flow_mod, "_extract", return_value=("## corpus", "d1")),
                 patch.object(flow_mod, "_save_framework_figure", return_value=False),
+                patch.object(flow_mod, "_fetch_pdf_from_minio", return_value=False),
             ):
                 assert flow_mod.metrail_enrich("nowcasting") == 1
 
     assert have.fulltext_uri == "nowcasting/2026-W31/2604.11111.metrail.md"
     assert (mirror / have.fulltext_uri).read_text(encoding="utf-8") == "## corpus"
     assert missing.fulltext_uri is None
+
+
+def test_minio_fallback_recovers_missing_local_pdf(monkeypatch, mirror):
+    """PDF absent from the mirror but present in MinIO (e.g. downloaded by the
+    proxy-equipped dev machine) → fetched into the mirror and enriched."""
+    monkeypatch.setenv("METRAIL_API_URL", "http://metrail.lan:8000")
+    p = _paper("2604.88888", "minio://papers-nowcasting/2026-W31/2604.88888.pdf")
+
+    def fake_minio_fetch(pdf_uri, local_pdf):
+        local_pdf.parent.mkdir(parents=True, exist_ok=True)
+        local_pdf.write_bytes(b"%PDF from minio")
+        return True
+
+    session = _fake_session([p])
+    with patch.object(flow_mod, "load_topic_config_typed", return_value=_cfg({})):
+        with patch.object(flow_mod, "make_session_factory", return_value=lambda: session):
+            with (
+                patch.object(flow_mod, "_extract", return_value=("## corpus", "d1")),
+                patch.object(flow_mod, "_save_framework_figure", return_value=False),
+                patch.object(flow_mod, "_fetch_pdf_from_minio", side_effect=fake_minio_fetch),
+            ):
+                assert flow_mod.metrail_enrich("nowcasting") == 1
+
+    assert p.fulltext_uri == "nowcasting/2026-W31/2604.88888.metrail.md"
+    assert (mirror / "nowcasting" / "2026-W31" / "2604.88888.pdf").exists()
 
 
 def test_timeout_on_one_paper_does_not_block_others(monkeypatch, mirror):
