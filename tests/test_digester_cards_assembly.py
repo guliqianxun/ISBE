@@ -104,6 +104,28 @@ def test_template_renders_card_fact_rows():
     assert "evidence cards" in out and "拒绝 1 个字段" in out
 
 
+def test_cards_writer_prompt_is_opinions_only():
+    from isbe.llm.prompts import CARDS_SYSTEM_PROMPT, SYSTEM_PROMPT
+
+    assert "证据卡" in CARDS_SYSTEM_PROMPT
+    assert "你不输出事实字段" in CARDS_SYSTEM_PROMPT
+    # the slim per-paper contract keeps only opinion rows
+    assert "- 评价:" in CARDS_SYSTEM_PROMPT and "- 速览:" in CARDS_SYSTEM_PROMPT
+    assert "- 数据: <训练" not in CARDS_SYSTEM_PROMPT  # legacy field spec absent
+    assert "- 数据: <训练" in SYSTEM_PROMPT  # legacy untouched
+
+
+def test_slim_paper_blocks_parse_without_fact_fields():
+    from isbe.topics._shared.digester_utils import parse_paper_blocks
+
+    text = "### [2608.01626]\n- 评价: 值得细读\n- 速览: 拆尺度再预测\n"
+    blocks = parse_paper_blocks(text)
+    blk = blocks["2608.01626"]
+    assert blk.verdict == "值得细读"
+    assert blk.plain == "拆尺度再预测"
+    assert not blk.sota
+
+
 def test_template_without_cards_keeps_legacy_shape():
     out = _render(None)
     assert "效果（原文）" not in out

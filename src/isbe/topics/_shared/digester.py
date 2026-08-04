@@ -23,7 +23,7 @@ from sqlalchemy import select
 from isbe.artifacts.store import save_artifact
 from isbe.facts.db import make_session_factory
 from isbe.llm.client import complete
-from isbe.llm.prompts import SYSTEM_PROMPT, build_digest_prompt
+from isbe.llm.prompts import CARDS_SYSTEM_PROMPT, SYSTEM_PROMPT, build_digest_prompt
 from isbe.memory.pending import write_pending
 from isbe.notify import send_digest_notification
 from isbe.observability.runs import topic_run
@@ -337,7 +337,8 @@ def _digester_impl(
         facts_block=facts_block,
         memory_block=memory_block,
     )
-    resp = complete(system=SYSTEM_PROMPT, user=user_prompt)
+    system_prompt = CARDS_SYSTEM_PROMPT if pipeline == "cards" else SYSTEM_PROMPT
+    resp = complete(system=system_prompt, user=user_prompt)
     parts = _split_sections(resp.text)
     sections = [
         DigestSection(kind="tldr", body=parts.get("tldr", "")),
