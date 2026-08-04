@@ -84,17 +84,26 @@ def _arxiv_pdf_base_urls() -> list[str]:
     return ["https://export.arxiv.org", "https://arxiv.org"]
 
 
-def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float = 180.0) -> bytes:
+def fetch_pdf_bytes(arxiv_id: str, *, max_retries: int = 2, timeout: float | None = None) -> bytes:
     """Fetch one PDF, trying configured mirrors with retries.
 
+    Per-attempt read timeout defaults to 180s, tunable via ARXIV_PDF_TIMEOUT_S
+    (CN routes often stall — a lower value fails over to the next mirror
+    faster). Connect timeout is a tight 10s regardless.
     Raises the LAST exception if all mirrors+retries fail.
     """
+    if timeout is None:
+        timeout = float(os.getenv("ARXIV_PDF_TIMEOUT_S", "180"))
     last_exc: Exception | None = None
     for base in _arxiv_pdf_base_urls():
         url = f"{base}/pdf/{arxiv_id}"
         for attempt in range(max_retries + 1):
             try:
-                resp = httpx.get(url, follow_redirects=True, timeout=timeout)
+                resp = httpx.get(
+                    url,
+                    follow_redirects=True,
+                    timeout=httpx.Timeout(timeout, connect=10.0),
+                )
                 resp.raise_for_status()
                 return resp.content
             except (httpx.TimeoutException, httpx.HTTPError) as e:
