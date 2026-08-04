@@ -339,7 +339,21 @@ def _digester_impl(
     )
     system_prompt = CARDS_SYSTEM_PROMPT if pipeline == "cards" else SYSTEM_PROMPT
     resp = complete(system=system_prompt, user=user_prompt)
-    parts = _split_sections(resp.text)
+    final_text = resp.text
+    review_summary = None
+    if pipeline == "cards":
+        from isbe.topics._shared.reviewer import review_and_maybe_rewrite
+
+        # memory must be part of the evidence bundle, or (memory: name@rev)
+        # citations in 分析 would be flagged as unsupported.
+        evidence = f"{facts_block}\n\n=== Memory ===\n{memory_block}"
+        final_text, review_summary = review_and_maybe_rewrite(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            first_text=resp.text,
+            evidence=evidence,
+        )
+    parts = _split_sections(final_text)
     sections = [
         DigestSection(kind="tldr", body=parts.get("tldr", "")),
         DigestSection(kind="paper_reviews", body=parts.get("paper_reviews", "")),
@@ -383,6 +397,7 @@ def _digester_impl(
         repos=repos or [],
         repo_reviews=repo_reviews,
         comparison=comparison,
+        review=review_summary,
         generated_at=datetime.now(UTC).isoformat(),
         artifact_id=str(artifact_id),
     )
@@ -415,6 +430,8 @@ def _digester_impl(
     run.payload["pipeline"] = pipeline
     run.payload["n_cards"] = len(paper_cards)
     run.payload["card_rejected_fields"] = sum(len(c["rejected"]) for c in paper_cards.values())
+    if review_summary is not None:
+        run.payload["review"] = review_summary
     run.payload["n_drafts"] = len(drafts)
     run.payload["artifact_id"] = str(artifact_id)
     run.payload["llm_input_tokens"] = resp.input_tokens
@@ -422,7 +439,7 @@ def _digester_impl(
 
     mirror_root = Path(os.getenv("ISBE_ARTIFACT_MIRROR", "artifacts"))
     latest = mirror_root / topic_id / period_label / "latest.md"
-    excerpt = (resp.text or "")[:800]
+    excerpt = (final_text or "")[:800]
     pushed = send_digest_notification(
         topic_label=topic_label,
         period_label=period_label,
