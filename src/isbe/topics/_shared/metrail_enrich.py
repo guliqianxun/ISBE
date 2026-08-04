@@ -205,9 +205,8 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                     )
                     continue
                 if _strikes(local_pdf) >= _MAX_STRIKES:
-                    skipped.append(
-                        {"arxiv_id": p.arxiv_id, "reason": f"blacklisted after {_MAX_STRIKES} strikes"}
-                    )
+                    reason = f"blacklisted after {_MAX_STRIKES} strikes"
+                    skipped.append({"arxiv_id": p.arxiv_id, "reason": reason})
                     continue
                 print(f"[metrail] ({idx}/{total}) {p.arxiv_id} extracting...", flush=True)
                 try:

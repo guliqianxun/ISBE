@@ -159,8 +159,9 @@ def test_timeout_strikes_lead_to_blacklist(monkeypatch, mirror):
         calls["n"] += 1
         raise MetrailTimeout("stuck")
 
+    session_factory = lambda: _fake_session([p])  # noqa: E731
     with patch.object(flow_mod, "load_topic_config_typed", return_value=_cfg({})):
-        with patch.object(flow_mod, "make_session_factory", return_value=lambda: _fake_session([p])):
+        with patch.object(flow_mod, "make_session_factory", return_value=session_factory):
             with (
                 patch.object(flow_mod, "_extract", side_effect=extract),
                 patch.object(flow_mod, "_save_framework_figure", return_value=False),
