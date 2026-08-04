@@ -429,6 +429,41 @@ def test_render_html_strips_javascript_urls():
     assert "javascript:" not in html
 
 
+def test_plaintext_part_strips_datauri_images(monkeypatch, tmp_path):
+    """text/plain must never carry base64 walls — figures live in the HTML part."""
+    from isbe.notify import send_digest_notification
+
+    _set_env(monkeypatch)
+    artifact = tmp_path / "latest.md"
+    big = "data:image/png;base64," + "A" * 50_000
+    artifact.write_text(f"# T\n\n![fig]({big})\n\n正文内容\n", encoding="utf-8")
+
+    sent = {}
+
+    class FakeSMTP:
+        def __init__(self, *a, **k): ...
+        def __enter__(self):
+            return self
+        def __exit__(self, *a):
+            return False
+        def starttls(self, **k): ...
+        def login(self, *a): ...
+        def send_message(self, msg):
+            sent["msg"] = msg
+        def ehlo(self, *a): ...
+        def has_extn(self, *a):
+            return True
+
+    monkeypatch.setattr("smtplib.SMTP", FakeSMTP)
+    assert send_digest_notification(
+        topic_label="t", period_label="p", artifact_path=artifact, excerpt="e"
+    )
+    plain = sent["msg"].get_body(preferencelist=("plain",)).get_content()
+    assert "base64,AAAA" not in plain
+    assert "正文内容" in plain
+    assert "图片见 HTML 版" in plain
+
+
 def test_render_html_caps_inline_image_budget():
     """Figures beyond the per-email data-URI budget are replaced with a note
     so mail clients don't clip the digest; the artifact keeps them all."""

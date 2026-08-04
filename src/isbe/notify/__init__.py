@@ -6,12 +6,19 @@ v1 仅实现 SMTP email：digest 落盘后投递一段摘要 + artifact 路径�
 from __future__ import annotations
 
 import os
+import re
 import smtplib
 import sys
 from email.message import EmailMessage
 from pathlib import Path
 
 from isbe.notify.render import render_html  # noqa: F401 — re-exported for patching in tests
+
+_DATAURI_IMG_RE = re.compile(r"!\[[^\]]*\]\(data:image/[^)]+\)")
+
+
+def _strip_datauri_images(md: str) -> str:
+    return _DATAURI_IMG_RE.sub("[图片见 HTML 版邮件 / artifact 原文]", md)
 
 
 def is_configured() -> bool:
@@ -88,7 +95,10 @@ def send_digest_notification(
             _warn(f"failed to read artifact {artifact_path}: {e}; falling back to excerpt")
             full_text = None
     if full_text is not None:
-        plaintext_body = "\n".join(header + ["--- digest ---", full_text])
+        # Plaintext readers must not face walls of base64 — inline data-URI
+        # figures are dropped here (the HTML alternative carries them).
+        text_only = _strip_datauri_images(full_text)
+        plaintext_body = "\n".join(header + ["--- digest ---", text_only])
     else:
         plaintext_body = "\n".join(header + ["--- excerpt ---", excerpt])
     msg.set_content(plaintext_body)
