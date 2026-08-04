@@ -27,6 +27,7 @@
 {% if papers -%}
 ## 重点论文（{{ papers | length }}）
 {% for p in papers %}{% set blk = paper_blocks.get(p.arxiv_id) %}
+{%- set card = paper_cards.get(p.arxiv_id) if paper_cards else None %}
 ### [{{ p.arxiv_id }}] {{ p.title | e }}
 {% if blk and blk.verdict %}
 > **本期评价**：{{ blk.verdict | e }}
@@ -36,15 +37,27 @@
 {%- endif %}
 
 {% if blk and blk.provenance %}- **来源**: {{ blk.provenance | e }}
-{% endif %}{% if blk and blk.method %}- **方法/背景**: {{ blk.method | e }}
-{% endif %}{% if blk and blk.data %}- **数据**: {{ blk.data | e }}
+{% endif %}{% if card and card.method %}- **方法/背景**: {{ card.method | e }}
+{% elif blk and blk.method %}- **方法/背景**: {{ blk.method | e }}
+{% endif %}{% if card and card.data %}- **数据**: {{ card.data | e }}{% if card.datasets %}（数据集: {{ card.datasets | e }}）{% endif %}
+{% elif blk and blk.data %}- **数据**: {{ blk.data | e }}
 {% endif %}- **作者**: {{ p.authors | join(", ") | e }} · {{ p.primary_category | e }} · 提交 {{ p.submitted_at.strftime("%Y-%m-%d") if p.submitted_at else "—" }}
 - **原文**: {{ p.source_url | e }}{% if p.pdf_uri %} · 本地 `papers/{{ topic_id }}/{{ period_label }}/{{ p.arxiv_id }}.pdf`{% endif %}
-{%- if blk and blk.code %}
+{%- if card and card.code %}
+- **代码**: {{ card.code | e }}
+{%- elif blk and blk.code %}
 - **代码**: {{ blk.code | e }}
 {%- endif %}
-{%- if blk and blk.repro %}
+{%- if card and (card.repro or card.compute) %}
+- **复现**: {% if card.repro %}{{ card.repro | e }}{% endif %}{% if card.compute %}{% if card.repro %} · {% endif %}算力={{ card.compute | e }}{% endif %}
+{%- elif blk and blk.repro %}
 - **复现**: {% for k in ["开源", "权重", "算力", "代码完整度"] %}{% if blk.repro.get(k) %}{{ k }}={{ blk.repro[k] | e }}{% if not loop.last %} · {% endif %}{% endif %}{% endfor %}
+{%- endif %}
+{%- if card and card.results %}
+- **效果（原文）**: {{ card.results | e }}
+{%- endif %}
+{%- if card and card.limitations %}
+- **局限（作者自述）**: {{ card.limitations | e }}
 {%- endif %}
 {%- if blk and blk.sota %}
 
@@ -68,6 +81,10 @@
 {%- if asset and asset.figure %}
 
 **框架图**：{{ asset.figure.caption | e }}
+{%- if card and card.figure_reading %}
+
+> 图解读：{{ card.figure_reading | e }}
+{%- endif %}
 
 ![framework]({{ asset.figure.datauri }})
 {%- endif %}
@@ -125,6 +142,8 @@
 - **artifact_id**: {{ artifact_id }}
 - **trace_id**: {{ trace_id }}
 - **memory snapshot**: {{ memory_refs }}
+{% if paper_cards %}- **evidence cards**: {{ paper_cards | length }} 篇带证据卡（锚点校验拒绝 {{ paper_cards.values() | map(attribute='rejected') | map('length') | sum }} 个字段）
+{% endif %}
 {% if papers %}- **papers fingerprint**: {{ papers | map(attribute='arxiv_id') | list | join(", ") }}
 {% endif %}{% if repos %}- **repos fingerprint**: {{ repos | map(attribute='github_url') | list | join(", ") }}
 {% endif %}

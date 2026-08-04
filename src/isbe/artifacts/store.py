@@ -37,8 +37,11 @@ def save_artifact(
     body_markdown: str,
     fingerprint: dict,
     generated_at: datetime,
+    artifact_id: UUID | None = None,
 ) -> UUID:
-    artifact_id = uuid4()
+    # Caller may precompute the id so the rendered body can embed it (the
+    # audit block used to ship a literal "(filled below)" placeholder).
+    artifact_id = artifact_id or uuid4()
     body_bytes = body_markdown.encode("utf-8")
     object_name = f"{topic_id}/{period_label}/{artifact_id}.md"
 

@@ -14,6 +14,7 @@ import json
 import os
 from datetime import UTC, date, datetime
 from pathlib import Path
+from uuid import uuid4
 
 from jinja2 import Template
 from prefect import flow
@@ -78,6 +79,47 @@ def _load_fulltext(paper) -> str | None:
 _MAX_FIGURE_BYTES = 500_000
 
 
+def _card_view(card) -> dict:
+    """Flatten a PaperCard into the template's per-paper fact rows."""
+    f = {k: v.value for k, v in card.fields.items()}
+    return {
+        "method": f.get("method"),
+        "data": f.get("data"),
+        "results": f.get("results"),
+        "compute": f.get("compute") or ("、".join(card.gpu_mentions) or None),
+        "repro": f.get("reproducibility"),
+        "limitations": f.get("limitations"),
+        "figure_reading": f.get("figure_reading"),
+        "code": " · ".join(card.code_urls) if card.code_urls else None,
+        "datasets": "、".join(card.dataset_mentions) if card.dataset_mentions else None,
+        "verified_n": len(card.fields),
+        "rejected": list(card.rejected_fields),
+    }
+
+
+def _load_cards(papers: list, *, enabled: bool) -> dict:
+    """Grounded paper cards for papers with fulltext. Per-paper fail-open:
+    a card-extraction failure only costs that paper its card."""
+    if not enabled:
+        return {}
+    from isbe.topics._shared.paper_cards import load_or_build_card
+
+    mirror = Path(os.getenv("ISBE_PAPERS_MIRROR", "papers"))
+    views: dict = {}
+    for p in papers:
+        uri = getattr(p, "fulltext_uri", None)
+        if not uri:
+            continue
+        try:
+            card = load_or_build_card(p.arxiv_id, mirror / uri)
+        except Exception as e:  # noqa: BLE001 — extraction must not kill the digest
+            print(f"[cards] {p.arxiv_id} extraction failed: {type(e).__name__}: {e}", flush=True)
+            continue
+        if card is not None:
+            views[p.arxiv_id] = _card_view(card)
+    return views
+
+
 def _load_paper_assets(papers: list) -> dict:
     """Collect per-paper assets saved by metrail_enrich: the framework figure
     and the paper's core result/ablation tables (verbatim GFM markdown).
@@ -134,6 +176,7 @@ def _build_facts_block(
     fulltext_for=None,
     per_paper_chars: int = 3000,
     total_chars: int = 24000,
+    cards: dict | None = None,
 ) -> str:
     """Render papers (+repos) for the prompt.
 
@@ -151,7 +194,22 @@ def _build_facts_block(
             abstract = (getattr(p, "abstract", "") or "").strip()
             if abstract:
                 lines.append(f"  摘要: {abstract}")
-        if fulltext_for is not None and fulltext_budget > 0:
+        card = cards.get(p.arxiv_id) if cards else None
+        if card is not None:
+            # cards mode: the verified card replaces the raw excerpt — compact,
+            # already grounded, and cheaper in tokens.
+            parts = [
+                f"{label}={card[key]}"
+                for label, key in (
+                    ("方法", "method"), ("数据", "data"), ("结果", "results"),
+                    ("代码", "code"), ("算力", "compute"), ("复现", "repro"),
+                    ("局限", "limitations"),
+                )
+                if card.get(key)
+            ]
+            if parts:
+                lines.append("  证据卡: " + " | ".join(parts))
+        elif fulltext_for is not None and fulltext_budget > 0:
             fulltext = fulltext_for(p)
             if fulltext:
                 excerpt = fulltext[: min(per_paper_chars, fulltext_budget)].strip()
@@ -188,6 +246,7 @@ def weekly_digester(
     include_abstract = bool(digest_cfg.get("include_abstract", True))
     fulltext_per_paper_chars = int(digest_cfg.get("fulltext_per_paper_chars", 3000))
     fulltext_total_chars = int(digest_cfg.get("fulltext_total_chars", 24000))
+    pipeline = str(digest_cfg.get("pipeline", "legacy"))
     keywords = arxiv_cfg.get("include_keywords", [])
 
     with topic_run(topic_id, "weekly-digester") as run:
@@ -202,6 +261,7 @@ def weekly_digester(
             include_abstract=include_abstract,
             fulltext_per_paper_chars=fulltext_per_paper_chars,
             fulltext_total_chars=fulltext_total_chars,
+            pipeline=pipeline,
             contract=contract_from_config(cfg),
             run=run,
         )
@@ -219,6 +279,7 @@ def _digester_impl(
     include_abstract: bool = True,
     fulltext_per_paper_chars: int = 3000,
     fulltext_total_chars: int = 24000,
+    pipeline: str = "legacy",
     contract: RetrievalContract | None = None,
     run=None,
 ) -> DigestResult:
@@ -257,6 +318,7 @@ def _digester_impl(
             repos=repos,
         )
 
+    paper_cards = _load_cards(papers, enabled=(pipeline == "cards"))
     facts_block = _build_facts_block(
         papers,
         repos,
@@ -264,6 +326,7 @@ def _digester_impl(
         fulltext_for=_load_fulltext,
         per_paper_chars=fulltext_per_paper_chars,
         total_chars=fulltext_total_chars,
+        cards=paper_cards or None,
     )
     mroot = _memory_root()
     memory_block, memory_index = build_memory_block(mroot, topic_id=topic_id)
@@ -300,6 +363,7 @@ def _digester_impl(
         "message_id": resp.message_id,
     }
 
+    artifact_id = uuid4()
     template = Template(SHARED_TEMPLATE.read_text(encoding="utf-8"))
     rendered = template.render(
         topic_id=topic_id,
@@ -313,21 +377,23 @@ def _digester_impl(
         papers=papers,
         paper_blocks=paper_blocks,
         paper_assets=_load_paper_assets(papers),
+        paper_cards=paper_cards,
         glossary=glossary,
         repos=repos or [],
         repo_reviews=repo_reviews,
         comparison=comparison,
         generated_at=datetime.now(UTC).isoformat(),
-        artifact_id="(filled below)",
+        artifact_id=str(artifact_id),
     )
 
-    artifact_id = save_artifact(
+    save_artifact(
         topic_id=topic_id,
         kind="weekly_digest",
         period_label=period_label,
         body_markdown=rendered,
         fingerprint=fingerprint,
         generated_at=datetime.now(UTC),
+        artifact_id=artifact_id,
     )
 
     run.payload["period_label"] = period_label
@@ -345,6 +411,9 @@ def _digester_impl(
     run.payload["n_paper_blocks"] = len(paper_blocks)
     run.payload["n_blocks_with_sota"] = sum(1 for b in paper_blocks.values() if b.sota)
     run.payload["n_glossary"] = len(glossary)
+    run.payload["pipeline"] = pipeline
+    run.payload["n_cards"] = len(paper_cards)
+    run.payload["card_rejected_fields"] = sum(len(c["rejected"]) for c in paper_cards.values())
     run.payload["n_drafts"] = len(drafts)
     run.payload["artifact_id"] = str(artifact_id)
     run.payload["llm_input_tokens"] = resp.input_tokens

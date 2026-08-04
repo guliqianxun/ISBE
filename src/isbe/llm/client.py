@@ -1,6 +1,6 @@
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 
 import anthropic
@@ -231,4 +231,13 @@ def complete(
             input_tokens=resp.input_tokens,
             output_tokens=resp.output_tokens,
         )
+        # Surface the real OTel trace id so artifacts/audit blocks can link to
+        # the Phoenix trace (previously always None unless caller-supplied).
+        if resp.trace_id is None:
+            try:
+                ctx = span.get_span_context()
+                if getattr(ctx, "trace_id", 0):
+                    resp = replace(resp, trace_id=f"{ctx.trace_id:032x}")
+            except Exception:
+                pass
         return resp

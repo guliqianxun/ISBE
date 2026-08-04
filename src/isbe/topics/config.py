@@ -105,6 +105,10 @@ class DigestConfig(_Strict):
     include_abstract: bool = True
     fulltext_per_paper_chars: int = 3000
     fulltext_total_chars: int = 24000
+    # "cards" switches fact fields to the grounded paper-cards pipeline
+    # (regex + anchored extraction over the full corpus); "legacy" keeps the
+    # single-pass writer as the source of fact fields.
+    pipeline: Literal["legacy", "cards"] = "legacy"
 
 
 class MetrailConfig(_Strict):
