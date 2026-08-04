@@ -169,7 +169,10 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                 stmt = stmt.where(kw_filter)
             if limit and limit > 0:
                 stmt = stmt.limit(limit)
-            for p in s.scalars(stmt).all():
+            targets = list(s.scalars(stmt).all())
+            total = len(targets)
+            print(f"[metrail] starting: {total} paper(s) to extract, base={base_url}", flush=True)
+            for idx, p in enumerate(targets, 1):
                 local_pdf = _local_pdf_path(p.pdf_uri or "")
                 if local_pdf is None:
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": "unparseable pdf_uri"})
@@ -179,6 +182,7 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                         {"arxiv_id": p.arxiv_id, "reason": "pdf not in local mirror or minio"}
                     )
                     continue
+                print(f"[metrail] ({idx}/{total}) {p.arxiv_id} extracting...", flush=True)
                 try:
                     corpus_md, doc_id = _extract(
                         local_pdf,
@@ -188,6 +192,10 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                         ocr=ocr,
                     )
                 except (MetrailError, OSError, httpx.HTTPError) as e:
+                    print(
+                        f"[metrail] ({idx}/{total}) SKIP {p.arxiv_id}: {type(e).__name__}: {e}",
+                        flush=True,
+                    )
                     skipped.append({"arxiv_id": p.arxiv_id, "reason": f"{type(e).__name__}: {e}"})
                     continue
                 md_path = local_pdf.with_suffix(".metrail.md")
