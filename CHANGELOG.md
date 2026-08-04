@@ -7,6 +7,23 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **Grounded delivery pipeline (`digest.pipeline: cards`)**: per-paper
+  evidence cards extracted from the FULL metrail corpus — deterministic regex
+  layer (code URLs / GPU / dataset lexicon) + one anchored LLM extraction call
+  whose every field carries a verbatim quote, verified LangExtract-style
+  (exact → normalized → rejected). The template renders fact fields
+  (方法/数据/代码/复现/效果/局限 + figure interpretation) straight from cards;
+  the writer produces opinions only; a RAGAS-style reviewer audits opinion
+  claims against the evidence with a single rewrite round. Enabled for
+  nowcasting; other topics stay on `legacy`.
+- **Core tables verbatim**: the paper's comparison/ablation tables (metrail
+  table atoms, GFM markdown) ship in the report unparaphrased.
+- **Monthly reports**: `monthly_digester` rolls the month's weeklies + memory
+  into 月度总览/本月必读/论点演化/下月关注, emailed and archived like any
+  digest; `radar topics run <topic> --monthly`; nowcasting scheduled on the
+  1st. Cadence family is now daily / weekly / monthly.
+- Audit block integrity: real `artifact_id` (precomputed), real OTel
+  `trace_id`, evidence-card and reviewer summaries.
 - **metrail-web integration**: new shared `metrail_enrich` flow extracts full
   text from downloaded arXiv PDFs via the LAN metrail-web service
   (`METRAIL_API_URL`; unset = disabled). `papers.fulltext_uri` (migration 005)

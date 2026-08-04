@@ -18,6 +18,9 @@ digest:
   flavor: weekly
   facts_window_days: 7
   include_repos: true   # 唯一启用 github repo 跟踪的 topic
+  # 灰度：证据卡管线（regex+锚点抽取→事实直渲→审核员）。video-generation 留
+  # legacy 作对照；跑稳后再推其他 topic。回滚 = 删掉这一行。
+  pipeline: cards
 
 # metrail-web 全文提取（局域网服务，METRAIL_API_URL 未设时自动跳过）。
 metrail:
