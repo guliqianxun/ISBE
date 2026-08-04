@@ -23,6 +23,22 @@ def test_open_access_pdf_url_parses_link():
     assert open_access_pdf_url("2604.11111", get_fn=fake_get) == "https://cdn.example/oa.pdf"
 
 
+def test_s2_base_url_env_override(monkeypatch):
+    from isbe.topics._shared.semantic_scholar import _s2_paper_url, _s2_search_url
+
+    monkeypatch.setenv("S2_BASE_URL", "https://gw.example.com/k9/s2/")
+    assert _s2_paper_url() == "https://gw.example.com/k9/s2/graph/v1/paper"
+    assert _s2_search_url() == "https://gw.example.com/k9/s2/graph/v1/paper/search"
+
+
+def test_arxiv_api_base_url_env_override(monkeypatch):
+    from isbe.topics._shared.arxiv import _arxiv_url
+
+    monkeypatch.setenv("ARXIV_API_BASE_URL", "https://gw.example.com/k9/export-arxiv")
+    url = _arxiv_url(["cs.LG"], ["nowcasting"], 10)
+    assert url.startswith("https://gw.example.com/k9/export-arxiv/api/query?")
+
+
 def test_open_access_pdf_url_none_when_absent():
     assert open_access_pdf_url("2604.11111", get_fn=lambda u: {"openAccessPdf": None}) is None
     assert open_access_pdf_url("2604.11111", get_fn=lambda u: None) is None

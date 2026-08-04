@@ -20,8 +20,19 @@ from dataclasses import dataclass
 
 import httpx
 
-S2_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search"
-S2_PAPER = "https://api.semanticscholar.org/graph/v1/paper"
+
+def _s2_base() -> str:
+    """S2 API base; S2_BASE_URL points it at a mirror/gateway (e.g. the CF
+    worker's /s2 route) on stalled-egress deployments."""
+    return os.getenv("S2_BASE_URL", "https://api.semanticscholar.org").rstrip("/")
+
+
+def _s2_search_url() -> str:
+    return f"{_s2_base()}/graph/v1/paper/search"
+
+
+def _s2_paper_url() -> str:
+    return f"{_s2_base()}/graph/v1/paper"
 FIELDS = "title,abstract,year,publicationDate,citationCount,externalIds,fieldsOfStudy,authors"
 _UA = {"User-Agent": "ISBE-acquire/0.1 (mailto:visitorindark@gmail.com)"}
 
@@ -75,7 +86,7 @@ def open_access_pdf_url(arxiv_id: str, *, tries: int = 3, get_fn=None) -> str | 
     if get_fn is None:
         def get_fn(url: str) -> dict | None:
             return default_get(url, tries=tries)
-    d = get_fn(f"{S2_PAPER}/arXiv:{arxiv_id}?fields=openAccessPdf")
+    d = get_fn(f"{_s2_paper_url()}/arXiv:{arxiv_id}?fields=openAccessPdf")
     if not d:
         return None
     url = ((d.get("openAccessPdf") or {}).get("url") or "").strip()
@@ -116,7 +127,7 @@ def s2_search(
     """
     qp = httpx.QueryParams({"q": query})["q"]
     window = f"publicationDateOrYear={pub_date}" if pub_date else f"year={year_from}-{year_to}"
-    url = f"{S2_SEARCH}?query={qp}&{window}&limit={limit}&fields={FIELDS}"
+    url = f"{_s2_search_url()}?query={qp}&{window}&limit={limit}&fields={FIELDS}"
     d = get_fn(url)
     if d is None:
         return None

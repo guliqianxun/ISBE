@@ -1,29 +1,48 @@
 /**
- * arxiv PDF mirror on Cloudflare Workers — for deployments whose egress to
- * arxiv.org/Fastly stalls (e.g. CN servers).
+ * ISBE scholarly-API gateway on Cloudflare Workers — unified mirror for every
+ * external paper source, for deployments whose egress stalls (e.g. CN servers).
+ *
+ * Routes (GET/HEAD only, prefix → upstream):
+ *   /pdf/<id>            → https://arxiv.org/pdf/<id>          (back-compat)
+ *   /arxiv/...           → https://arxiv.org/...               (PDFs, abs pages)
+ *   /export-arxiv/...    → https://export.arxiv.org/...        (atom metadata API)
+ *   /s2/...              → https://api.semanticscholar.org/... (x-api-key forwarded)
+ *   /openalex/...        → https://api.openalex.org/...
+ *   /openreview/...      → https://api.openreview.net/...
+ *   /hf/...              → https://huggingface.co/...          (daily papers API)
  *
  * Deploy: CF Dashboard → Workers & Pages → Create Worker → paste → Deploy,
- * then Settings → Domains & Routes → Add Custom Domain (e.g. arxiv.yourdomain.com;
- * *.workers.dev is usually blocked in CN, a custom domain is required).
+ * then Settings → Domains & Routes → Add Custom Domain (custom domain is
+ * required in CN; *.workers.dev is usually blocked).
  *
- * Optional hardening: set an environment variable SECRET on the worker; the
- * mirror then only answers under /<SECRET>/pdf/... and you configure ISBE with
- *   ARXIV_PDF_BASE_URL=https://arxiv.yourdomain.com/<SECRET>
- * Without SECRET it answers under /pdf/... directly:
- *   ARXIV_PDF_BASE_URL=https://arxiv.yourdomain.com
+ * Optional hardening: set env var SECRET on the worker; all routes then live
+ * under /<SECRET>/... and ISBE-side base URLs include the prefix, e.g.
+ *   ARXIV_PDF_BASE_URL=https://api.yourdomain.com/<SECRET>/arxiv
+ *   ARXIV_API_BASE_URL=https://api.yourdomain.com/<SECRET>/export-arxiv
+ *   S2_BASE_URL=https://api.yourdomain.com/<SECRET>/s2
  *
- * Same-paper requests are cached at the CF edge for 7 days, so arxiv.org sees
- * each PDF at most once per week regardless of retries.
+ * Caching: PDFs are immutable → 7d edge cache; API responses → 15min, so
+ * repeated collector retries don't hammer upstreams.
  */
 
-const UPSTREAM = "https://arxiv.org";
+const UPSTREAMS = {
+  "arxiv": { base: "https://arxiv.org", ttl: 604800 },
+  "export-arxiv": { base: "https://export.arxiv.org", ttl: 900 },
+  "s2": { base: "https://api.semanticscholar.org", ttl: 900 },
+  "openalex": { base: "https://api.openalex.org", ttl: 900 },
+  "openreview": { base: "https://api.openreview.net", ttl: 900 },
+  "hf": { base: "https://huggingface.co", ttl: 900 },
+};
+
+const FORWARD_HEADERS = ["x-api-key", "user-agent", "accept"];
 
 export default {
   async fetch(req, env) {
     if (req.method !== "GET" && req.method !== "HEAD") {
       return new Response("method not allowed", { status: 405 });
     }
-    let path = new URL(req.url).pathname;
+    const url = new URL(req.url);
+    let path = url.pathname;
 
     if (env.SECRET) {
       const prefix = `/${env.SECRET}`;
@@ -32,22 +51,32 @@ export default {
     }
 
     if (path === "/" || path === "/healthz") {
-      return new Response("isbe-arxiv-mirror ok", { status: 200 });
-    }
-    // Only proxy PDF paths — this is a PDF mirror, not an open proxy.
-    if (!/^\/pdf\/[A-Za-z0-9._\/-]+$/.test(path)) {
-      return new Response("only /pdf/<arxiv_id>", { status: 403 });
+      return new Response("isbe-gateway ok", { status: 200 });
     }
 
-    const upstream = await fetch(UPSTREAM + path, {
-      headers: { "User-Agent": "isbe-arxiv-mirror/0.1 (Cloudflare Worker)" },
+    // Back-compat: bare /pdf/<id> → arxiv PDFs
+    if (path.startsWith("/pdf/")) path = "/arxiv" + path;
+
+    const m = path.match(/^\/([a-z-]+)(\/.*)$/);
+    const upstream = m && UPSTREAMS[m[1]];
+    if (!upstream) {
+      return new Response("unknown route; see UPSTREAMS", { status: 403 });
+    }
+
+    const headers = new Headers();
+    for (const h of FORWARD_HEADERS) {
+      const v = req.headers.get(h);
+      if (v) headers.set(h, v);
+    }
+    if (!headers.has("user-agent")) headers.set("user-agent", "isbe-gateway/0.2");
+
+    const resp = await fetch(upstream.base + m[2] + url.search, {
+      headers,
       redirect: "follow",
-      cf: { cacheEverything: true, cacheTtl: 604800 }, // 7d edge cache
+      cf: { cacheEverything: true, cacheTtl: upstream.ttl },
     });
-
-    // Pass through, pinning cache headers for the edge.
-    const resp = new Response(upstream.body, upstream);
-    resp.headers.set("Cache-Control", "public, max-age=604800, immutable");
-    return resp;
+    const out = new Response(resp.body, resp);
+    out.headers.set("Cache-Control", `public, max-age=${upstream.ttl}`);
+    return out;
   },
 };

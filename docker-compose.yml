@@ -169,6 +169,12 @@ services:
       HTTPS_PROXY: ${HTTPS_PROXY:-}
       NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,postgres,prefect-server,phoenix,minio,rsshub,morerssplz}
       ARXIV_PDF_TIMEOUT_S: ${ARXIV_PDF_TIMEOUT_S:-180}
+      # Scholarly-API gateway routes (see infra/cloudflare/, .env.example)
+      ARXIV_PDF_BASE_URL: ${ARXIV_PDF_BASE_URL:-}
+      ARXIV_PDF_MIRRORS: ${ARXIV_PDF_MIRRORS:-}
+      ARXIV_API_BASE_URL: ${ARXIV_API_BASE_URL:-}
+      S2_BASE_URL: ${S2_BASE_URL:-}
+      SEMANTIC_SCHOLAR_API_KEY: ${SEMANTIC_SCHOLAR_API_KEY:-}
       ISBE_UID: ${ISBE_UID:-me}
       ISBE_SMTP_HOST: ${ISBE_SMTP_HOST:-}
       ISBE_SMTP_PORT: ${ISBE_SMTP_PORT:-587}

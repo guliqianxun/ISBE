@@ -11,6 +11,7 @@ Schema expected in topic.yaml:
       max_results: 50                  # default per fetch
 """
 
+import os
 import time
 from datetime import UTC, datetime
 
@@ -70,9 +71,15 @@ def _build_query(categories: list[str], keywords: list[str]) -> str:
     return f"({cat_clause})+AND+({kw_clause})"
 
 
+def _arxiv_api_base() -> str:
+    """arXiv atom-API base; ARXIV_API_BASE_URL points it at a mirror/gateway
+    (e.g. the CF worker's /export-arxiv route) on stalled-egress deployments."""
+    return os.getenv("ARXIV_API_BASE_URL", "https://export.arxiv.org").rstrip("/")
+
+
 def _arxiv_url(categories: list[str], keywords: list[str], max_results: int) -> str:
     return (
-        "https://export.arxiv.org/api/query"
+        f"{_arxiv_api_base()}/api/query"
         f"?search_query={_build_query(categories, keywords)}"
         f"&sortBy=submittedDate&sortOrder=descending&max_results={max_results}"
     )
