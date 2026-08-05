@@ -30,6 +30,15 @@ def test_grep_facts_extracts_hard_facts():
     assert "KNMI" in facts["dataset_mentions"]
 
 
+def test_grep_dataset_lexicon_respects_word_boundaries():
+    """'operational' must not light up the OPERA dataset (observed W32)."""
+    facts = grep_facts("an operational nowcasting system evaluated on SEVIR data")
+    assert "OPERA" not in facts["dataset_mentions"]
+    assert "SEVIR" in facts["dataset_mentions"]
+    facts2 = grep_facts("we use the OPERA radar composite")
+    assert "OPERA" in facts2["dataset_mentions"]
+
+
 def test_grep_strips_trailing_punctuation():
     facts = grep_facts("see https://github.com/a/b).")
     assert facts["code_urls"] == ["https://github.com/a/b"]

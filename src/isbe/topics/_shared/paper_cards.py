@@ -52,7 +52,19 @@ def grep_facts(corpus: str, datasets: tuple[str, ...] = DEFAULT_DATASET_LEXICON)
     the match itself is the evidence."""
     code_urls = sorted({m.rstrip(".,);]") for m in _CODE_RE.findall(corpus)})
     gpu_mentions = sorted({re.sub(r"\s+", "", m) for m in _GPU_RE.findall(corpus) if m.strip()})
-    found_datasets = sorted({d for d in datasets if re.search(re.escape(d), corpus, re.I)})
+    # Word boundaries + case-sensitive for acronym-style names: without them
+    # "OPERA" matches inside "operational" (observed false positive W32).
+    found_datasets = sorted(
+        {
+            d
+            for d in datasets
+            if re.search(
+                rf"\b{re.escape(d)}\b",
+                corpus,
+                0 if d.isupper() else re.IGNORECASE,
+            )
+        }
+    )
     return {
         "code_urls": code_urls,
         "gpu_mentions": gpu_mentions,
