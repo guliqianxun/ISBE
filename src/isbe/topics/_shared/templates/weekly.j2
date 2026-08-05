@@ -1,5 +1,7 @@
 # {{ topic_label }} — {{ period_label }}
-
+{% if window_start %}
+> 覆盖窗口：{{ window_start }} → {{ window_end }}（论文按提交时间计）
+{% endif %}
 ## TL;DR
 {{ tldr }}
 

@@ -396,6 +396,8 @@ def _digester_impl(
         topic_id=topic_id,
         topic_label=topic_label,
         period_label=period_label,
+        window_start=cutoff_low.date().isoformat(),
+        window_end=cutoff_high.date().isoformat(),
         tldr=parts.get("tldr", "").strip(),
         analysis=parts.get("analysis", "").strip(),
         distillation=parts.get("distillation", "").strip(),
