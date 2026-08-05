@@ -10,6 +10,10 @@ from isbe.topics._shared.metrail import MetrailTimeout
 from isbe.topics.config import TopicConfig
 from isbe.topics.nowcasting.facts import Paper
 
+# Captured before the autouse fixture patches the module attribute — the
+# backfill tests exercise the real implementation.
+_REAL_BACKFILL = flow_mod._backfill_assets
+
 
 def _paper(arxiv_id: str, pdf_uri: str | None) -> Paper:
     return Paper(
@@ -316,7 +320,7 @@ def test_backfill_extracts_assets_for_pre_feature_fulltext(mirror):
         patch.object(flow_mod, "wait_until_done", return_value={"state": "done"}),
         patch.object(flow_mod, "_save_assets", return_value=(True, 2)) as save,
     ):
-        figures, tables, backfilled = flow_mod._backfill_assets(
+        figures, tables, backfilled = _REAL_BACKFILL(
             _bf_session([p]), None, base_url="http://x", backend="pdfplumber",
             ocr=False, poll_timeout_s=60,
         )
@@ -336,14 +340,14 @@ def test_backfill_marks_assetless_papers_and_skips_done(mirror):
         patch.object(flow_mod, "wait_until_done", return_value={"state": "done"}),
         patch.object(flow_mod, "_save_assets", return_value=(False, 0)),
     ):
-        _, _, backfilled = flow_mod._backfill_assets(
+        _, _, backfilled = _REAL_BACKFILL(
             _bf_session([p]), None, base_url="http://x", backend="pdfplumber",
             ocr=False, poll_timeout_s=60,
         )
         assert backfilled == 1
         assert pdf.with_suffix(".metrail.noassets").exists()
         # second run: marker present → not resubmitted
-        _, _, backfilled2 = flow_mod._backfill_assets(
+        _, _, backfilled2 = _REAL_BACKFILL(
             _bf_session([p]), None, base_url="http://x", backend="pdfplumber",
             ocr=False, poll_timeout_s=60,
         )
