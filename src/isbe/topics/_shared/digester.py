@@ -12,6 +12,7 @@ Each digest run:
 import base64
 import json
 import os
+import re
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -77,6 +78,16 @@ def _load_fulltext(paper) -> str | None:
 
 
 _MAX_FIGURE_BYTES = 500_000
+
+# "卡片/证据卡" is pipeline jargon — readers get conclusions plus natural
+# provenance wording, never our machinery's names. Belt-and-suspenders scrub
+# on top of the prompt instruction.
+_JARGON_CITE_RE = re.compile(r"（据?\s*(?:证据)?卡片[:：][^）]*）")
+
+
+def _scrub_internal_jargon(text: str) -> str:
+    text = _JARGON_CITE_RE.sub("（据原文）", text)
+    return text.replace("证据卡", "全文事实")
 
 
 def _card_view(card) -> dict:
@@ -208,7 +219,7 @@ def _build_facts_block(
                 if card.get(key)
             ]
             if parts:
-                lines.append("  证据卡: " + " | ".join(parts))
+                lines.append("  全文事实: " + " | ".join(parts))
         elif fulltext_for is not None and fulltext_budget > 0:
             fulltext = fulltext_for(p)
             if fulltext:
@@ -353,6 +364,7 @@ def _digester_impl(
             first_text=resp.text,
             evidence=evidence,
         )
+        final_text = _scrub_internal_jargon(final_text)
     parts = _split_sections(final_text)
     sections = [
         DigestSection(kind="tldr", body=parts.get("tldr", "")),

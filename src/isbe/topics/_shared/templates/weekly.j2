@@ -142,7 +142,7 @@
 - **artifact_id**: {{ artifact_id }}
 - **trace_id**: {{ trace_id }}
 - **memory snapshot**: {{ memory_refs }}
-{% if paper_cards %}- **evidence cards**: {{ paper_cards | length }} 篇带证据卡（锚点校验拒绝 {{ paper_cards.values() | map(attribute='rejected') | map('length') | sum }} 个字段）
+{% if paper_cards %}- **事实核验**: {{ paper_cards | length }} 篇论文的事实字段经全文逐字锚点校验（{{ paper_cards.values() | map(attribute='rejected') | map('length') | sum }} 个字段未过校验、已略去）
 {% endif %}
 {%- if review %}- **审核员**: {{ review.claims }} 条断言 / 首轮存疑 {{ review.flagged_first_pass }}{% if review.rewritten %} / 已重写一轮{% endif %}
 {%- if review.flagged_residual %}

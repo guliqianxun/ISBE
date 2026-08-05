@@ -56,7 +56,7 @@ def test_facts_block_prefers_card_over_excerpt():
         fulltext_for=lambda p: "x" * 5000,
         cards={"1.1": view},
     )
-    assert "证据卡:" in block
+    assert "全文事实:" in block
     assert "方法=m" in block and "结果=r" in block
     assert "全文摘录" not in block  # card replaces the raw excerpt
 
@@ -101,7 +101,8 @@ def test_template_renders_card_fact_rows():
     assert "算力=8×A100" in out
     assert "- **效果（原文）**: CSI 0.41→0.47 vs DGMR" in out
     assert "- **局限（作者自述）**: 仅在雷达数据验证" in out
-    assert "evidence cards" in out and "拒绝 1 个字段" in out
+    assert "事实核验" in out and "1 个字段未过校验" in out
+    assert "证据卡" not in out  # internal jargon must stay invisible
 
 
 def test_cards_writer_prompt_is_opinions_only():
@@ -129,5 +130,16 @@ def test_slim_paper_blocks_parse_without_fact_fields():
 def test_template_without_cards_keeps_legacy_shape():
     out = _render(None)
     assert "效果（原文）" not in out
-    assert "evidence cards" not in out
+    assert "事实核验" not in out
     assert "real-artifact-id" in out  # audit placeholder fixed
+
+
+def test_scrub_internal_jargon():
+    from isbe.topics._shared.digester import _scrub_internal_jargon
+
+    text = "值得细读（据卡片:结果、复现）。证据卡显示其数据公开。显卡型号无关。"
+    out = _scrub_internal_jargon(text)
+    assert "卡片" not in out.replace("显卡", "")
+    assert "（据原文）" in out
+    assert "全文事实显示其数据公开" in out
+    assert "显卡型号无关" in out  # unrelated words untouched
