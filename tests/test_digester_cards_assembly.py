@@ -134,6 +134,25 @@ def test_template_without_cards_keeps_legacy_shape():
     assert "real-artifact-id" in out  # audit placeholder fixed
 
 
+def test_weekly_label_is_content_week():
+    """Label = the week the window covers (anchored on yesterday): a Monday
+    run reports on — and is labeled as — the week that just ended."""
+    from datetime import date
+    from unittest.mock import MagicMock, patch
+
+    from isbe.cli.topics_cmd import _period_label_for
+
+    cfg = MagicMock()
+    cfg.cadence = "weekly"
+    with patch("isbe.cli.topics_cmd.load_topic_config_typed", return_value=cfg):
+        # Mon 2026-08-03 (first day of W32) → covers W31
+        assert _period_label_for("nowcasting", date(2026, 8, 3), None) == "2026-W31"
+        # Sun 2026-08-09 (last day of W32) → still inside W32's coverage
+        assert _period_label_for("nowcasting", date(2026, 8, 9), None) == "2026-W32"
+        # explicit override always wins
+        assert _period_label_for("nowcasting", date(2026, 8, 3), "2026-W30") == "2026-W30"
+
+
 def test_scrub_internal_jargon():
     from isbe.topics._shared.digester import _scrub_internal_jargon
 

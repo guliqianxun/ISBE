@@ -10,7 +10,7 @@ topics; `pdf_uri` is single-valued).
 import io
 import os
 import time
-from datetime import date
+from datetime import date, timedelta
 from functools import lru_cache
 from pathlib import Path
 
@@ -44,7 +44,10 @@ def _papers_bucket(topic_id: str) -> str:
 
 
 def _current_iso_week() -> str:
-    year, week, _ = date.today().isocalendar()
+    # Content-week convention (matches the digester): the Monday-morning PDF
+    # batch belongs to the week that just ended, anchored on yesterday.
+    anchor = date.today() - timedelta(days=1)
+    year, week, _ = anchor.isocalendar()
     return f"{year}-W{week:02d}"
 
 

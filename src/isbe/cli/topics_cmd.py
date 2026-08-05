@@ -18,11 +18,16 @@ def topics_list() -> None:
 def _period_label_for(topic_id: str, today: date, override: str | None) -> str:
     if override:
         return override
-    # NVDA / any daily topic: ISO date. Weekly topics: ISO year-week.
+    # NVDA / any daily topic: ISO date. Weekly topics: ISO year-week of the
+    # CONTENT (the 7-day window ending today → anchored on yesterday), so a
+    # Monday run is labeled as the week it reports on.
     cfg = load_topic_config_typed(default_topics_root(), topic_id)
     if cfg.cadence.startswith("daily"):
         return today.isoformat()
-    year, week, _ = today.isocalendar()
+    from datetime import timedelta
+
+    anchor = today - timedelta(days=1)
+    year, week, _ = anchor.isocalendar()
     return f"{year}-W{week:02d}"
 
 

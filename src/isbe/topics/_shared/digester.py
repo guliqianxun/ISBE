@@ -13,7 +13,7 @@ import base64
 import json
 import os
 import re
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
@@ -245,7 +245,11 @@ def weekly_digester(
     """Generic weekly digest flow. Topic config loaded from topic.yaml."""
     today = today or date.today()
     if period_label is None:
-        year, week, _ = today.isocalendar()
+        # Label = the week the CONTENT covers, not the run week: the window is
+        # the 7 days ending today, so its week is anchored on yesterday.
+        # (A Monday-morning run reports on — and is labeled as — last week.)
+        anchor = today - timedelta(days=1)
+        year, week, _ = anchor.isocalendar()
         period_label = f"{year}-W{week:02d}"
 
     cfg = load_topic_config(default_topics_root(), topic_id)
