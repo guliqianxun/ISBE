@@ -68,6 +68,12 @@ _MAX_FIGURE_BYTES = 500_000
 # PDF — delete the file to retry the paper.
 _MAX_STRIKES = 3
 
+# Papers enriched before the figure/table features shipped have fulltext but
+# no assets sidecar; each run backfills up to this many (drains the backlog
+# over a few runs without storming metrail). A `.metrail.noassets` marker
+# stops retrying papers that genuinely yield nothing.
+_ASSET_BACKFILL_CAP = 10
+
 
 def _strikes(local_pdf: Path) -> int:
     marker = local_pdf.with_suffix(".metrail.skip")
@@ -204,6 +210,58 @@ def _save_assets(doc_id: str, local_pdf: Path, *, base_url: str) -> tuple[bool, 
     return figure_saved, len(tables)
 
 
+def _backfill_assets(
+    s,
+    kw_filter,
+    *,
+    base_url: str,
+    backend: str,
+    ocr: bool,
+    poll_timeout_s: float,
+) -> tuple[int, int, int]:
+    """Second chance for papers whose fulltext predates the figure/table
+    features: re-submit the PDF for assets only, capped per run. Papers that
+    yield nothing get a `.metrail.noassets` marker so they aren't retried.
+
+    Returns (figures, tables, backfilled).
+    """
+    figures = tables = backfilled = 0
+    stmt = select(Paper).where(Paper.fulltext_uri.is_not(None))
+    if kw_filter is not None:
+        stmt = stmt.where(kw_filter)
+    for p in s.scalars(stmt).all():
+        if backfilled >= _ASSET_BACKFILL_CAP:
+            break
+        local_pdf = _local_pdf_path(p.pdf_uri or "")
+        if local_pdf is None or not local_pdf.is_file():
+            continue
+        assets_json = local_pdf.with_suffix(".metrail.assets.json")
+        marker = local_pdf.with_suffix(".metrail.noassets")
+        if assets_json.exists() or marker.exists():
+            continue
+        if _strikes(local_pdf) >= _MAX_STRIKES:
+            continue
+        print(f"[metrail] backfill assets: {p.arxiv_id}", flush=True)
+        try:
+            doc_id = submit_pdf(local_pdf, base_url=base_url, backend=backend, ocr=ocr)
+            wait_until_done(doc_id, base_url=base_url, timeout_s=poll_timeout_s)
+            fig_saved, n_tables = _save_assets(doc_id, local_pdf, base_url=base_url)
+        except (MetrailError, ValueError, OSError, httpx.HTTPError) as e:
+            _add_strike(local_pdf)
+            print(f"[metrail] backfill SKIP {p.arxiv_id}: {type(e).__name__}: {e}", flush=True)
+            continue
+        if fig_saved or n_tables:
+            figures += int(fig_saved)
+            tables += n_tables
+        else:
+            try:
+                marker.write_text("no assets extracted", encoding="utf-8")
+            except OSError:
+                pass
+        backfilled += 1
+    return figures, tables, backfilled
+
+
 @flow(name="metrail-enrich")
 def metrail_enrich(topic_id: str, limit: int = 0) -> int:
     """Extract full text for this topic's downloaded-but-unextracted papers."""
@@ -301,9 +359,21 @@ def metrail_enrich(topic_id: str, limit: int = 0) -> int:
                 except (MetrailError, OSError, httpx.HTTPError, ValueError):
                     pass
 
+            bf_figures, bf_tables, backfilled = _backfill_assets(
+                s,
+                kw_filter,
+                base_url=base_url,
+                backend=backend,
+                ocr=ocr,
+                poll_timeout_s=poll_timeout_s,
+            )
+            figures += bf_figures
+            tables += bf_tables
+
         run.payload["enriched"] = enriched
         run.payload["figures"] = figures
         run.payload["tables"] = tables
+        run.payload["assets_backfilled"] = backfilled
         run.payload["skipped"] = len(skipped)
         if skipped:
             run.payload["skipped_papers"] = skipped

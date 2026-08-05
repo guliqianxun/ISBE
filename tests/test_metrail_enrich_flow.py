@@ -48,7 +48,8 @@ def _fake_session(papers: list[Paper]) -> MagicMock:
 @pytest.fixture(autouse=True)
 def _no_run_persistence():
     with patch("isbe.observability.runs._persist_run"):
-        yield
+        with patch.object(flow_mod, "_backfill_assets", return_value=(0, 0, 0)):
+            yield
 
 
 @pytest.fixture()
@@ -293,6 +294,61 @@ def test_topic_without_keywords_refuses_unscoped_enrich(monkeypatch, mirror):
         with patch.object(flow_mod, "_extract") as extract:
             assert flow_mod.metrail_enrich("x") == 0
     extract.assert_not_called()
+
+
+def _bf_session(papers):
+    s = MagicMock()
+    s.scalars.return_value.all.return_value = papers
+    return s
+
+
+def test_backfill_extracts_assets_for_pre_feature_fulltext(mirror):
+    """A paper with fulltext but no assets sidecar (enriched before the
+    figure/table features) gets assets on the next run."""
+    p = _paper("2607.25148", "minio://papers-nowcasting/2026-W31/2607.25148.pdf")
+    p.fulltext_uri = "nowcasting/2026-W31/2607.25148.metrail.md"
+    pdf = mirror / "nowcasting" / "2026-W31" / "2607.25148.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF fake")
+
+    with (
+        patch.object(flow_mod, "submit_pdf", return_value="d9"),
+        patch.object(flow_mod, "wait_until_done", return_value={"state": "done"}),
+        patch.object(flow_mod, "_save_assets", return_value=(True, 2)) as save,
+    ):
+        figures, tables, backfilled = flow_mod._backfill_assets(
+            _bf_session([p]), None, base_url="http://x", backend="pdfplumber",
+            ocr=False, poll_timeout_s=60,
+        )
+    assert (figures, tables, backfilled) == (1, 2, 1)
+    save.assert_called_once()
+
+
+def test_backfill_marks_assetless_papers_and_skips_done(mirror):
+    p = _paper("2607.25149", "minio://papers-nowcasting/2026-W31/2607.25149.pdf")
+    p.fulltext_uri = "nowcasting/2026-W31/2607.25149.metrail.md"
+    pdf = mirror / "nowcasting" / "2026-W31" / "2607.25149.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF fake")
+
+    with (
+        patch.object(flow_mod, "submit_pdf", return_value="d9") as submit,
+        patch.object(flow_mod, "wait_until_done", return_value={"state": "done"}),
+        patch.object(flow_mod, "_save_assets", return_value=(False, 0)),
+    ):
+        _, _, backfilled = flow_mod._backfill_assets(
+            _bf_session([p]), None, base_url="http://x", backend="pdfplumber",
+            ocr=False, poll_timeout_s=60,
+        )
+        assert backfilled == 1
+        assert pdf.with_suffix(".metrail.noassets").exists()
+        # second run: marker present → not resubmitted
+        _, _, backfilled2 = flow_mod._backfill_assets(
+            _bf_session([p]), None, base_url="http://x", backend="pdfplumber",
+            ocr=False, poll_timeout_s=60,
+        )
+    assert backfilled2 == 0
+    assert submit.call_count == 1
 
 
 def test_dispatch_resolves_metrail_enrich():
