@@ -4,13 +4,53 @@ Loaded at registry time so a malformed yaml fails at startup with a field-pointe
 error instead of three days later in a Prefect run.
 """
 
+import os
+import re
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
 from isbe.triage.contract import RetrievalContract
+
+# ${VAR}, ${VAR:-default}, ${VAR:?message} — shell / docker-compose syntax.
+_ENV_VAR_RE = re.compile(r"\$\{(\w+)(?:(:-|:\?)([^}]*))?\}")
+
+
+def _interpolate_env(value: Any) -> Any:
+    """Expand ``${VAR}`` references in every string leaf of a parsed config.
+
+    Lets a single committed topic.yaml point at an environment-specific
+    endpoint without hard-coding it — e.g. a self-hosted feed service reached
+    via its docker service name in-container but via ``localhost:<port>`` when
+    ``radar`` runs on a dev host. Substitution rules (POSIX / compose):
+
+      ``${VAR}``            -> value of VAR; unset is a config error (fail fast)
+      ``${VAR:-default}``   -> VAR if set & non-empty, else ``default``
+      ``${VAR:?message}``   -> VAR if set & non-empty, else raise with ``message``
+
+    Only string values are touched; dict keys and non-strings pass through.
+    """
+    if isinstance(value, str):
+
+        def _sub(m: "re.Match[str]") -> str:
+            name, op, arg = m.group(1), m.group(2), m.group(3)
+            env = os.environ.get(name)
+            if env not in (None, ""):
+                return env  # type: ignore[return-value]
+            if op == ":-":
+                return arg
+            if op == ":?":
+                raise ValueError(f"topic.yaml requires env var ${{{name}}}: {arg}")
+            raise ValueError(f"topic.yaml references undefined env var ${{{name}}}")
+
+        return _ENV_VAR_RE.sub(_sub, value)
+    if isinstance(value, list):
+        return [_interpolate_env(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _interpolate_env(v) for k, v in value.items()}
+    return value
 
 # ---------------------------------------------------------------------------
 # Closed-set vocabularies — extend deliberately, not by typo
@@ -152,4 +192,5 @@ class TopicConfig(_Strict):
     @classmethod
     def from_yaml_file(cls, path: Path) -> "TopicConfig":
         raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        raw = _interpolate_env(raw)
         return cls.model_validate(raw)

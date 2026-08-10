@@ -151,3 +151,53 @@ def test_from_yaml_file_includes_file_path_in_error(tmp_path: Path) -> None:
         TopicConfig.from_yaml_file(p)
     # Pydantic error itself surfaces field; loader wraps with file context
     assert "label" in str(exc.value)
+
+
+# ---------------------------------------------------------------------------
+# ${VAR} env interpolation (config points at env-specific endpoints)
+# ---------------------------------------------------------------------------
+
+
+def _write_feed_topic(tmp_path: Path, url: str) -> Path:
+    p = tmp_path / "topic.yaml"
+    p.write_text(
+        "id: t1\nlabel: T1\ncadence: weekly\n"
+        "rss:\n  feeds:\n    - name: f\n"
+        f"      url: {url}\n"
+        "schedules:\n  digester: '0 8 * * 1'\n",
+        encoding="utf-8",
+    )
+    return p
+
+
+def test_env_default_used_when_var_unset(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MORERSSPLZ_URL", raising=False)
+    p = _write_feed_topic(tmp_path, "${MORERSSPLZ_URL:-http://morerssplz:8000}/zhihuzhuanlan/x")
+    cfg = TopicConfig.from_yaml_file(p)
+    assert cfg.rss is not None
+    assert cfg.rss.feeds[0].url == "http://morerssplz:8000/zhihuzhuanlan/x"
+
+
+def test_env_value_overrides_default(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("MORERSSPLZ_URL", "http://localhost:1201")
+    p = _write_feed_topic(tmp_path, "${MORERSSPLZ_URL:-http://morerssplz:8000}/zhihuzhuanlan/x")
+    cfg = TopicConfig.from_yaml_file(p)
+    assert cfg.rss is not None
+    assert cfg.rss.feeds[0].url == "http://localhost:1201/zhihuzhuanlan/x"
+
+
+def test_empty_env_falls_back_to_default(tmp_path: Path, monkeypatch) -> None:
+    # An empty string (compose passthrough with nothing set) must NOT win.
+    monkeypatch.setenv("MORERSSPLZ_URL", "")
+    p = _write_feed_topic(tmp_path, "${MORERSSPLZ_URL:-http://morerssplz:8000}/zhihuzhuanlan/x")
+    cfg = TopicConfig.from_yaml_file(p)
+    assert cfg.rss is not None
+    assert cfg.rss.feeds[0].url == "http://morerssplz:8000/zhihuzhuanlan/x"
+
+
+def test_undefined_env_without_default_is_config_error(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("NOPE_UNSET", raising=False)
+    p = _write_feed_topic(tmp_path, "${NOPE_UNSET}/x")
+    with pytest.raises(ValueError) as exc:
+        TopicConfig.from_yaml_file(p)
+    assert "NOPE_UNSET" in str(exc.value)

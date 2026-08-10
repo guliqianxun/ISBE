@@ -19,8 +19,9 @@ prices:
 
 news_rss:
   feeds:
-    - source: yahoo-finance-nvda
-      url: https://feeds.finance.yahoo.com/rss/2.0/headline?s=NVDA&region=US&lang=en-US
+    # yahoo-finance-nvda 已下线：feeds.finance.yahoo.com/rss/2.0/headline 于
+    # 2026-08 返回 404（每 30min 刷屏一次）。Yahoo 关停了该 RSS 端点，暂无
+    # 官方替代；移除以止损，待补一个替代新闻源（如 Google News RSS / 网关）。
     - source: nasdaq-nvda
       url: https://www.nasdaq.com/feed/rssoutbound?symbol=NVDA
 

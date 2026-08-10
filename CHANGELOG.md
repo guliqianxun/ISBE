@@ -42,6 +42,17 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/).
   pre-commit config, and an English `README.en.md`.
 
 ### Fixed
+- **china-tech 知乎源在容器内不可达**: the 机器之心/量子位 feeds pointed at
+  `http://localhost:1201` (a dev-host port from the compose override) — inside
+  the worker container `localhost` is the container itself, so every fetch hit
+  `Connection refused` and those two feeds silently produced zero articles on
+  the server. topic.yaml now supports `${VAR:-default}` interpolation
+  (`TopicConfig.from_yaml_file`); the feeds use
+  `${MORERSSPLZ_URL:-http://morerssplz:8000}` so the in-network service name is
+  the default and dev hosts override via `MORERSSPLZ_URL`.
+- **NVDA yahoo-finance news feed removed**: `feeds.finance.yahoo.com/rss/...`
+  now 404s (endpoint retired upstream), flooding logs every 30 min; NVDA news
+  runs on `nasdaq-nvda` until a replacement source lands.
 - **Memory accept no longer destroys the thesis file**: `accept_pending` merges
   into an existing target (frontmatter kept, `revision` bumped, draft body
   appended under a dated heading) instead of overwriting it wholesale;

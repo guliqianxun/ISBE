@@ -162,6 +162,8 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       METRAIL_API_URL: ${METRAIL_API_URL:-}
+      # Empty → topic.yaml default http://morerssplz:8000 (in-network service name).
+      MORERSSPLZ_URL: ${MORERSSPLZ_URL:-}
       # Optional egress proxy for slow/blocked routes (arxiv PDFs etc). When
       # setting HTTP(S)_PROXY, keep NO_PROXY covering all internal services —
       # and add your metrail/LAN host IPs to it in .env.

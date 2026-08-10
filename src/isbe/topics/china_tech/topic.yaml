@@ -17,10 +17,15 @@ rss:
     # （见 docs/howto/zhihu-cookies.md）。新增专栏先用
     # `uv run python scripts/probe_morerssplz.py` 试一下，注意 pubDate
     # 要近 14 天内，否则被 lookback_days 过滤掉（如停更的 `aiera`）。
+    #
+    # URL base 由 MORERSSPLZ_URL 决定，缺省用 docker 服务名（容器内可达）：
+    #   - 服务器 / `docker compose` 本地栈：不设 → http://morerssplz:8000
+    #   - 开发机直接 `uv run radar ...`（不进容器）：在 .env 设
+    #     MORERSSPLZ_URL=http://localhost:1201（override 把 morerssplz 映射到 1201）
     - name: zhihu_jiqizhixin
-      url: http://localhost:1201/zhihuzhuanlan/jiqizhixin   # 机器之心 — research summaries
+      url: ${MORERSSPLZ_URL:-http://morerssplz:8000}/zhihuzhuanlan/jiqizhixin   # 机器之心 — research summaries
     - name: zhihu_qbitai
-      url: http://localhost:1201/zhihuzhuanlan/qbitai       # 量子位 — applied AI / products
+      url: ${MORERSSPLZ_URL:-http://morerssplz:8000}/zhihuzhuanlan/qbitai       # 量子位 — applied AI / products
   exclude_keywords:
     # 招商引资类硬广 / 平台运营帖：留干净的资讯
     - "招商"
