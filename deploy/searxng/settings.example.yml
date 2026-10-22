@@ -1,0 +1,35 @@
+use_default_settings:
+  engines:
+    keep_only:
+      - bing
+      - sogou
+      - 360search
+      - yahoo
+      - bing news
+general:
+  instance_name: ISBE Search
+search:
+  autocomplete: ""
+  default_lang: zh-CN
+  formats:
+    - html
+    - json
+server:
+  secret_key: REPLACE_WITH_RANDOM_SECRET
+  limiter: false
+  public_instance: false
+outgoing:
+  request_timeout: 10.0
+  max_request_timeout: 15.0
+engines:
+  - name: bing
+    disabled: false
+  - name: sogou
+    disabled: false
+  - name: 360search
+    disabled: false
+  - name: yahoo
+    disabled: false
+  - name: bing news
+    disabled: false
+    categories: [general, news]

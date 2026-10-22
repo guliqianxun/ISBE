@@ -1,0 +1,26 @@
+# An articles topic: Rust ecosystem news from RSS, reported weekly in English.
+id: rust-news
+label: Rust ecosystem weekly
+lang: en
+cadence: weekly
+schedule_timezone: UTC
+window_days: 7
+
+schedules:
+  collect: "0 6 * * *"
+  digest: "0 7 * * 1"
+
+rss:
+  feeds:
+    - name: rust-blog
+      url: https://blog.rust-lang.org/feed.xml
+    - name: this-week-in-rust
+      url: https://this-week-in-rust.org/rss.xml
+    # Feed hosts can come from the environment, e.g. a self-hosted RSSHub:
+    # - name: rsshub-example
+    #   url: ${RSSHUB_URL:-http://rsshub:1200}/github/trending/daily/rust
+  lookback_days: 14
+
+retrieval:
+  intent: "Language and toolchain changes, notable crate releases, and ecosystem shifts a working Rust developer should know about"
+  out_of_scope_keywords: [hiring, "job opening", sponsor]

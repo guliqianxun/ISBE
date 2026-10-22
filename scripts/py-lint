@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Lint the Python code with ruff inside the pinned Python 3.14 container.
+#   scripts/py-lint          # report problems
+#   scripts/py-lint --fix    # also apply the safe automatic fixes
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+image=isbe-py-dev:3.14
+if ! docker image inspect "$image" >/dev/null 2>&1; then
+    docker build -q -t "$image" -f "$root/docker/py-dev.Dockerfile" "$root/docker" >/dev/null
+fi
+cache=${ISBE_UV_CACHE:-$HOME/.cache/isbe-uv}
+mkdir -p "$cache"
+exec docker run --rm -u "$(id -u):$(id -g)" -v "$root:/src" -v "$cache:/uv-cache" "$image" \
+    sh -c 'uv sync --frozen --quiet && exec uv run --frozen --no-sync ruff check "$@"' sh "$@"

@@ -1,0 +1,19 @@
+/data
+/reference/
+.env
+.env.*
+*.env
+!.env.example
+!*.env.example
+settings.json
+settings.json.*
+.settings-*.tmp
+
+# Python
+__pycache__/
+.venv/
+.venv-docker/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.parity/

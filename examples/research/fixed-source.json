@@ -1,0 +1,59 @@
+{
+  "topic": "synthetic-research-demo",
+  "title": "合成演示：固定材料专题（不可用于研究结论）",
+  "period": "2026-10-16-demo-v1",
+  "scope": {
+    "from": "2024-01-01",
+    "to": "2026-10-16",
+    "region": "虚构上海场景，不代表上海实际情况",
+    "languages": [
+      "zh"
+    ],
+    "questions": [
+      "示例材料明确披露了哪些培训信息？",
+      "能否判断培训降低了融资成本？"
+    ]
+  },
+  "search_note": "未执行检索；仅使用本仓库的合成演示文字，不对应任何真实企业或统计。",
+  "limitations": [
+    "全部事实、企业和地域场景均为合成，不得作为真实研究结论或佐证。",
+    "本示例只演示模型生成、冻结材料和引用回看路径。"
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "虚构企业培训与融资材料（合成）",
+      "publisher": "虚构企业（合成）",
+      "url": "https://example.invalid/synthetic-research-demo",
+      "material_type": "synthetic_company_disclosure",
+      "published_on": null,
+      "coverage": "培训陈述为2025年；融资成本段期间未披露",
+      "reading_depth": "完整读取单行合成材料；不代表真实报告全文",
+      "role": "synthetic_self_report",
+      "limitations": [
+        "虚构企业自述，没有独立佐证。",
+        "融资成本和该段统计期间均缺失，不能判断因果。"
+      ],
+      "original_file": "fixed-source.txt",
+      "sha256": "8cb557cc1d412850c26c29e83dd0aae584a363cb1119aac10289222106675e7d",
+      "text_file": "fixed-source.txt",
+      "excerpts": [
+        {
+          "id": "E1",
+          "location": "合成材料：培训陈述",
+          "quote": "2025年开展了8次ESG培训。"
+        },
+        {
+          "id": "E2",
+          "location": "合成材料：缺失信息",
+          "quote": "融资成本数据未披露，该段没有说明统计期间。"
+        },
+        {
+          "id": "E3",
+          "location": "合成材料：因果边界",
+          "quote": "材料未提供培训与融资成本变化的因果证据。"
+        }
+      ]
+    }
+  ]
+}

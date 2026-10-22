@@ -1,0 +1,16 @@
+{
+  "id": "shanghai-esg-news",
+  "name": "上海 ESG 与绿色金融·联网报道",
+  "topic": "上海 ESG 与绿色金融",
+  "provider": "searxng",
+  "queries": [
+    "上海 ESG",
+    "上海 绿色金融",
+    "上海 企业可持续信息披露",
+    "Shanghai sustainable finance"
+  ],
+  "start_date": "2026-10-01",
+  "end_date": "2026-10-16",
+  "language": "zh-CN",
+  "max_results": 10
+}

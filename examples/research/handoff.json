@@ -1,0 +1,134 @@
+{
+  "kind": "design_example",
+  "synthetic": true,
+  "notice": "Synthetic contract examples only; no real search, company findings or production guarantees.",
+  "research_scope": {
+    "id": "scope-a", "owner_id": "owner-a",
+    "topics": ["ESG", "绿色金融"], "region": "上海", "languages": ["zh", "en"],
+    "question": "上海 ESG 与绿色金融推广现状及未来变化",
+    "publication_window": { "from": "2024-01-01", "to": "2026-10-16" },
+    "outlook_years": [1, 3],
+    "budget": { "status": "unconfirmed", "amount": null }
+  },
+  "search_runs": [
+    {
+      "id": "search-partial", "scope_id": "scope-a", "owner_id": "owner-a",
+      "query": "synthetic Shanghai ESG example", "status": "partial",
+      "failure": { "code": "timeout", "stage": "next_page" },
+      "cost": { "status": "unknown", "amount": null }
+    },
+    {
+      "id": "search-failed", "scope_id": "scope-a", "owner_id": "owner-a",
+      "query": "synthetic Shanghai green finance example", "status": "failed",
+      "failure": { "code": "timeout", "stage": "first_page" },
+      "cost": { "status": "unknown", "amount": null }
+    }
+  ],
+  "hits": [
+    {
+      "id": "hit-a", "search_run_id": "search-partial", "material_id": "material-a",
+      "url": "https://example.invalid/synthetic-company-a/disclosure", "rank": 1,
+      "title": "Synthetic Company A disclosure", "abstract": null, "abstract_status": "missing"
+    }
+  ],
+  "materials": [
+    {
+      "id": "material-a", "owner_id": "owner-a", "type": "company_disclosure",
+      "source_url": "https://example.invalid/synthetic-company-a/disclosure"
+    },
+    {
+      "id": "material-b", "owner_id": "owner-b", "type": "company_disclosure",
+      "source_url": "https://example.invalid/synthetic-company-a/disclosure"
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "snapshot-a1", "material_id": "material-a", "status": "acquired",
+      "fetched_at": "2026-10-15T00:00:00Z", "published_on": null,
+      "media_type": "text/html", "encoding": "utf-8",
+      "raw": "<p>Synthetic Company A reports 8 ESG training sessions in 2025.</p><p>融资成本：No financing cost data is disclosed.</p>",
+      "sha256": "c3e21b777bfa455a7c12179a2d80cee6ff4bebc49714797dd042348e99b9885f"
+    },
+    {
+      "id": "snapshot-a2", "material_id": "material-a", "status": "acquired",
+      "fetched_at": "2026-10-16T00:00:00Z", "published_on": null,
+      "media_type": "text/html", "encoding": "utf-8",
+      "raw": "<p>Synthetic Company A reports 9 ESG training sessions in 2025.</p><p>融资成本：No financing cost data is disclosed.</p>",
+      "sha256": "cccf0ee143a9e8772096dc877b312856cdf8d24b7efa29dcc2419ce9f1abbc48"
+    },
+    {
+      "id": "snapshot-b1", "material_id": "material-b", "status": "acquired",
+      "fetched_at": "2026-10-16T00:00:00Z", "published_on": null,
+      "media_type": "text/html", "encoding": "utf-8",
+      "raw": "<p>Synthetic Company A reports 8 ESG training sessions in 2025.</p><p>融资成本：No financing cost data is disclosed.</p>",
+      "sha256": "c3e21b777bfa455a7c12179a2d80cee6ff4bebc49714797dd042348e99b9885f"
+    }
+  ],
+  "parse_results": [
+    {
+      "id": "parse-a1", "snapshot_id": "snapshot-a1", "parser_revision": "example-v1", "status": "complete",
+      "blocks": [
+        { "id": "block-a1", "paragraph": 1, "text": "Synthetic Company A reports 8 ESG training sessions in 2025." },
+        { "id": "block-a2", "paragraph": 2, "text": "融资成本：No financing cost data is disclosed." }
+      ]
+    },
+    {
+      "id": "parse-a1-again", "snapshot_id": "snapshot-a1", "parser_revision": "example-v2", "status": "complete",
+      "blocks": [
+        { "id": "block-reparsed-1", "paragraph": 1, "text": "Synthetic Company A reports 8 ESG training sessions in 2025." },
+        { "id": "block-reparsed-2", "paragraph": 2, "text": "融资成本：No financing cost data is disclosed." }
+      ]
+    },
+    {
+      "id": "parse-a2", "snapshot_id": "snapshot-a2", "parser_revision": "example-v2", "status": "complete",
+      "blocks": [
+        { "id": "block-revised-1", "paragraph": 1, "text": "Synthetic Company A reports 9 ESG training sessions in 2025." },
+        { "id": "block-revised-2", "paragraph": 2, "text": "融资成本：No financing cost data is disclosed." }
+      ]
+    }
+  ],
+  "research_versions": [
+    { "id": "research-v1", "scope_id": "scope-a", "owner_id": "owner-a", "snapshot_id": "snapshot-a1", "parse_result_id": "parse-a1" },
+    { "id": "research-reparsed", "scope_id": "scope-a", "owner_id": "owner-a", "snapshot_id": "snapshot-a1", "parse_result_id": "parse-a1-again" },
+    { "id": "research-revised", "scope_id": "scope-a", "owner_id": "owner-a", "snapshot_id": "snapshot-a2", "parse_result_id": "parse-a2" }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-sessions", "research_version_id": "research-v1", "block_id": "block-a1",
+      "quote": "8 ESG training sessions", "start": 28, "end": 51
+    },
+    {
+      "id": "evidence-missing", "research_version_id": "research-v1", "block_id": "block-a2",
+      "quote": "No financing cost data is disclosed.", "start": 15, "end": 51
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact-sessions", "evidence_id": "evidence-sessions", "subject": "Synthetic Company A",
+      "metric": "ESG training sessions", "reporting_period": "2025", "value": 8, "unit": "sessions",
+      "value_status": "reported", "statement_type": "company_self_report"
+    },
+    {
+      "id": "fact-financing", "evidence_id": "evidence-missing", "subject": "Synthetic Company A",
+      "metric": "financing costs", "reporting_period": null, "value": null, "unit": null,
+      "value_status": "missing", "statement_type": "company_self_report"
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-report", "research_version_id": "research-v1", "evidence_ids": ["evidence-sessions"],
+      "text": "Synthetic Company A reports 8 ESG training sessions in 2025.",
+      "support": { "status": "supported", "method": "synthetic_manual_expectation", "reason": "Supports what the company reports, not independent verification of the event." }
+    },
+    {
+      "id": "claim-causation", "research_version_id": "research-v1", "evidence_ids": ["evidence-sessions", "evidence-missing"],
+      "text": "ESG training reduced Synthetic Company A financing costs.",
+      "support": { "status": "insufficient", "method": "synthetic_manual_expectation", "reason": "The quotes exist, but contain neither financing cost figures nor causal evidence." }
+    }
+  ],
+  "access_expectations": [
+    { "owner_id": "owner-b", "snapshot_id": "snapshot-a1", "expected": "denied" },
+    { "owner_id": "owner-b", "snapshot_id": "snapshot-b1", "expected": "allowed" }
+  ],
+  "position_convention": "Paragraphs are one-based; quote offsets are zero-based UTF-8 byte offsets into block text, with an inclusive start and exclusive end. Only the literal synthetic HTML paragraphs are exercised."
+}

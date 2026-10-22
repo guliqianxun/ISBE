@@ -1,0 +1,17 @@
+name: isbe-search
+services:
+  searxng:
+    image: docker.io/searxng/searxng@sha256:8bdd9aa136b2dc3b9332cf24714fa34a375b8a1949a1201ec900c24d7378596e
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:48785:8080"
+    environment:
+      SEARXNG_BASE_URL: http://127.0.0.1:48785/
+    volumes:
+      - ../../data/searxng/config:/etc/searxng
+      - ../../data/searxng/cache:/var/cache/searxng
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"

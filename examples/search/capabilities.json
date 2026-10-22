@@ -1,0 +1,349 @@
+{
+  "kind": "capability_description",
+  "revision": "2026-10-21",
+  "notice": "Generated from isbe/search/capabilities.py and isbe/search/query.py; tests/py/registry/test_search_capabilities.py keeps them equal. The first routing examples use the constraints of the research scope in examples/research/handoff.json (region, languages, publication window) plus a site restriction; the last one is a plan query with region and institution, as a run sends it.",
+  "statuses": {
+    "supported": "the run enforces it",
+    "unsupported": "the run cannot ask for it: name it in the query terms or check the results",
+    "unknown": "the request may carry it but nothing has checked that the source applies it; never treated as supported"
+  },
+  "sources": {
+    "searxng": {
+      "id": "searxng",
+      "revision": "2026-10-21",
+      "kind": "search",
+      "requires": [
+        "SEARXNG_URL"
+      ],
+      "limits": {
+        "queries": [
+          1,
+          8
+        ],
+        "query_chars": 200,
+        "result_count": [
+          1,
+          20
+        ],
+        "timeout_s": 30,
+        "response_bytes": 2097152,
+        "redirects": 0,
+        "retries": 0
+      },
+      "constraints": {
+        "terms": {
+          "status": "supported",
+          "basis": "each plan query, normalized by query.compile, is sent as q",
+          "sent": "q"
+        },
+        "phrase": {
+          "status": "unknown",
+          "basis": "ISBE sends the query text unchanged; whether the instance's engines honour this syntax has not been checked",
+          "sent": "q"
+        },
+        "boolean": {
+          "status": "unknown",
+          "basis": "ISBE sends the query text unchanged; whether the instance's engines honour this syntax has not been checked",
+          "sent": "q"
+        },
+        "exclusion": {
+          "status": "unknown",
+          "basis": "ISBE sends the query text unchanged; whether the instance's engines honour this syntax has not been checked",
+          "sent": "q"
+        },
+        "site": {
+          "status": "unknown",
+          "basis": "ISBE sends the query text unchanged; whether the instance's engines honour this syntax has not been checked",
+          "sent": "q"
+        },
+        "title": {
+          "status": "unknown",
+          "basis": "ISBE sends the query text unchanged; whether the instance's engines honour this syntax has not been checked",
+          "sent": "q"
+        },
+        "institution": {
+          "status": "unsupported",
+          "basis": "the request has no parameter for it; name it in the query terms or check the results"
+        },
+        "region": {
+          "status": "unsupported",
+          "basis": "the request has no region parameter; language zh-CN names a language variant, not a place"
+        },
+        "language": {
+          "status": "unknown",
+          "basis": "SearXNG passes language to the engines that take one; results are not checked for their language",
+          "sent": "language"
+        },
+        "publication_window": {
+          "status": "unsupported",
+          "basis": "only a recency hint: time_range=month or year when the window starts within 30 or 365 days of the run, otherwise none (providers.time_range); exact dates come from date rechecks",
+          "sent": "time_range"
+        },
+        "pages": {
+          "status": "unsupported",
+          "basis": "providers.request asks for the first page only",
+          "sent": "pageno=1"
+        },
+        "result_count": {
+          "status": "supported",
+          "basis": "results.parse keeps the first max_results rows and counts the ones it left out"
+        },
+        "total_estimate": {
+          "status": "unsupported",
+          "basis": "results.parse reads no total from the response"
+        },
+        "publication_dates": {
+          "status": "unsupported",
+          "basis": "a date a provider returns is kept as search_date_hint, never as the publication date; date rechecks read the date from the original page"
+        }
+      }
+    },
+    "rss": {
+      "id": "rss",
+      "revision": "2026-10-21",
+      "kind": "fixed",
+      "requires": [],
+      "limits": {
+        "result_count": [
+          1,
+          200
+        ]
+      },
+      "constraints": {
+        "terms": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "phrase": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "boolean": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "exclusion": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "site": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "title": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "institution": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "region": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "language": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "publication_window": {
+          "status": "unsupported",
+          "basis": "the reader lists the entries the feed shows, whatever their dates"
+        },
+        "pages": {
+          "status": "unsupported",
+          "basis": "the feed document only; entries it no longer lists are not fetched"
+        },
+        "result_count": {
+          "status": "supported",
+          "basis": "max_items entries per read (sources.reader.read)"
+        },
+        "total_estimate": {
+          "status": "unsupported",
+          "basis": "a feed states no total"
+        },
+        "publication_dates": {
+          "status": "supported",
+          "basis": "the dates the feed states for an entry are stored as its published_at and updated_at; they are the feed's statement, not checked against the article page"
+        }
+      }
+    },
+    "page": {
+      "id": "page",
+      "revision": "2026-10-21",
+      "kind": "fixed",
+      "requires": [],
+      "limits": {
+        "result_count": [
+          1,
+          200
+        ]
+      },
+      "constraints": {
+        "terms": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "phrase": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "boolean": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "exclusion": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "site": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "title": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "institution": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "region": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "language": {
+          "status": "unsupported",
+          "basis": "a fixed source reads one feed or listing page and takes no query"
+        },
+        "publication_window": {
+          "status": "unsupported",
+          "basis": "the reader lists the article links the page shows, whatever their dates"
+        },
+        "pages": {
+          "status": "unsupported",
+          "basis": "one listing page; its pagination is not followed"
+        },
+        "result_count": {
+          "status": "supported",
+          "basis": "max_items links per read (sources.reader.read)"
+        },
+        "total_estimate": {
+          "status": "unsupported",
+          "basis": "a listing page states no total"
+        },
+        "publication_dates": {
+          "status": "unsupported",
+          "basis": "a link carries no date, and none is guessed from its address"
+        }
+      }
+    }
+  },
+  "routing": [
+    {
+      "source": "searxng",
+      "wanted": [
+        "terms",
+        "language",
+        "region",
+        "publication_window",
+        "site"
+      ],
+      "expected": {
+        "executed": [
+          "terms"
+        ],
+        "deferred": [
+          "language",
+          "region",
+          "publication_window",
+          "site"
+        ],
+        "unknown": [
+          "language",
+          "site"
+        ]
+      }
+    },
+    {
+      "source": "rss",
+      "wanted": [
+        "terms",
+        "language",
+        "region",
+        "publication_window",
+        "site"
+      ],
+      "expected": {
+        "executed": [],
+        "deferred": [
+          "terms",
+          "language",
+          "region",
+          "publication_window",
+          "site"
+        ],
+        "unknown": []
+      }
+    },
+    {
+      "source": "searxng",
+      "wanted": [
+        "terms",
+        "result_count",
+        "pages",
+        "sentiment"
+      ],
+      "expected": {
+        "executed": [
+          "terms",
+          "result_count"
+        ],
+        "deferred": [
+          "pages",
+          "sentiment"
+        ],
+        "unknown": [
+          "sentiment"
+        ]
+      }
+    },
+    {
+      "source": "searxng",
+      "query": "上海 \"绿色金融\" ESG OR 可持续 -招聘",
+      "region": "上海",
+      "institution": "上海证券交易所",
+      "sent": "上海 \"绿色金融\" ESG OR 可持续 -招聘 \"上海证券交易所\"",
+      "wanted": [
+        "terms",
+        "phrase",
+        "boolean",
+        "exclusion",
+        "institution",
+        "region",
+        "language",
+        "publication_window"
+      ],
+      "expected": {
+        "executed": [
+          "terms"
+        ],
+        "deferred": [
+          "phrase",
+          "boolean",
+          "exclusion",
+          "institution",
+          "region",
+          "language",
+          "publication_window"
+        ],
+        "unknown": [
+          "phrase",
+          "boolean",
+          "exclusion",
+          "language"
+        ]
+      }
+    }
+  ]
+}

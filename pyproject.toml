@@ -1,0 +1,67 @@
+[project]
+name = "isbe"
+version = "0.2.0.dev0"
+description = "Self-hosted research radar: topics → triage → digest → human-reviewed memory"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+    "httpx>=0.28",
+    "pydantic>=2.10",
+    "PyYAML>=6.0.2",
+    "feedparser>=6.0.11",
+    "lxml>=5.3",
+    "markdown-it-py>=3.0",
+    "nh3>=0.2.20",
+    # IANA zone names (incl. backward links such as US/Eastern) that slim images omit.
+    "tzdata>=2025.2",
+    # WHATWG URL parsing, as the stored URLs were normalized.
+    "ada-url>=1.15",
+]
+
+[project.scripts]
+isbe = "isbe.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.17"]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["isbe"]
+
+# Packaged so an installed `isbe` needs no checkout.
+[tool.hatch.build.targets.wheel.force-include]
+"migrations" = "isbe/_assets/migrations"
+"prompts" = "isbe/_assets/prompts"
+"web" = "isbe/_assets/web"
+"README.md" = "isbe/_assets/README.md"
+"README.en.md" = "isbe/_assets/README.en.md"
+"docs" = "isbe/_assets/docs"
+"deploy/searxng/README.md" = "isbe/_assets/deploy/searxng/README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/py"]
+addopts = "-q"
+markers = ["real_hash: run with the real 600 000-round PBKDF2 instead of the test stub"]
+
+# Lint only; the code is not auto-formatted, so line length is not enforced.
+[tool.ruff]
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "SIM", "C4", "RUF"]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # full-width Chinese punctuation is intended
+    "RUF043",                      # unescaped "." in pytest.raises(match=...) is fine
+    "SIM102", "SIM105", "SIM117",  # nested if/with and try-pass stay explicit
+    "SIM905",                      # long constant word lists read better as "a b c".split()
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Test helpers defined in a loop run in that iteration, so the closure is safe.
+"tests/**" = ["B023"]

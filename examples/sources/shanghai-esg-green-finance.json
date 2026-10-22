@@ -1,0 +1,104 @@
+{
+  "sources": [
+    {
+      "id": "spdb-esg",
+      "name": "浦发银行 · ESG动态（集团实践）",
+      "url": "https://www.spdb.com.cn/spdb_esg/esg_news/esg_dynamic/",
+      "kind": "page",
+      "topic": "上海 ESG 与绿色金融",
+      "link_pattern": "/esg_dynamic/20",
+      "max_items": 30,
+      "enabled": true
+    },
+    {
+      "id": "saif-sustainability",
+      "name": "上海交大高金 · 可持续发展（上海研究与活动）",
+      "url": "https://www.saif.sjtu.edu.cn/sustainability",
+      "kind": "page",
+      "link_pattern": "/show-107-",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 30
+    },
+    {
+      "id": "iigf-research",
+      "name": "中财大绿金院 · 研究报告（全国背景）",
+      "url": "https://iigf.cufe.edu.cn/yjcg/yjbg.htm",
+      "kind": "page",
+      "link_pattern": "/info/1014/",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 30
+    },
+    {
+      "id": "yicai-esg",
+      "name": "第一财经 · 一财ESG（上海媒体与企业实践）",
+      "url": "https://www.yicai.com/author/100012525.html",
+      "kind": "page",
+      "link_pattern": "/news/",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 30
+    },
+    {
+      "id": "sse-sustainability-guide-2026",
+      "name": "上交所 · 可持续发展报告编制指南（参考资料）",
+      "url": "https://www.sse.com.cn/lawandrules/guide/stock/zbxxpljg/ssgszljg/c/c_20250117_10770284.shtml",
+      "kind": "page",
+      "link_pattern": "/files/",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 30
+    },
+    {
+      "id": "sse-sustainability-practice-cases",
+      "name": "上交所 · 沪市可持续信息披露实践案例（参考资料）",
+      "url": "https://www.sse.com.cn/aboutus/research/special/",
+      "kind": "page",
+      "link_pattern": "/10813104/",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 20
+    },
+    {
+      "id": "cneeex-carbon-policy",
+      "name": "上海环交所 · 碳市场政策（全国与上海）",
+      "url": "https://overview.cneeex.com/xwzx/zcdt/",
+      "kind": "page",
+      "link_pattern": "/c/",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 50
+    },
+    {
+      "id": "cneeex-shanghai-carbon-policy",
+      "name": "上海环交所 · 上海碳市场政策（含历史制度）",
+      "url": "https://overview.cneeex.com/tpfjy/fg/shszc/",
+      "kind": "page",
+      "link_pattern": "/c/",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 50
+    },
+    {
+      "id": "spdb-sustainability-reports",
+      "name": "浦发银行 · 可持续发展报告（中英年度资料）",
+      "url": "https://www.spdb.com.cn/spdb_esg/esg_reports/esg_sustainability_reporting/",
+      "kind": "page",
+      "link_pattern": "/spdb_esg/esg_reports/esg_sustainability_reporting/20",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 30
+    },
+    {
+      "id": "shgbc-practice",
+      "name": "上海市绿色建筑协会 · 低碳建筑与行业实践",
+      "url": "https://www.shgbc.org/xiehuidongtai/",
+      "kind": "page",
+      "link_pattern": "/xiehuidongtai/20",
+      "topic": "上海 ESG 与绿色金融",
+      "enabled": true,
+      "max_items": 30
+    }
+  ]
+}
