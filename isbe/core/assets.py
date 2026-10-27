@@ -1,5 +1,5 @@
-"""Files shipped beside the code: migrations, prompts, the web UI and the help pages
-(the READMEs and documents).
+"""Files shipped beside the code: migrations, prompts, the web UI and the
+service guide pages of docs/ (served at /help/service).
 
 An installed wheel carries them under `isbe/_assets`; a checkout keeps them at
 the repository root, so edits there apply without a rebuild.

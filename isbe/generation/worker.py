@@ -8,6 +8,10 @@ the same transaction a cancel needs, so a task is either cancelled or run,
 never both. Its result is written before the execution lock is released and
 before any other task starts, retrying until the database accepts it; a
 crash in between leaves it running, which the next `Manager.open` resolves.
+
+When no report task is queued, the worker takes a step of a question run
+(`isbe.question.flow`), under the same execution lock and the same settings
+snapshot as a report.
 """
 
 import logging
@@ -24,6 +28,8 @@ from isbe import topics
 from isbe.core import db, locks, paths, settings
 from isbe.core.errors import describe
 from isbe.core.llm import Llm
+from isbe.question import flow
+from isbe.question import queue as question_queue
 from isbe.topics import Flavor, Topic
 
 from .fingerprint import unchanged
@@ -102,12 +108,16 @@ class Signal:
             self._woken = False
 
 
-def loop(root: Path, lock: locks.Lock, read: ReadSettings, stages: Stages, signal: Signal) -> None:
+def loop(
+    root: Path, lock: locks.Lock, read: ReadSettings, stages: Stages, signal: Signal,
+    questions: flow.Services | None = None,
+) -> None:
     """The worker thread: run queued tasks until stopped, then drop the worker lock."""
+    questions = questions or flow.Services()
     with lock:
         while not signal.stopped():
             try:
-                worked = work_one(root, read, stages, signal)
+                worked = work_one(root, read, stages, signal) or question_one(root, read, questions, signal)
             except Exception as error:
                 log.error(
                     "report queue could not update its persistent state; retrying: %s",
@@ -156,6 +166,22 @@ def work_one(root: Path, read: ReadSettings, stages: Stages, signal: Signal) -> 
                 )
             state, error, period = _outcome(conn, root, read, stages, task)
             return _finish(conn, signal, task.id, state, error, period)
+
+
+def question_one(root: Path, read: ReadSettings, services: flow.Services, signal: Signal) -> bool:
+    """Take one step of a question run; false when none was ready or the execution
+    lock is busy."""
+    if not question_queue.pending(root):
+        return False
+    try:
+        execution = locks.execution_lock(root)
+    except locks.LockBusy:
+        return False
+    with execution:
+        if signal.stopped():
+            return False
+        with settings.task_scope(read(root)):
+            return flow.work_one(root, services)
 
 
 def _outcome(

@@ -203,7 +203,7 @@ def test_context_rejection_uses_only_a_static_message(status: int, body: str, cl
     expected = (
         "HTTP 400: input and requested output exceed the model context window; reduce input or maximum output tokens"
         if classified
-        else f"HTTP {status}: model provider rejected the request"
+        else f"HTTP {status}: model provider {'failed' if status >= 500 else 'rejected'} the request"
     )
     for message in [describe(error), stored]:  # type: ignore[arg-type]
         assert message.endswith(expected), message
@@ -345,7 +345,7 @@ def test_transient_failures_are_retried_twice_but_timeouts_are_not() -> None:
     assert [s for s in seen if not isinstance(s, httpx.Request)] == [5, 30]
     model, seen = configured(answer({}, 500))
     error, _ = run(model)
-    assert describe(error).endswith("HTTP 500: model provider rejected the request")  # type: ignore[arg-type]
+    assert describe(error).endswith("HTTP 500: model provider failed the request")  # type: ignore[arg-type]
     assert len([s for s in seen if isinstance(s, httpx.Request)]) == 3
     model, seen = configured(answer({}, 404))
     run(model)
@@ -417,3 +417,28 @@ def test_a_real_local_server_sees_the_request(serve) -> None:  # type: ignore[no
         b'{"max_completion_tokens":10,"messages":[{"content":"test","role":"system"},'
         b'{"content":"test","role":"user"}],"model":"gpt-5-mini"}',
     )]
+
+
+def test_a_refused_connection_is_retried_unless_turned_off_and_noted_for_health() -> None:
+    from isbe.core import upstreams
+
+    tries = []
+
+    def refuse(request: httpx.Request) -> httpx.Response:
+        tries.append(1)
+        raise httpx.ConnectError("[Errno 111] Connection refused", request=request)
+
+    env = {"ISBE_LLM_PROVIDER": "openai", "ISBE_LLM_NO_AUTH": "true", "ISBE_LLM_BASE_URL": "http://127.0.0.1:9/v1"}
+    llm = Llm.from_vars(env.get, client=http.Http(5, transport=httpx.MockTransport(refuse)))
+    llm._sleep = lambda _: None
+    prompt = Prompt("t", Tier.FAST, "s", "u", 10)
+    with pytest.raises(httpx.ConnectError):
+        llm.send("m", prompt, 10)
+    assert len(tries) == 3
+    llm.retry_connect = False
+    with pytest.raises(httpx.ConnectError):
+        llm.send("m", prompt, 10)
+    assert len(tries) == 4
+    seen = upstreams.last(upstreams.MODEL)
+    assert seen is not None and not seen.ok and seen.error == "ConnectError: [Errno 111] Connection refused"
+    assert upstreams.unreachable(LlmError("x").with_traceback(None)) is False

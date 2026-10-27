@@ -5,8 +5,10 @@ import asyncio
 import json
 import re
 import socket
+import sqlite3
 import threading
 import time
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -15,8 +17,9 @@ import pytest
 import uvicorn
 from conftest import PASSWORD, TOKEN, FakeManager, add_user
 
-from isbe.core import assets
+from isbe.core import assets, db
 from isbe.web import Limits, TrustedProxies, create_app, serve, views
+from isbe.web.console import Static
 from isbe.web.guards import client_address
 
 
@@ -84,6 +87,63 @@ def test_serve_refuses_bad_binds_and_shared_mode_without_admin(data: Path) -> No
             serve(data, f"127.0.0.1:{port}", False, False)
     finally:
         busy.close()
+
+
+def test_serve_upgrades_every_workspace_before_it_listens(data: Path, monkeypatch: pytest.MonkeyPatch,
+                                                          capsys: pytest.CaptureFixture[str],
+                                                          caplog: pytest.LogCaptureFixture) -> None:
+    def at(path: Path, version: int) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with closing(sqlite3.connect(path, autocommit=True)) as conn:
+            for sql in db._migrations()[:min(version, 15)]:
+                conn.executescript(sql)
+            conn.execute(f"PRAGMA user_version = {version}")
+
+    every = data / "workspaces"
+    behind, corrupt, too_new = (every / ("a" * 32), every / ("b" * 32), every / ("c" * 32))
+    at(behind / "isbe.db", 15)
+    corrupt.mkdir(parents=True)
+    (corrupt / "isbe.db").write_bytes(b"not a database" * 100)
+    at(too_new / "isbe.db", 99)
+    versions: list[int] = []
+
+    def run(self: uvicorn.Server, sockets: list[socket.socket]) -> None:
+        with closing(sqlite3.connect(behind / "isbe.db")) as conn:
+            versions.append(conn.execute("PRAGMA user_version").fetchone()[0])
+
+    monkeypatch.setattr(uvicorn.Server, "run", run)
+    with caplog.at_level("ERROR", logger="isbe.web.server"):
+        serve(data, "127.0.0.1:0", False, False)
+    # Migrated before the console listened; the broken ones are named and skipped.
+    assert versions == [len(db._migrations())]
+    out = capsys.readouterr().out.splitlines()
+    assert out[0] == f"migrating {behind / 'isbe.db'} from schema v15 to v{len(db._migrations())}…"
+    assert out[1].startswith(f"migrated {behind / 'isbe.db'} in ") and out[-1].startswith("ISBE console on")
+    assert f"could not upgrade {corrupt / 'isbe.db'}" in caplog.text and "not a database" in caplog.text
+    assert f"could not upgrade {too_new / 'isbe.db'}" in caplog.text and "newer than this binary" in caplog.text
+    # The root database must work.
+    (data / "isbe.db").write_bytes(b"not a database" * 100)
+    with pytest.raises(RuntimeError, match=f"^{re.escape(str(data / 'isbe.db'))}: file is not a database"):
+        serve(data, "127.0.0.1:0", False, False)
+
+
+def test_serve_does_not_follow_a_linked_workspaces_directory(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                                                             caplog: pytest.LogCaptureFixture) -> None:
+    data, elsewhere = tmp_path / "data", tmp_path / "elsewhere"
+    outside = elsewhere / ("a" * 32) / "isbe.db"
+    outside.parent.mkdir(parents=True)
+    with closing(sqlite3.connect(outside, autocommit=True)) as conn:
+        for sql in db._migrations()[:15]:
+            conn.executescript(sql)
+        conn.execute("PRAGMA user_version = 15")
+    data.mkdir()
+    (data / "workspaces").symlink_to(elsewhere)
+    monkeypatch.setattr(uvicorn.Server, "run", lambda self, sockets: None)
+    with caplog.at_level("ERROR", logger="isbe.web.server"):
+        serve(data, "127.0.0.1:0", False, False)
+    assert "workspaces in" in caplog.text and "links are not allowed" in caplog.text
+    with closing(sqlite3.connect(outside)) as conn:
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == 15
 
 
 def test_serve_opens_the_queue_after_binding_and_closes_it(data: Path, monkeypatch: pytest.MonkeyPatch,
@@ -198,15 +258,25 @@ EXPECTED_CSP = (
 )
 
 
-def test_security_headers_on_every_response(live: Any) -> None:
+@pytest.mark.parametrize("built", [True, False], ids=["built", "unbuilt"])
+def test_security_headers_on_every_response(live: Any, tmp_path: Path, built: bool) -> None:
+    # Pin the React build instead of reading isbe/_assets/app, so the result does
+    # not depend on whether this checkout has run `npm run build` (#70).
+    build = tmp_path / "app"
+    if built:
+        (build / "assets").mkdir(parents=True)
+        (build / "index.html").write_text("<!doctype html><title>ISBE</title>")
+        (build / "assets/index-1.js").write_text("console.log(1)")
     server = live()
+    server.console.static = Static(app_dir=build)
     base = f"http://{server.host}"
     with httpx.Client(base_url=base, timeout=5) as client:
         responses = [
             client.get("/"), client.get("/reports?topic=x"), client.get("/app.js"), client.get("/app.css"),
-            client.get("/help"), client.get("/api/session"), client.get("/api/nope"), client.post("/"),
+            client.get("/help/service"), client.get("/api/session"), client.get("/api/nope"), client.post("/"),
             client.get("/figures/missing.png"), client.get("/api/session", headers={"Host": "evil.example"}),
             client.put("/api/settings", content=b"{}", headers={"Content-Type": "application/json"}),
+            client.get("/question"), client.get("/app/assets/index-1.js"),
         ]
     for response in responses:
         h = response.headers
@@ -215,9 +285,15 @@ def test_security_headers_on_every_response(live: Any) -> None:
         assert h["x-content-type-options"] == "nosniff"
         assert h["referrer-policy"] == "no-referrer"
         assert h["cross-origin-resource-policy"] == "same-origin"
-        assert h.get("cache-control") in ("no-store", "no-cache"), response.url
+        cached = response.url.path.startswith("/app/") and response.status_code == 200
+        allowed = ("public, max-age=31536000, immutable",) if cached else ("no-store", "no-cache")
+        assert h.get("cache-control") in allowed, response.url
         assert "server" not in h
-    assert [r.status_code for r in responses] == [200, 200, 200, 200, 200, 200, 404, 405, 404, 403, 403]
+    # React pages (/ and /question) answer 503 when the console is not built,
+    # and its files 404.
+    react, file = (200, 200) if built else (503, 404)
+    statuses = [r.status_code for r in responses]
+    assert statuses == [react, 200, 200, 200, 200, 200, 404, 405, 404, 403, 403, react, file]
 
 
 def test_the_ui_works_under_its_policy() -> None:
@@ -235,6 +311,23 @@ def test_the_ui_works_under_its_policy() -> None:
     assert 'style="' in app
     css = assets.text("web", "app.css")
     assert "@import" not in css and "url(" not in css
+
+
+def test_the_react_build_works_under_its_policy() -> None:
+    """The React build loads only its own files: no inline script or style
+    element, no outside origin; the policy stays as for web/."""
+    try:
+        root = assets.path("app")
+    except FileNotFoundError:
+        pytest.skip("the React console is not built (npm --prefix frontend run build)")
+    index = (root / "index.html").read_text(encoding="utf-8")
+    scripts = re.findall(r"<script\b([^>]*)>(.*?)</script>", index, re.S)
+    assert scripts and all(body == "" and 'src="/app/assets/' in attrs for attrs, body in scripts)
+    assert "<style" not in index and not re.search(r"\son[a-z]+\s*=", index)
+    for path in (root / "assets").rglob("*"):
+        if path.suffix in (".js", ".css"):
+            text = path.read_text(encoding="utf-8")
+            assert not re.search(r"""(fetch\(|EventSource\(|url\()\s*['"`]?(https?:)?//""", text), path
 
 
 def test_login_throttle_uses_the_peer_unless_a_trusted_proxy_forwards(data: Path) -> None:

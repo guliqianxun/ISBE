@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "prompt_sha": "d956f2c34654113d9b8f2b9afd7262b97dee9890e9397f9f3e926a1bc36cd142",
+   "reply": "{\"reformulation\": \"The association between exposure to urban green space and mental health outcomes.\", \"concepts\": [{\"role\": \"subject\", \"terms\": [\"green space\", \"greenspace\", \"greenness\", \"vegetation\"]}, {\"role\": \"subject\", \"terms\": [\"mental health\", \"psychological wellbeing\", \"wellbeing\", \"psychological distress\"]}, {\"role\": \"context\", \"terms\": [\"urban\", \"city\", \"residential\", \"metropolitan\"]}, {\"role\": \"method\", \"terms\": [\"NDVI\", \"vegetation index\", \"greenness index\"]}, {\"role\": \"method\", \"terms\": [\"cohort\", \"longitudinal study\", \"cross sectional study\"]}, {\"role\": \"outcome\", \"terms\": [\"depression\", \"anxiety\", \"stress\", \"rumination\"]}], \"year_from\": null, \"year_to\": null, \"criteria\": {\"include\": [\"Studies examine exposure to urban green space and mental health or psychological wellbeing outcomes in human populations.\", \"They may use observational, longitudinal, or experimental designs.\"], \"exclude\": [\"Studies of green space that report only physical health, ecological, or economic outcomes.\", \"Studies of mental health without green space exposure.\", \"Studies of non-urban green space where urban context is not relevant.\"]}, \"rationale\": \"Green space and mental health are required in every query, with urban context, exposure measures, study designs, and specific mental health outcomes narrowing the search.\"}"
+  }
+ ]
+}

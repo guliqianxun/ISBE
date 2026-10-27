@@ -25,15 +25,16 @@ async function reportsPage(path, reports, topics = [], reader = null) {
 test('empty selected topic opens a guide for that topic even when other topics have reports', async () => {
   const html = await reportsPage('/reports?topic=new', [{ topic_id: 'old' }], [{ id: 'new', label: 'New research', flavor: 'papers' }, { id: 'other', flavor: 'papers' }]);
   assert.match(html, /first-report-guide/);
-  assert.match(html, /data-act="guideOpen" data-topic="new"/);
+  // The guide is on Help, opened on the topic.
+  assert.match(html, /<a class="btn primary" href="\/help\?topic=new#report-guide">/);
   assert.doesNotMatch(html, /isbe --data|uv run|Docker|data directory/);
   assert.match(html, /Model configuration incomplete/);
-  assert.match(html, /<dialog id="report-guide"[^>]*aria-labelledby="guide-title"/);
+  assert.doesNotMatch(html, /<dialog id="report-guide"/);
 });
 
 test('an empty library offers the guide without inventing a topic or running a command', async () => {
   const html = await reportsPage('/reports', []);
-  assert.match(html, /data-act="guideOpen" data-topic=""/);
+  assert.match(html, /href="\/help#report-guide"/);
   assert.doesNotMatch(html, /isbe --data|uv run|Docker|data directory/);
 });
 
@@ -58,7 +59,7 @@ test('other-owner report navigation and downloads keep owner and are read-only',
   assert.match(html, /href="\/api\/report.md\?topic=papers&period=2026-W42&owner=alice"/);
   assert.match(html, /href="\/reports\?topic=papers&period=2026-W41&owner=alice"/);
   assert.match(html, /href="\/reports\?topic=papers&owner=alice"/);
-  assert.doesNotMatch(html, /data-act="mailOpen"|data-act="guideOpen"|\/private\/workspaces/);
+  assert.doesNotMatch(html, /data-act="mailOpen"|#report-guide|\/private\/workspaces/);
 });
 
 test('media weekly shelf and issue navigation count source material instead of zero papers', async () => {

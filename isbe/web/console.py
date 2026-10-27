@@ -1,6 +1,6 @@
 """The console's process-wide state, shared by every request."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from isbe import mail
 from isbe.core import assets
+from isbe.core.markdown import render_markdown
 from isbe.reports.library import Articles
 
 from .generation_api import Manager
@@ -44,8 +45,49 @@ class Limits:
     handlers: int = 16
 
 
+# The React build's file types; anything else in it is not served.
+_APP_TYPES = {
+    ".js": "text/javascript; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".webp": "image/webp",
+    ".woff2": "font/woff2",
+    ".json": "application/json; charset=utf-8",
+}
+
+
+@dataclass(frozen=True)
+class AppBuild:
+    """The React console as `npm run build` leaves it in `isbe/_assets/app`:
+    its page and, by path below `/app/`, its content-hashed files."""
+
+    index: bytes
+    files: Mapping[str, tuple[str, bytes]]
+
+    @classmethod
+    def read(cls, root: Path) -> AppBuild | None:
+        try:
+            index = (root / "index.html").read_bytes()
+        except OSError:
+            return None
+        files: dict[str, tuple[str, bytes]] = {}
+        assets_dir = root / "assets"
+        if assets_dir.is_dir():
+            for path in sorted(assets_dir.rglob("*")):
+                kind = _APP_TYPES.get(path.suffix)
+                if kind is None or path.is_symlink() or not path.is_file():
+                    continue
+                files[path.relative_to(root).as_posix()] = (kind, path.read_bytes())
+        return cls(index, files)
+
+
+@dataclass
 class Static:
-    """The UI's files, read once and kept in memory."""
+    """The UI's files, read once and kept in memory. `app_dir` is the React
+    build (default: the packaged or checked-out `isbe/_assets/app`)."""
+
+    app_dir: Path | None = None
 
     @cached_property
     def index(self) -> bytes:
@@ -58,6 +100,23 @@ class Static:
     @cached_property
     def app_css(self) -> bytes:
         return assets.path("web", "app.css").read_bytes()
+
+    @cached_property
+    def app(self) -> AppBuild | None:
+        """None when the React console was not built (a checkout without `npm run build`)."""
+        root = self.app_dir
+        if root is None:
+            try:
+                root = assets.path("app")
+            except FileNotFoundError:
+                return None
+        return AppBuild.read(root)
+
+    @cached_property
+    def help(self) -> bytes:
+        # The service guide: configuration, then Docker, upgrades and backups.
+        pages = (assets.text("docs", "configuration.md"), assets.text("docs", "deployment.md"))
+        return render_markdown("\n\n".join(pages)).encode("utf-8")
 
 
 @dataclass

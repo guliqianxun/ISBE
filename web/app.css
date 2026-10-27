@@ -202,6 +202,7 @@ details.call h4{margin:6px 0 0;font-size:11.5px;color:var(--muted);letter-spacin
 .setting-hint{color:var(--muted);font-size:12px;line-height:1.5}.setting-hint:empty{display:none}.setting-remove{align-self:flex-start;background:none;border:0;border-bottom:1px solid var(--line);padding:0 0 3px;color:var(--text-2);font-size:12px;cursor:pointer}.setting-remove:hover{color:var(--danger)}
 .settings-section details{border-top:1px solid var(--line-soft);padding-top:16px}.settings-section summary{cursor:pointer;min-height:32px;font-size:13px;color:var(--text-2)}.settings-section details[open] summary{margin-bottom:12px}
 .settings-storage{margin:0;font-size:12.5px;color:var(--muted);line-height:1.7;max-width:800px}.settings-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding-top:4px}.settings-actions p{flex:1 1 260px;margin:0;font-size:13px;line-height:1.6;color:var(--accent)}.settings-actions p.error{color:var(--danger)}.settings-form button:disabled{opacity:.5;cursor:not-allowed}
+.settings-file p{flex-basis:100%}.settings-file p:empty{display:none}.settings-file .settings-file-hint{color:var(--muted);font-size:12.5px}.settings-file button:disabled{opacity:.5;cursor:not-allowed}
 @media (max-width:760px){.settings-grid{grid-template-columns:1fr}.settings-section{padding:20px 18px}.settings-actions p{flex-basis:100%}}
 
 /* Topic editor: a searchable index alongside the active draft. */
@@ -234,15 +235,13 @@ details.call h4{margin:6px 0 0;font-size:11.5px;color:var(--muted);letter-spacin
 .source-counts{margin:0 0 14px}.source-timeline{margin-top:10px;padding:10px 14px;background:var(--sunken);border-left:2px solid var(--line);font-size:13px;line-height:1.7}.source-timeline h4{margin:0 0 4px;font:600 13px/1.5 var(--sans)}.source-timeline ol{margin:6px 0 0;padding-left:1.2em}.source-timeline li{margin:4px 0;overflow-wrap:anywhere}
 @media(max-width:1100px){.search-workspace{grid-template-columns:1fr}.search-plans #search-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}.search-plan{margin-top:0}}
 .search-plan-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.search-plan-actions .btn{padding:0 9px}.source-inbox-context>div{margin-right:auto;min-width:0}
-/* First report: native modal keeps keyboard focus inside the current step. */
-.report-guide{box-sizing:border-box;width:min(680px,calc(100% - 32px));max-height:calc(100dvh - 40px);padding:28px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--text);box-shadow:0 24px 100px #0006;font:14px/1.65 var(--sans)}
-.report-guide::backdrop{background:#0008;backdrop-filter:blur(3px)}
+/* The report guide's steps and progress (Help, frontend/src/help/ReportGuide.tsx). */
 .guide-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.guide-head h2{margin:5px 0 0;font:600 27px/1.3 var(--serif)}.guide-head .eyebrow{margin:0}.guide-head .btn{flex:none;min-width:44px}
 .guide-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;list-style:none;margin:26px 0;padding:0}.guide-steps li{border-top:2px solid var(--line);padding-top:10px;color:var(--muted);font-size:12px}.guide-steps li[aria-current]{color:var(--accent);border-color:var(--accent)}.guide-steps span{display:block;font:12px var(--mono);margin-bottom:4px}
-.guide-body{display:flex;flex-direction:column;align-items:stretch;gap:16px;min-height:170px}.guide-body h3,.guide-body p{margin:0}.guide-body>.btn{align-self:flex-start}.guide-ready{color:var(--accent)}.guide-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line-soft)}.report-guide button:disabled{opacity:.5;cursor:not-allowed}
+.guide-body{display:flex;flex-direction:column;align-items:stretch;gap:16px;min-height:170px}.guide-body h3,.guide-body p{margin:0}.guide-body>.btn{align-self:flex-start}.guide-ready{color:var(--accent)}.guide-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line-soft)}
 .generation-stages{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}.generation-stages li{display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-bottom:1px solid var(--line-soft)}.generation-stages li:last-child{border:0}.generation-stages small{color:var(--muted)}.generation-stages li[aria-current]{background:var(--raised);color:var(--accent)}.generation-stages li[aria-current] small{color:inherit}
 .first-report-guide>.btn{align-self:flex-start}.first-report-guide p{margin:0}
-@media(max-width:640px){.report-guide{padding:20px}.guide-head h2{font-size:23px}.guide-steps{gap:8px}.guide-actions .btn{flex:1}}
+@media(max-width:640px){.guide-head h2{font-size:23px}.guide-steps{gap:8px}.guide-actions .btn{flex:1}}
 
 /* Customize panel */
 .custom{flex:1 1 340px;box-sizing:border-box;background:var(--nav);border-left:1px solid var(--line-soft);padding:28px 24px 40px;display:flex;flex-direction:column;gap:28px}

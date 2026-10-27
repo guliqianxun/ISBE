@@ -213,7 +213,7 @@ isbe --data data media-weekly shanghai-esg-live-20261018 --topic shanghai-esg-gr
 
 接口：`POST /api/sources/search/{id}/weekly`，请求体为 `{"topic_id":"shanghai-esg-green-finance","week_end":"2026-10-18"}`。沿用来源管理的管理员、工作区、Host、CSRF 和 JSON 检查，与采集／报告任务共用执行锁；本地渲染完成后返回报告地址与各分区数量。重复请求保存为独立版本，不视为幂等覆盖。
 
-该入口生成的是完整候选材料的汇编，未加入自动选稿、跨媒体事件合并、全文提炼或模型简评。编辑稿发布使用独立的 `media-briefing` 命令，按议题组织事件进展、背景与后续日程，见 [行业周报使用方式](configuration.md#媒体材料与行业周报)。引用位置检查不等于人工语义核验。
+该入口生成的是完整候选材料的汇编，未加入自动选稿、跨媒体事件合并、全文提炼或模型简评。编辑稿发布使用独立的 `media-briefing` 命令，按议题组织事件进展、背景与后续日程，见 [行业周报使用方式](research.md#媒体材料与行业周报)。引用位置检查不等于人工语义核验。
 
 ### 原文展开与正文缓存
 

@@ -38,7 +38,7 @@ from typing import Any
 
 import httpx
 
-from isbe.core import db, http, jsonfmt, settings, validators
+from isbe.core import db, http, jsonfmt, settings, upstreams, validators
 from isbe.core.validators import RESERVED_BODY, provider_defaults
 
 log = logging.getLogger(__name__)
@@ -162,6 +162,11 @@ class Llm:
     http: http.Http
     _key: str = field(default="", repr=False)
     _sleep: Callable[[float], None] = field(default=time.sleep, repr=False)
+    # False: a connection that could not be made at all (refused, no route, DNS) is
+    # not retried, so an interactive caller learns at once that the model is gone.
+    retry_connect: bool = field(default=True, repr=False)
+    # The seconds before each retry; question work retries once (`plan.load_model`).
+    waits: tuple[float, ...] = field(default=(5, 30), repr=False)
 
     @classmethod
     def from_env(cls, *, client: http.Http | None = None) -> Llm:
@@ -305,8 +310,22 @@ class Llm:
         }
 
     def send(self, model: str, p: Prompt, max_tokens: int) -> Any:
-        """POST with up to two retries (after 5 s, then 30 s) on rate limits, overload,
-        5xx and network errors; not on a timeout, which would just repeat."""
+        """POST with up to two retries (after `waits`: 5 s, then 30 s) on rate limits, overload,
+        5xx and network errors (a refused connection only with `retry_connect`); not
+        on a timeout, which would just repeat. The outcome is noted in `upstreams`."""
+        try:
+            out = self._send(model, p, max_tokens)
+        except Exception as error:
+            # A rejection that names the context is the prompt's fault: the model answered.
+            answered = isinstance(error, ContextExceeded)
+            upstreams.record(upstreams.MODEL, answered, describe_failure(error))
+            if not answered:
+                log.warning("llm: %s call to %s failed: %s", p.purpose, model, describe_failure(error))
+            raise
+        upstreams.record(upstreams.MODEL, True)
+        return out
+
+    def _send(self, model: str, p: Prompt, max_tokens: int) -> Any:
         url, body = self._request(model, p, max_tokens)
         # Validation already refuses reserved keys; never let one replace ours anyway.
         body.update((k, v) for k, v in self.extra.items() if k not in RESERVED_BODY)
@@ -314,7 +333,7 @@ class Llm:
             headers = {"x-api-key": self._key, "anthropic-version": "2023-06-01"}
         else:
             headers = {"Authorization": f"Bearer {self._key}"} if self._key else {}
-        waits = iter((5, 30))
+        waits = iter(self.waits)
         while True:
             error: Exception
             with ExitStack() as stack:
@@ -325,7 +344,7 @@ class Llm:
                 except httpx.TimeoutException:
                     raise
                 except (httpx.NetworkError, httpx.RemoteProtocolError) as failure:
-                    retry, error = True, failure
+                    retry, error = self.retry_connect or not isinstance(failure, httpx.ConnectError), failure
                 else:
                     status = response.status_code
                     if status == 200:
@@ -337,6 +356,12 @@ class Llm:
                 raise error
             log.warning("llm: %s; retrying in %ss", error, wait)
             self._sleep(wait)
+
+
+def describe_failure(error: BaseException) -> str:
+    """A failed send as text safe to show: the error class and its message, which
+    for network errors and rejections (`_rejection`) carries no provider body."""
+    return f"{type(error).__name__}: {error}" if str(error) else type(error).__name__
 
 
 def _rejection(status: int, response: httpx.Response) -> ProviderError:
@@ -359,7 +384,9 @@ def _rejection(status: int, response: httpx.Response) -> ProviderError:
             if counts is None:
                 return ContextExceeded(None, None)
             return ContextExceeded(int(counts[1]), int(counts[2]))
-    return ProviderError(f"HTTP {status}: model provider rejected the request")
+    # A 5xx is the provider failing, not refusing: the console tells the two apart.
+    verb = "failed" if status >= 500 else "rejected"
+    return ProviderError(f"HTTP {status}: model provider {verb} the request")
 
 
 def _i64(value: Any) -> int | None:

@@ -17,7 +17,7 @@ def test_init_creates_the_layout_and_prints_the_path_as_given(tmp_path: Path, ca
     for sub in ("topics", "memory", "reports"):
         assert (tmp_path / "data" / sub).is_dir()
     conn = sqlite3.connect(tmp_path / "data" / "isbe.db")
-    assert conn.execute("PRAGMA user_version").fetchone()[0] == 10
+    assert conn.execute("PRAGMA user_version").fetchone()[0] == 19
     conn.close()
     assert cli.main(["init", "--data", raw]) == 0, "safe to re-run, --data after the command"
 

@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "prompt_sha": "097320a8868f99749dae1796509d545450017068c2a5751ca39d1f730254f847",
+   "reply": "{\"reformulation\": \"Identifying deep learning methods for radar echo extrapolation in zero to two hour precipitation nowcasting.\", \"concepts\": [{\"role\": \"subject\", \"terms\": [\"radar echo extrapolation\", \"radar reflectivity extrapolation\", \"radar echo prediction\", \"radar extrapolation\", \"radar echo forecasting\"]}, {\"role\": \"subject\", \"terms\": [\"precipitation nowcasting\", \"rainfall nowcasting\", \"nowcasting\", \"precipitation forecast\", \"rainfall forecast\"]}, {\"role\": \"method\", \"terms\": [\"deep learning\", \"neural network\", \"artificial neural network\"]}, {\"role\": \"method\", \"terms\": [\"convolutional neural network\", \"CNN\", \"convolutional network\"]}, {\"role\": \"method\", \"terms\": [\"recurrent neural network\", \"RNN\", \"ConvLSTM\"]}, {\"role\": \"context\", \"terms\": [\"two hours\", \"short term\", \"near term\"]}, {\"role\": \"landmark\", \"terms\": [\"ConvLSTM\", \"UNet\", \"Transformer\", \"PredNet\", \"TrajGRU\", \"SimVP\"]}], \"year_from\": null, \"year_to\": null, \"criteria\": {\"include\": [\"Applies deep learning to extrapolate radar echoes for precipitation nowcasting within a 0-2 hour horizon.\"], \"exclude\": [\"Uses radar echo extrapolation for long-range forecasts or non-precipitation targets.\", \"Uses numerical weather prediction or optical flow without deep learning.\", \"Uses satellite or station data without radar echoes.\"]}, \"rationale\": \"Radar echo extrapolation and precipitation nowcasting are required subjects, combined with deep, convolutional, recurrent, and named radar nowcasting models and short-horizon context.\"}"
+  }
+ ]
+}

@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:question_metrics",
+  "title": "question_metrics@1: what one run achieved and cost",
+  "description": "See README.md for how each number is computed. `recall` and `screen_audit` are present only when the run answered a sample question or was audited.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "counts",
+    "stage_ms",
+    "tokens"
+  ],
+  "properties": {
+    "schema": {
+      "const": "question_metrics@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "sample_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The question_samples@1 question this run answered."
+    },
+    "recall": {
+      "type": "object",
+      "required": [
+        "must_find",
+        "candidates_found",
+        "included_found",
+        "missing"
+      ],
+      "properties": {
+        "must_find": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "candidates_found": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Must-find papers among the deduplicated candidates, before screening."
+        },
+        "included_found": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Must-find papers whose effective decision is include."
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Titles of the must-find papers not included."
+        }
+      },
+      "additionalProperties": false
+    },
+    "screen_audit": {
+      "type": "object",
+      "required": [
+        "sampled",
+        "agreed",
+        "seed",
+        "auditor"
+      ],
+      "properties": {
+        "sampled": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "agreed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "seed": {
+          "type": "integer",
+          "description": "The random seed that drew the sample, so it can be redrawn."
+        },
+        "auditor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "hits",
+        "candidates",
+        "included",
+        "excluded",
+        "overridden",
+        "expanded"
+      ],
+      "properties": {
+        "queries_run": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Search results before deduplication."
+        },
+        "candidates": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unique papers after deduplication, expansion included."
+        },
+        "included": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excluded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overridden": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expanded": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "New candidates added by citation expansion."
+        },
+        "failed_batches": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "stage_ms": {
+      "type": "object",
+      "required": [
+        "total"
+      ],
+      "properties": {
+        "plan": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "search": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "screen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expand": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "graph": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "tokens": {
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_stage": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "plan",
+              "screen",
+              "expand"
+            ]
+          },
+          "additionalProperties": {
+            "$ref": "urn:isbe:question:common#/$defs/llm_usage"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

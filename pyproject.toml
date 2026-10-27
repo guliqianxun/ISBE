@@ -1,6 +1,6 @@
 [project]
 name = "isbe"
-version = "0.2.0.dev0"
+version = "0.2.0"
 description = "Self-hosted research radar: topics → triage → digest → human-reviewed memory"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -25,7 +25,7 @@ dependencies = [
 isbe = "isbe.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.3", "ruff>=0.17"]
+dev = ["pytest>=8.3", "pytest-cov>=7.0", "ruff>=0.17", "jsonschema>=4.23"]
 
 [build-system]
 requires = ["hatchling>=1.26"]
@@ -33,25 +33,30 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["isbe"]
+# The React console, built by `npm --prefix frontend run build` (git-ignored, so named here).
+artifacts = ["isbe/_assets/app/"]
 
 # Packaged so an installed `isbe` needs no checkout.
 [tool.hatch.build.targets.wheel.force-include]
 "migrations" = "isbe/_assets/migrations"
 "prompts" = "isbe/_assets/prompts"
 "web" = "isbe/_assets/web"
-"README.md" = "isbe/_assets/README.md"
-"README.en.md" = "isbe/_assets/README.en.md"
-"docs" = "isbe/_assets/docs"
-"deploy/searxng/README.md" = "isbe/_assets/deploy/searxng/README.md"
+"docs/configuration.md" = "isbe/_assets/docs/configuration.md"
+"docs/deployment.md" = "isbe/_assets/docs/deployment.md"
 
 [tool.pytest.ini_options]
 testpaths = ["tests/py"]
-addopts = "-q"
-markers = ["real_hash: run with the real 600 000-round PBKDF2 instead of the test stub"]
+addopts = "-q -m 'not live'"
+markers = [
+    "real_hash: run with the real 600 000-round PBKDF2 instead of the test stub",
+    "live: needs real services (essaies, Strata); skipped unless selected with -m live",
+]
 
 # Lint only; the code is not auto-formatted, so line length is not enforced.
 [tool.ruff]
 target-version = "py314"
+# CI keeps its package caches in the checkout.
+extend-exclude = [".uv-cache", ".npm-cache"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I", "UP", "B", "SIM", "C4", "RUF"]
@@ -65,3 +70,12 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Test helpers defined in a loop run in that iteration, so the closure is safe.
 "tests/**" = ["B023"]
+
+# `pytest --cov`: which code counts; scripts/py-test --cov and CI print the summary.
+[tool.coverage.run]
+source = ["isbe"]
+branch = true
+
+[tool.coverage.report]
+skip_covered = true
+skip_empty = true

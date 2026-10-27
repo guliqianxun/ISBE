@@ -1,0 +1,60 @@
+{
+ "note": "The queries whose recorded candidates model.screen.json screened (plan.json's and Strata's pre-composer plan, 2026-10-23); replay.screening_plan reads them so the recorded verdicts keep matching.",
+ "queries": [
+  {
+   "id": "q1",
+   "query": "machine learning medium-range global weather forecasting",
+   "priority": 1
+  },
+  {
+   "id": "q2",
+   "query": "data-driven global weather model",
+   "priority": 2
+  },
+  {
+   "id": "q3",
+   "query": "graph neural network weather forecasting",
+   "priority": 3
+  },
+  {
+   "id": "q4",
+   "query": "diffusion ensemble weather forecasting",
+   "priority": 4
+  },
+  {
+   "id": "q5",
+   "query": "benchmark data-driven weather forecasting",
+   "priority": 5
+  },
+  {
+   "id": "q6",
+   "query": "(\"machine learning\" OR \"deep learning\") (weather OR forecast) global",
+   "priority": 1
+  },
+  {
+   "id": "q7",
+   "query": "(\"data driven\" OR \"deep learning\") (weather OR forecast) (\"medium range\" OR global)",
+   "priority": 2
+  },
+  {
+   "id": "q8",
+   "query": "(\"foundation model\" OR transformer OR diffusion) (weather OR forecast)",
+   "priority": 3
+  },
+  {
+   "id": "q9",
+   "query": "(Pangu OR GraphCast OR FourCastNet OR GenCast) (weather OR forecast)",
+   "priority": 3
+  },
+  {
+   "id": "q10",
+   "query": "(\"graph neural network\" OR transformer OR diffusion) (forecast OR prediction)",
+   "priority": 4
+  },
+  {
+   "id": "q11",
+   "query": "(climate OR ocean) (forecast OR prediction) (\"deep learning\" OR \"machine learning\")",
+   "priority": 5
+  }
+ ]
+}

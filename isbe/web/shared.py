@@ -5,7 +5,7 @@ workspace is the data directory itself. Shared mode requires a session
 cookie; each account works in `workspaces/<id>` (`core.paths.workspace`),
 administrators may read another account's workspace with `?owner=<id>`,
 and service settings, accounts, sources, runs, model calls, triage, the mail
-test and `/help` are for administrators only.
+test and the service help (`/help/service`) are for administrators only.
 """
 
 from contextlib import closing
@@ -17,7 +17,7 @@ from isbe import auth, mail
 from isbe.core import paths, settings
 from isbe.reports import library
 
-from . import accounts, routes, tasks, views
+from . import accounts, health, question_api, routes, tasks, views
 from .connect import open_db
 from .console import Console
 from .guards import cookie, session_token
@@ -35,7 +35,7 @@ from .wire import (
     request_json,
 )
 
-_ADMIN_ONLY = frozenset({"/api/settings", "/api/runs", "/api/call", "/api/triage", "/api/mail/test", "/help"})
+_ADMIN_ONLY = frozenset({"/api/settings", "/api/runs", "/api/call", "/api/triage", "/api/mail/test", "/help/service"})
 
 
 def user_json(user: auth.User | None) -> dict[str, Any] | None:
@@ -68,7 +68,7 @@ def route(console: Console, req: Request) -> Reply:
     """Answer one request; runs in a worker thread."""
     path = req.path
     # The UI contains no private data; every dynamic request below is checked.
-    if not path.startswith("/api/") and not path.startswith("/figures/") and path != "/help":
+    if not path.startswith("/api/") and not path.startswith("/figures/") and path != "/help/service":
         return routes.ui(console, req)
     if (refused := console.access.rejects(req)) is not None:
         return refused
@@ -84,6 +84,8 @@ def _route(console: Console, conn: Connection, req: Request) -> Reply:
     user = auth.authenticate(conn, session_token(req)) if console.shared else auth.local_user()
     if path == "/api/session" and req.method == "GET":
         return json_reply(200, session(console, user))
+    if path == "/api/health" and req.method == "GET":
+        return json_reply(200, health.health(console))
     if path == "/api/login" and req.method == "POST":
         return _login(console, conn, req)
     if user is None:
@@ -126,7 +128,7 @@ def _authenticated(console: Console, conn: Connection, req: Request, user: auth.
     sources = path == "/api/sources" or path.startswith("/api/sources/")
     if not admin and (sources or path in _ADMIN_ONLY):
         return error(403, "Administrator access is required.")
-    if path in ("/api/settings", "/help"):
+    if path in ("/api/settings", "/help/service"):
         return routes.route(console, conn, console.root, req)
     owner = req.args.get("owner", user.id)
     if owner != user.id:
@@ -156,6 +158,12 @@ def _workspace(
             ready = session(console, user)["llm"]["ready"]
             value["services"] = {"llm": "configured" if ready else None}
         return json_reply(200, value)
+    if path == "/api/home":
+        value = views.home(conn, data, console.root)
+        if member:
+            ready = session(console, user)["llm"]["ready"]
+            value["services"] = {"llm": "configured" if ready else None}
+        return json_reply(200, value)
     if path == "/api/report" and owner != user.id:
         found = library.report(conn, data, req.arg("topic"), req.arg("period"), articles=console.articles)
         if found is None:
@@ -170,4 +178,6 @@ def _workspace(
         )
     if path == "/api/mail" or path.startswith("/api/mail/"):
         return mail_route(console, conn, data, console.root, req, user)
+    if path == "/api/question" or path.startswith("/api/question/"):
+        return question_api.route(console, conn, data, req, user, owner)
     return routes.route(console, conn, data, req)

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from isbe.core import settings
+from isbe.core import settings, upstreams
 
 
 @pytest.fixture
@@ -24,6 +24,7 @@ def clean_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     for name in settings.KEYS:
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setattr(settings, "_saved", {})
+    upstreams.forget()
     yield
 
 

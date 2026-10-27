@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "contains": "扩散模型在图像生成中是如何发展起来的？",
+   "reply": "{\"reformulation\": \"The development of diffusion probabilistic models for image generation, from early formulations to guided, latent and transformer-based models.\", \"subject_terms\": [\"image generation\", \"image synthesis\"], \"method_terms\": [\"diffusion model\", \"score-based generative model\", \"denoising\"], \"outcome_terms\": [\"sample quality\", \"text-to-image generation\"], \"keyword_layers\": {\"canonical\": [\"denoising diffusion probabilistic models\", \"score-based generative modeling\"], \"mainstream\": [\"latent diffusion image synthesis\", \"classifier-free guidance\"], \"emerging\": [\"diffusion transformer\", \"controllable text-to-image diffusion\"], \"method_centric\": [\"stochastic differential equation generative model\"], \"cross_domain\": [\"nonequilibrium thermodynamics deep learning\"]}, \"queries\": [{\"id\": \"q1\", \"query\": \"denoising diffusion probabilistic models\", \"layer\": \"canonical\", \"priority\": 1}, {\"id\": \"q2\", \"query\": \"score-based generative modeling stochastic differential equations\", \"layer\": \"canonical\", \"priority\": 2}, {\"id\": \"q3\", \"query\": \"latent diffusion high-resolution image synthesis\", \"layer\": \"mainstream\", \"priority\": 3}, {\"id\": \"q4\", \"query\": \"text-to-image diffusion model\", \"layer\": \"mainstream\", \"priority\": 4}, {\"id\": \"q5\", \"query\": \"diffusion guidance image synthesis\", \"layer\": \"emerging\", \"priority\": 5}], \"year_from\": 2014, \"year_to\": null, \"criteria\": {\"include\": [\"Proposes, analyses or substantially improves a diffusion or score-based model for generating images\"], \"exclude\": [\"Applies an existing diffusion model to a downstream task without a generative contribution\", \"Diffusion in the physical or graph-signal sense\"]}, \"rationale\": \"Follows the field's lineage: the original formulation, DDPM and score SDEs, then guidance, latent models and transformers.\"}"
+  }
+ ]
+}

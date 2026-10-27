@@ -18,6 +18,8 @@ import logging
 import re
 import secrets
 import socket
+import sqlite3
+from collections.abc import Callable
 from contextlib import closing
 from pathlib import Path
 from typing import Any
@@ -26,7 +28,7 @@ import uvicorn
 from uvicorn.protocols.http.h11_impl import H11Protocol
 
 from isbe import auth
-from isbe.core import db
+from isbe.core import db, paths
 from isbe.reports.library import Articles
 
 from .app import create_app
@@ -141,7 +143,40 @@ def server_config(app: Any, limits: Limits, trusted: TrustedProxies) -> uvicorn.
         timeout_keep_alive=max(1, round(limits.keep_alive_seconds)),
         limit_concurrency=limits.connections,
         log_level="warning",
+        # Open event streams last minutes; on shutdown they are cut after this.
+        timeout_graceful_shutdown=5,
     )
+
+
+def upgrade(data: Path, say: Callable[[str], None] = lambda line: print(line, flush=True)) -> None:
+    """Migrate (and compact) every database of the data directory before the
+    socket is bound, so no request waits for a migration (016 takes about 30 s
+    per GB). The root database must work or the console does not start; a
+    member workspace that cannot be upgraded (corrupt, too new, locked, a link)
+    is logged and skipped, and only its owner's requests fail, as before."""
+    root = data / "isbe.db"
+    if root.is_file():
+        try:
+            db.upgrade(root, say)
+        except (sqlite3.Error, db.SchemaTooNew) as error:
+            raise RuntimeError(f"{root}: {error}") from error
+    every = data / "workspaces"
+    try:
+        for ancestor in (data, *data.parents, every):
+            paths.check_path(ancestor)
+        members = sorted(every.iterdir()) if every.is_dir() else []
+    except (paths.UnsafePath, OSError) as error:
+        log.error("workspaces in %s were not upgraded: %s", data, error)
+        return
+    for member in members:
+        path = member / "isbe.db"
+        try:
+            paths.check_path(member)
+            paths.check_path(path)
+            if path.is_file():
+                db.upgrade(path, say)
+        except (sqlite3.Error, db.SchemaTooNew, paths.UnsafePath, OSError) as error:
+            log.error("could not upgrade %s, its owner's requests will fail: %s", path, error)
 
 
 def serve(
@@ -168,6 +203,7 @@ def serve(
     host, port, family = parse_bind(bind)
     if not shared and not loopback(ipaddress.ip_address(host.split("%", 1)[0])):
         raise RuntimeError("Use --shared for network access; local mode only listens on localhost.")
+    upgrade(data)
     with closing(db.connect(data / "isbe.db")) as conn:
         if shared and not auth.has_admin(conn):
             raise RuntimeError("Create an administrator with account-add --admin before starting shared mode.")

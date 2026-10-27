@@ -1,0 +1,82 @@
+{
+  "schema": "question_plan@1",
+  "run_id": "run-20261022-a1",
+  "version": 1,
+  "parent_version": null,
+  "created_at": "2026-10-22T10:00:05Z",
+  "source": "model",
+  "question": "基于深度学习的雷达回波外推降水临近预报（0–2 小时）有哪些主要方法？",
+  "lang": "zh",
+  "reformulation": "Deep learning methods for radar-echo extrapolation in precipitation nowcasting at 0–2 hour lead times.",
+  "subject_terms": [
+    "precipitation nowcasting",
+    "radar echo extrapolation"
+  ],
+  "method_terms": [
+    "deep learning",
+    "recurrent neural network"
+  ],
+  "outcome_terms": [
+    "forecast skill",
+    "CSI"
+  ],
+  "keyword_layers": {
+    "canonical": [
+      "radar echo extrapolation",
+      "optical flow nowcasting"
+    ],
+    "mainstream": [
+      "ConvLSTM precipitation nowcasting",
+      "U-Net radar nowcasting"
+    ],
+    "emerging": [
+      "generative precipitation nowcasting",
+      "diffusion model nowcasting"
+    ],
+    "method_centric": [
+      "spatiotemporal sequence prediction"
+    ],
+    "cross_domain": [
+      "video prediction"
+    ]
+  },
+  "queries": [
+    {
+      "id": "q1",
+      "query": "\"precipitation nowcasting\" \"deep learning\" radar",
+      "layer": "canonical",
+      "priority": 1
+    },
+    {
+      "id": "q2",
+      "query": "\"radar echo extrapolation\" neural network",
+      "layer": "canonical",
+      "priority": 2
+    },
+    {
+      "id": "q3",
+      "query": "generative \"precipitation nowcasting\"",
+      "layer": "emerging",
+      "priority": 3
+    }
+  ],
+  "year_from": 2012,
+  "year_to": null,
+  "criteria": {
+    "include": [
+      "Proposes, evaluates or benchmarks a data-driven method for radar-based precipitation nowcasting up to a few hours ahead"
+    ],
+    "exclude": [
+      "Seasonal or climate-scale forecasting",
+      "Rain gauge interpolation without a forecast"
+    ]
+  },
+  "rationale": "Anchored on radar nowcasting, from extrapolation baselines to generative models.",
+  "llm": {
+    "model": "strata-qwen",
+    "input_tokens": 1840,
+    "output_tokens": 612,
+    "duration_ms": 9400,
+    "calls": 1
+  }
+}

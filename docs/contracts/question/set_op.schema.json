@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:set_op",
+  "title": "set_op@1: one recorded operation on paper sets",
+  "description": "Replaying the operations in order from the query sets reproduces every derived set. Operations match members by identity key.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "op_id",
+    "op",
+    "inputs",
+    "params",
+    "output",
+    "created_at",
+    "stats"
+  ],
+  "properties": {
+    "schema": {
+      "const": "set_op@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "op_id": {
+      "$ref": "urn:isbe:question:common#/$defs/local_id"
+    },
+    "op": {
+      "description": "union, intersection and difference (first input minus the rest) are set algebra; dedup merges members that share an identity; screen keeps the members whose effective decision is include or unscreened; limit keeps the first `params.n` by `params.order_by`.",
+      "enum": [
+        "union",
+        "intersection",
+        "difference",
+        "dedup",
+        "screen",
+        "limit"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "urn:isbe:question:common#/$defs/local_id"
+      }
+    },
+    "params": {
+      "type": "object",
+      "description": "Whatever the operation needs to be replayed, e.g. {\"n\": 200, \"order_by\": \"cited_by_count\"} for limit or {\"plan_version\": 2} for screen."
+    },
+    "output": {
+      "$ref": "urn:isbe:question:common#/$defs/local_id"
+    },
+    "created_at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    },
+    "stats": {
+      "type": "object",
+      "required": [
+        "input_sizes",
+        "output_size"
+      ],
+      "properties": {
+        "input_sizes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "output_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "merged": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Members folded into another by identity."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "op": {
+            "enum": [
+              "intersection",
+              "difference"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "inputs": {
+            "minItems": 2
+          }
+        }
+      }
+    }
+  ]
+}

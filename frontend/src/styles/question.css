@@ -1,0 +1,1111 @@
+/* The question pages and the star map (docs/question/star-map.md). The map
+   canvas is always a night sky; the panels around it follow the app theme. */
+.isbe {
+  --sky-bg: oklch(0.16 0.025 265);
+  --sky-dust: oklch(0.85 0.02 85 / 0.35);
+  --sky-label: oklch(0.93 0.01 90);
+  --sky-mark: oklch(0.97 0.01 90);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.link {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.q-ask textarea,
+.q-field input,
+.q-field select,
+.q-side select,
+.q-plan input,
+.q-plan select,
+.q-plan textarea {
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--sunken);
+  color: var(--text);
+  font: 14px/1.5 var(--sans);
+  padding: 8px 10px;
+}
+.q-question textarea {
+  width: 100%;
+  resize: vertical;
+  font-size: 16px;
+}
+.q-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+.q-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+fieldset.q-field {
+  flex-direction: row;
+  align-items: center;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+fieldset.q-field legend {
+  padding: 0 0 6px;
+}
+fieldset.q-field input {
+  width: 6em;
+}
+.q-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  font-size: 13px;
+}
+.q-check input {
+  accent-color: var(--accent);
+}
+.q-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.q-history li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+.q-history a {
+  flex: 1 1 300px;
+}
+
+/* --- run page --- */
+.q-run {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.q-run-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.q-run-question {
+  margin: 0;
+  max-width: 60ch;
+  font: 600 clamp(19px, 1.9vw, 24px) / 1.35 var(--sans);
+  letter-spacing: -0.01em;
+}
+.q-run-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.q-spacer {
+  flex: 1;
+}
+.q-chip-button {
+  border: 0;
+  cursor: pointer;
+}
+.q-counts {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.q-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--faint);
+}
+.q-stages li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.q-stages li::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  box-sizing: border-box;
+}
+.q-stages li[data-state='begin'] {
+  color: var(--accent);
+  font-weight: 500;
+}
+.q-stages li[data-state='begin']::before {
+  background: currentColor;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.q-stages li[data-state='end'] {
+  color: var(--text-2);
+}
+.q-stages li[data-state='end']::before {
+  background: currentColor;
+}
+.q-stages li[data-state='stopped'] {
+  color: var(--danger);
+}
+/* A bar, not a dot: stopped differs from pending by shape too. */
+.q-stages li[data-state='stopped']::before {
+  height: 2px;
+  border: 0;
+  border-radius: 1px;
+  background: currentColor;
+}
+.btn.danger {
+  border: 0;
+  background: var(--danger);
+  color: var(--bg);
+  font-weight: 600;
+}
+/* Where the run stopped: the accent and weight of a stage at work, without its glow. */
+.q-stages li[data-state='paused'] {
+  color: var(--accent);
+  font-weight: 500;
+}
+/* Two bars, the pause sign: not the filled dot of a stage at work. */
+.q-stages li[data-state='paused']::before {
+  width: 6px;
+  height: 8px;
+  border: 0;
+  border-left: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  border-radius: 0;
+}
+.q-stages li[data-state='skipped'] {
+  opacity: 0.7;
+}
+.q-stages li[data-state='skipped']::before {
+  border-style: dashed;
+}
+.q-connection:focus {
+  outline: none;
+}
+/* Kept in the page while empty (it holds focus after Retry): no gap of its own. */
+.q-connection:empty {
+  margin-top: -16px;
+}
+.q-banner {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 10px;
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  font-size: 13px;
+}
+.q-plan h3 {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.q-disclose {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.q-disclose::before {
+  content: '▸ ';
+}
+.q-disclose[aria-expanded='true']::before {
+  content: '▾ ';
+}
+.q-review {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.q-reformulation {
+  margin: 0;
+  color: var(--text-2);
+}
+.q-concepts,
+.q-queries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13.5px;
+}
+.q-concepts li,
+.q-queries li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.q-concepts input,
+.q-queries input {
+  flex: 1;
+  min-width: 0;
+}
+.q-queries code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font: 12.5px/1.5 var(--mono);
+}
+.q-swatch {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.q-criteria {
+  margin: 0;
+  font-size: 13.5px;
+}
+.q-criteria dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.q-criteria dd {
+  margin: 2px 0 6px 0;
+}
+.q-criteria-edit {
+  display: grid;
+  gap: 10px;
+}
+.q-skeleton {
+  opacity: 0.7;
+}
+/* --- the search flow --- */
+.q-flow {
+  padding: 20px;
+  background: var(--bg);
+  background-image: radial-gradient(var(--line-soft) 1px, transparent 1.2px);
+  background-size: 18px 18px;
+}
+.q-flow-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(140px, 160px) minmax(300px, 1fr);
+  column-gap: 44px;
+  align-items: center;
+}
+.q-flow-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.q-flow-lines path {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.q-node {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px oklch(0.3 0.02 var(--h, 200) / 0.06);
+}
+.q-node[data-node]::before,
+.q-node[data-node]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--faint);
+  box-sizing: border-box;
+}
+.q-node[data-node]::before {
+  left: -4px;
+}
+.q-node[data-node]::after {
+  right: -4px;
+}
+.q-flow-queries[data-wide] .q-query:nth-child(odd)::after,
+.q-node[data-node='in']::before,
+.q-node[data-node='screen']::after {
+  display: none;
+}
+.q-flow-queries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.q-flow-grid:has(.q-flow-queries[data-wide]) {
+  grid-template-columns: minmax(400px, 500px) minmax(140px, 160px) minmax(300px, 1fr);
+}
+.q-flow-queries[data-wide] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.q-query {
+  padding: 8px 12px 9px;
+  min-width: 0;
+}
+.q-query[data-state='idle'],
+.q-query[data-state='busy'] {
+  opacity: 0.6;
+}
+.q-query {
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.q-query[data-focus] {
+  opacity: 1;
+  border-color: var(--q-hue);
+  box-shadow:
+    0 0 0 1px var(--q-hue),
+    0 0 18px -4px var(--q-hue);
+}
+.q-query[data-state='failed'] {
+  border-color: var(--warn-line);
+  background: var(--warn-bg);
+}
+.q-query-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.q-query-layer {
+  flex: 1;
+  min-width: 0;
+}
+.q-hue {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.q-badge {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--sunken);
+  color: var(--text-2);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.q-query[data-state='busy'] .q-badge {
+  animation: q-pulse 1.2s ease-in-out infinite;
+}
+@keyframes q-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-query[data-state='busy'] .q-badge {
+    animation: none;
+  }
+}
+.q-query-text {
+  display: -webkit-box;
+  margin-top: 3px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font: 12px/1.45 var(--mono);
+}
+.q-merge {
+  padding: 14px 16px;
+  text-align: center;
+}
+.q-merge h3,
+.q-screen h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.q-merge p {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+.q-merge .q-big {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.q-merge[data-state='pending'],
+.q-screen[data-state='pending'] {
+  opacity: 0.7;
+}
+.q-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  min-width: 0;
+}
+.q-screen > p {
+  margin: 0;
+  font-size: 12px;
+}
+.q-screen-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.q-hist {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.q-hist-bars {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  height: 72px;
+  align-items: end;
+  border-bottom: 1px solid var(--line);
+}
+.q-hist-bin {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+.q-hist-bin span {
+  display: block;
+  border-radius: 2px 2px 0 0;
+}
+.q-hist-bin .include + .exclude,
+.q-hist-bin .exclude + .include {
+  border-radius: 0;
+}
+.q-hist .include {
+  background: var(--accent);
+}
+.q-hist .exclude {
+  background: var(--faint);
+}
+.q-hist-axis {
+  display: flex;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+}
+.q-hist-key {
+  display: flex;
+  gap: 14px;
+}
+.q-hist-key i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.q-top {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  table-layout: fixed;
+}
+.q-top th {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--muted);
+  font-weight: 500;
+  text-align: left;
+}
+.q-top th:last-child,
+.q-top td:last-child {
+  width: 3.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.q-top td {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.q-top td .link {
+  display: -webkit-box;
+  width: 100%;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  color: var(--text);
+}
+.q-top td .link:hover {
+  color: var(--accent);
+}
+@media (max-width: 1100px) {
+  .q-flow-grid,
+  .q-flow-grid:has(.q-flow-queries[data-wide]) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 16px;
+  }
+  .q-flow-lines {
+    display: none;
+  }
+}
+
+/* A phone: one column of query cards, and the run's controls together on
+   their own line under the counts. */
+@media (max-width: 640px) {
+  .q-flow-queries[data-wide] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .q-spacer {
+    flex-basis: 100%;
+  }
+}
+
+/* --- the map beside the paper list --- */
+.q-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .q-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.q-map {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.q-map-failed .sky {
+  opacity: 0.5;
+}
+.q-map-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px 6px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.q-map-tools .q-check {
+  min-height: 32px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.sky {
+  position: relative;
+  height: 640px;
+  background: var(--sky-bg);
+  background-image: radial-gradient(var(--sky-dust) 0.6px, transparent 0.8px);
+  background-size: 23px 29px;
+}
+.sky::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(oklch(0.95 0.02 90 / 0.7) 0.7px, transparent 1px),
+    radial-gradient(oklch(0.9 0.04 250 / 0.55) 0.6px, transparent 0.9px);
+  background-size:
+    97px 89px,
+    61px 73px;
+  background-position:
+    13px 29px,
+    41px 7px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sky::before {
+    animation: sky-twinkle 5s ease-in-out infinite alternate;
+  }
+}
+@keyframes sky-twinkle {
+  to {
+    opacity: 0.15;
+  }
+}
+.sky-canvas {
+  position: absolute;
+  inset: 0;
+}
+.sky-canvas canvas.sky-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sky-canvas canvas.sky-arcs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sky-note {
+  position: absolute;
+  inset: auto 16px 50% 16px;
+  text-align: center;
+  color: var(--sky-label);
+}
+.sky-tip {
+  position: absolute;
+  z-index: 3;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: oklch(0.22 0.025 265 / 0.95);
+  color: var(--sky-label);
+  font-size: 12px;
+  pointer-events: none;
+}
+/* The map's search box (graph mode), over the sky's top-left corner. */
+.sky-find {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sky-find input {
+  width: 240px;
+  max-width: calc(100vw - 80px);
+  box-sizing: border-box;
+  padding: 5px 10px;
+  border: 1px solid oklch(0.4 0.03 265);
+  border-radius: 8px;
+  background: oklch(0.22 0.025 265 / 0.9);
+  color: var(--sky-label);
+  font: inherit;
+  font-size: 12.5px;
+}
+.sky-find input[aria-invalid='true'] {
+  border-color: oklch(0.8 0.13 75);
+}
+.sky-find-miss {
+  font-size: 12px;
+  color: oklch(0.85 0.1 75);
+}
+.sky-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+.q-map-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: auto;
+}
+.q-map-kinds .chip {
+  font-size: 12px;
+  cursor: pointer;
+}
+.q-map-kinds .chip.off {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+.sky-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 10px 18px;
+  list-style: none;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12px;
+  color: var(--text-2);
+}
+.sky-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sky-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: oklch(0.74 0.12 30 / 0.6);
+}
+.sky-dot.bright {
+  background: oklch(0.74 0.15 30);
+}
+.sky-dot.hollow {
+  background: none;
+  border: 1px solid oklch(0.6 0.04 30 / 0.7);
+}
+.sky-dot.dashed {
+  background: none;
+  border: 1px dashed var(--muted);
+}
+
+/* --- side panel --- */
+.q-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  max-height: 616px;
+  overflow: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.q-side > .q-side-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 12px 8px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface);
+}
+.q-side-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.q-side-head h2,
+.q-side-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.q-side-head select {
+  padding: 4px 8px;
+  font-size: 12.5px;
+}
+.q-side > .muted {
+  padding: 12px 16px;
+}
+.q-papers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.q-papers button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 9px 16px 9px 28px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: none;
+  color: var(--text);
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.q-papers button::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 15px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 1px solid var(--faint);
+}
+.q-papers li[data-state='include'] button::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.q-papers button:hover {
+  background: var(--sunken);
+}
+.q-papers li[data-state='exclude'] button {
+  color: var(--muted);
+}
+.q-papers li[aria-current='true'] button {
+  background: var(--accent-soft);
+}
+.q-papers .muted {
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.q-paper {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--sunken);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.q-paper h4 {
+  margin: 10px 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.q-paper ul,
+.q-override-log {
+  margin: 0;
+  padding-left: 18px;
+}
+.q-overrule {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.q-overrule input {
+  width: 100%;
+}
+.q-overrule .btn {
+  font-size: 12px;
+}
+.q-result p {
+  margin: 0 0 6px;
+}
+.q-problems {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* A problem's meaning, what to do, then the server's reason */
+.q-reason small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* --- the knowledge graph view (#113): topic lineage and citation main paths --- */
+.q-graph h3 {
+  margin: 14px 0 2px;
+  font-size: 14px;
+}
+.q-graph-how,
+.q-graph-note {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  max-width: 80ch;
+}
+.q-graph-filters {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--sunken);
+}
+.q-graph-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+}
+.q-graph-label {
+  min-width: 84px;
+  color: var(--text-2);
+}
+.q-graph-term,
+.q-graph-community,
+.q-graph-preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  font-size: 12.5px;
+}
+.q-graph-term.exclude {
+  text-decoration: line-through;
+  text-decoration-color: var(--danger);
+}
+.q-graph-term.focus {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.q-graph-x {
+  border: 0;
+  padding: 0 2px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+.q-graph-preset {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.q-graph-community {
+  border: 0;
+  cursor: pointer;
+}
+.q-graph-community i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.q-graph-community.off {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+.q-graph-input,
+.q-graph-year {
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: 12.5px/1.4 var(--sans);
+  padding: 4px 8px;
+  min-height: 28px;
+}
+.q-graph-input {
+  width: 160px;
+}
+.q-graph-year {
+  width: 64px;
+}
+.q-graph-view {
+  overflow-x: auto;
+}
+.q-graph-svg {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+  font: 11.5px var(--sans);
+}
+.q-graph-axis line {
+  stroke: var(--line-soft);
+}
+.q-graph-axis text,
+.q-graph-faint {
+  fill: var(--faint);
+}
+.q-graph-kw {
+  cursor: pointer;
+  outline: none;
+}
+.q-graph-kw:focus-visible .q-graph-hit {
+  stroke: var(--accent);
+}
+.q-graph-hit {
+  fill: transparent;
+}
+.q-graph-kw:hover .q-graph-hit {
+  fill: var(--accent-soft);
+}
+.q-graph-kw.focused .q-graph-kw-label {
+  font-weight: 600;
+  fill: var(--accent);
+}
+.q-graph-kw-label,
+.q-graph-name {
+  fill: var(--text);
+}
+.q-graph-name {
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+.q-graph-lane {
+  font-weight: 600;
+}
+.q-graph-grow,
+.q-graph-cross,
+.q-graph-flow {
+  fill: none;
+  pointer-events: none;
+}
+.q-graph-grow,
+.q-graph-flow {
+  stroke: var(--text-2);
+}
+.q-graph-cross {
+  stroke: oklch(0.6 0.12 320);
+  stroke-dasharray: 3 3;
+}
+.q-graph-head {
+  fill: var(--text-2);
+}
+.q-graph-paper {
+  cursor: pointer;
+  stroke: var(--surface);
+  stroke-width: 0.8;
+}
+.q-graph-paper.selected {
+  stroke: var(--text);
+  stroke-width: 2;
+}
+.q-graph-paper:focus-visible {
+  outline: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.q-graph-hover {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+/* The global .chip (loaded later) keeps to one line; a long community name wraps here instead. */
+.q-graph-filters .q-graph-community {
+  flex: 0 1 auto;
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+}
+.q-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}

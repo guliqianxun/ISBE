@@ -81,14 +81,3 @@ def test_tables_use_pulldown_cmark_layout() -> None:
         "<tr><td>1</td><td>2</td><td>3</td><td></td></tr>\n</tbody></table>\n"
         "<p>Para after.</p>\n<table><thead><tr><th>one</th></tr></thead><tbody>\n</tbody></table>\n"
     )
-
-
-def test_documents_rewrite_links_and_anchor_headings() -> None:
-    md = "# Intro\n\n## Set up `uv`!\n\n## Intro\n\n[a](a.md#x) [b](b.md) [web](https://example.com) [here](#intro)\n"
-    html = render_markdown(md, lambda target: None if target == "b.md" else target.replace("a.md", "/help?doc=a"))
-    assert '<h1 id="intro">' in html and '<h2 id="set-up-uv">' in html and '<h2 id="intro-1">' in html
-    assert '<a href="/help?doc=a#x"' in html and '<a href="https://example.com"' in html and '<a href="#intro"' in html
-    assert "b.md" not in html and ">b</a>" in html
-    # Reports keep their markup: no heading ids.
-    assert render_markdown("# Intro\n") == "<h1>Intro</h1>\n"
-    assert '<h1 id="x">' not in render_markdown('<h1 id="x">raw</h1>')

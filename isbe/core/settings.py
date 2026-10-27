@@ -42,6 +42,10 @@ KEYS: tuple[str, ...] = (
     "ISBE_LLM_MAX_TOKENS",
     "ISBE_LLM_TIMEOUT_S",
     "ISBE_LLM_EXTRA_BODY",
+    "ISBE_PAPER_SOURCE",
+    "OPENALEX_API_URL",
+    "OPENALEX_API_KEY",
+    "OPENALEX_MAILTO",
     "ESSAIES_URL",
     "ISBE_FULLTEXT_EXTRACTOR",
     "METRAIL_API_URL",
@@ -61,11 +65,13 @@ SECRETS = frozenset(
         "DEEPSEEK_API_KEY",
         "OPENAI_API_KEY",
         "GITHUB_TOKEN",
+        "OPENALEX_API_KEY",
         "ZEPTOMAIL_TOKEN",
         "SMTP_PASSWORD",
     }
 )
 ARXIV_API = "https://export.arxiv.org/api/query"
+OPENALEX_API = "https://api.openalex.org"
 GITHUB_API = "https://api.github.com"
 LLM_TIMEOUT = 900
 MAX_FILE = 64 * 1024
@@ -200,6 +206,8 @@ def _snapshot(saved: Values, env: Callable[[str], str | None]) -> dict[str, Any]
         "ISBE_LLM_TIMEOUT_S": str(LLM_TIMEOUT),
         "ISBE_LLM_EXTRA_BODY": "{}",
         "ISBE_FULLTEXT_EXTRACTOR": "metrail" if effective("METRAIL_API_URL") else "llm",
+        "ISBE_PAPER_SOURCE": paper_source(lambda name: (effective(name) or (None, ""))[0]),
+        "OPENALEX_API_URL": OPENALEX_API,
         "ARXIV_API_URL": ARXIV_API,
         "GITHUB_API_URL": GITHUB_API,
         "ISBE_ARTICLE_DNS": "system",
@@ -235,6 +243,13 @@ def _snapshot(saved: Values, env: Callable[[str], str | None]) -> dict[str, Any]
         "provider_defaults": provider_defaults,
         "llm": {"ready": error is None, "error": error, "connection_verified": False},
     }
+
+
+def paper_source(value: Callable[[str], str | None] = get) -> str:
+    """Where question runs search for papers: `ISBE_PAPER_SOURCE`, else essaies when
+    `ESSAIES_URL` is set (an existing deployment keeps its source), else the OpenAlex
+    API, which needs nothing set up."""
+    return value("ISBE_PAPER_SOURCE") or ("essaies" if value("ESSAIES_URL") else "openalex")
 
 
 # Keeps concurrent read/modify/replace operations in this process from losing fields.

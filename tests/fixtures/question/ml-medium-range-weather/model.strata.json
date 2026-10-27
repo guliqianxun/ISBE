@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "prompt_sha": "6c822e73bca5922b875e59e4cec10c56a5a4c96fa3d92b708227190371fd36f5",
+   "reply": "{\"reformulation\": \"A comparison of machine-learning weather models with numerical weather prediction for medium-range global weather forecasting.\", \"concepts\": [{\"role\": \"subject\", \"terms\": [\"machine learning\", \"deep learning\", \"neural network\", \"artificial intelligence\"]}, {\"role\": \"subject\", \"terms\": [\"weather forecasting\", \"weather prediction\", \"weather model\"]}, {\"role\": \"method\", \"terms\": [\"numerical weather prediction\", \"NWP\", \"physics based model\", \"deterministic forecast\"]}, {\"role\": \"method\", \"terms\": [\"graph neural network\", \"GNN\", \"graph network\"]}, {\"role\": \"method\", \"terms\": [\"transformer\", \"vision transformer\", \"self attention\"]}, {\"role\": \"context\", \"terms\": [\"global\", \"global scale\", \"global forecast\"]}, {\"role\": \"context\", \"terms\": [\"medium range\", \"medium range forecast\", \"10 day forecast\"]}, {\"role\": \"landmark\", \"terms\": [\"GraphCast\", \"Pangu Weather\", \"FourCastNet\", \"Aurora\", \"GenCast\", \"IFS\"]}, {\"role\": \"outcome\", \"terms\": [\"forecast skill\", \"accuracy\", \"error\", \"lead time\"]}], \"year_from\": null, \"year_to\": null, \"criteria\": {\"include\": [\"Papers compare machine-learning or data-driven weather models with numerical weather prediction models for global medium-range forecasts.\", \"Papers evaluate forecast skill, accuracy, error, or lead time for such comparisons.\"], \"exclude\": [\"Papers present only numerical weather prediction without machine-learning model comparison.\", \"Papers present only machine-learning weather models without comparison to numerical weather prediction.\", \"Papers focus on regional, short-range, seasonal, climate, or non-weather forecasting tasks.\"]}, \"rationale\": \"Machine learning and weather forecasting are required in every query, while numerical weather prediction, model architectures, global medium-range context, named models, and skill outcomes capture the comparison.\"}"
+  }
+ ]
+}

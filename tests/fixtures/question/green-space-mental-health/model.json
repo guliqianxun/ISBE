@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "contains": "Does exposure to urban green space improve mental health?",
+   "reply": "{\"reformulation\": \"Associations between exposure to urban green space and mental health outcomes.\", \"subject_terms\": [\"urban green space\", \"nature exposure\"], \"method_terms\": [\"epidemiology\", \"systematic review\", \"cohort study\"], \"outcome_terms\": [\"mental health\", \"psychiatric disorders\", \"stress recovery\"], \"keyword_layers\": {\"canonical\": [\"green space mental health\", \"nature exposure wellbeing\"], \"mainstream\": [\"residential greenness depression\", \"green and blue spaces\"], \"emerging\": [\"ecosystem services mental health\"], \"method_centric\": [\"greenspace health pathways\"], \"cross_domain\": [\"restorative environments\", \"view through a window recovery\"]}, \"queries\": [{\"id\": \"q1\", \"query\": \"urban green space mental health\", \"layer\": \"canonical\", \"priority\": 1}, {\"id\": \"q2\", \"query\": \"residential green space psychiatric disorders\", \"layer\": \"mainstream\", \"priority\": 2}, {\"id\": \"q3\", \"query\": \"nature experience rumination\", \"layer\": \"mainstream\", \"priority\": 3}, {\"id\": \"q4\", \"query\": \"greenspace health pathways\", \"layer\": \"method_centric\", \"priority\": 4}, {\"id\": \"q5\", \"query\": \"nature mental health ecosystem service\", \"layer\": \"emerging\", \"priority\": 5}], \"year_from\": null, \"year_to\": null, \"criteria\": {\"include\": [\"Studies how exposure to green space or nature relates to a mental health outcome\"], \"exclude\": [\"Physical health outcomes only\", \"Indoor plants or horticultural therapy without green-space exposure\"]}, \"rationale\": \"Covers the epidemiology, the proposed pathways and the classic restorative-environment studies.\"}"
+  }
+ ]
+}

@@ -6,7 +6,8 @@ blocks the event loop and never waits on a slow client.
 """
 
 import enum
-from collections.abc import Sequence
+import gzip
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Any
@@ -59,10 +60,29 @@ class Request:
 
 
 @dataclass
+class Stream:
+    """A reply body sent in parts, for server-sent events. The ASGI layer calls
+    `poll()` in a worker thread every `interval` seconds while the client stays
+    connected: it returns the next bytes (b"" when there is nothing new) or None
+    to end the reply. A reply ends at the latest after `seconds`; event-stream
+    clients then reconnect on their own."""
+
+    poll: Callable[[], bytes | None]
+    interval: float = 0.5
+    seconds: float = 300.0
+    # Sent after this long with nothing else, so proxies keep the connection.
+    heartbeat: float = 15.0
+    # Called once the reply has ended, however it ended (frees what `poll` holds).
+    close: Callable[[], None] | None = None
+
+
+@dataclass
 class Reply:
     status: int
     body: bytes = b""
     headers: list[tuple[str, str]] = field(default_factory=list)
+    # When set, `body` is sent first and the stream follows (no Content-Length).
+    stream: Stream | None = None
 
     def with_header(self, name: str, value: str) -> Reply:
         self.headers.append((name, value))
@@ -94,6 +114,41 @@ def reply(status: int, content_type: str, body: bytes) -> Reply:
 def json_reply(status: int, value: Any) -> Reply:
     body = jsonfmt.dumps(value).encode("utf-8")
     return reply(status, "application/json; charset=utf-8", body).with_header("Cache-Control", "no-store")
+
+
+# Replies smaller than this are not worth compressing.
+_GZIP_MIN = 1024
+
+
+def gzipped(req: Request, response: Reply) -> Reply:
+    """`response` gzip-compressed when the client accepts it and the body is worth
+    it. Only for replies that hold no secret: compressing a secret next to text
+    an attacker chose leaks it (BREACH)."""
+    if response.stream is not None or response.get("Content-Encoding") or len(response.body) < _GZIP_MIN:
+        return response
+    response.set("Vary", "Accept-Encoding")
+    if not _accepts_gzip(req.header("accept-encoding") or ""):
+        return response
+    # Level 4: half the time of the default 6 for about 6 % more bytes.
+    response.body = gzip.compress(response.body, 4, mtime=0)
+    return response.set("Content-Encoding", "gzip")
+
+
+def _accepts_gzip(header: str) -> bool:
+    """Whether `Accept-Encoding` takes gzip: named (or `*`) with a q-value above 0."""
+    weights: dict[str, float] = {}
+    for part in header.split(","):
+        name, *params = (p.strip().lower() for p in part.split(";"))
+        q = 1.0
+        for param in params:
+            if param.startswith("q="):
+                try:
+                    q = float(param[2:])
+                except ValueError:
+                    q = 0.0
+        if name:
+            weights[name] = q
+    return weights.get("gzip", weights.get("x-gzip", weights.get("*", 0.0))) > 0
 
 
 def error(status: int, message: str) -> Reply:

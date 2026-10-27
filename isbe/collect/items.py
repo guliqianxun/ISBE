@@ -1,6 +1,9 @@
 """Collected items and the `items` / `topic_items` tables.
 
-Collection is the sole writer of both tables. Rows hold JSON in a fixed
+Collection is the sole writer of `topic_items` and of `items` except for one
+case: a question survey (`question.survey`) registers the papers it reads with
+`source = 'question'` and a placeholder date (the publication year). Collecting
+such a paper replaces the row, its date included. Rows hold JSON in a fixed
 layout: `authors` a compact array, `extra` an object with sorted keys.
 """
 
@@ -65,13 +68,16 @@ def store(conn: sqlite3.Connection, topic: str, items: list[Item]) -> int:
     with db.immediate(conn):
         for item in items:
             # published_at keeps its first value: an undated RSS entry is stamped
-            # "now" and must not look fresh again on every fetch.
+            # "now" and must not look fresh again on every fetch. A survey's row
+            # only has the year, so collecting the paper gives it its real date.
             conn.execute(
                 "INSERT INTO items (id, kind, source, title, summary, url, authors, lang, "
                 "published_at, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
                 "ON CONFLICT (id) DO UPDATE SET kind = excluded.kind, source = excluded.source, "
                 "title = excluded.title, summary = excluded.summary, url = excluded.url, "
-                "authors = excluded.authors, lang = excluded.lang, extra = excluded.extra",
+                "authors = excluded.authors, lang = excluded.lang, extra = excluded.extra, "
+                "published_at = CASE WHEN items.source = 'question' THEN excluded.published_at "
+                "ELSE items.published_at END",
                 (
                     item.id, item.kind, item.source, item.title, item.summary, item.url,
                     jsonfmt.dumps(item.authors), item.lang, item.published_at,

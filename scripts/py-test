@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run the Python test suite inside the pinned Python 3.14 container.
-#   scripts/py-test                      # whole suite
+#   scripts/py-test                      # whole suite with coverage, then scripts/web-test
 #   scripts/py-test tests/py/test_db.py  # pytest arguments pass through
 #   scripts/py-test --lock               # refresh uv.lock after editing dependencies
 set -euo pipefail
@@ -15,4 +15,14 @@ run=(docker run --rm -u "$(id -u):$(id -g)" -v "$root:/src" -v "$cache:/uv-cache
 if [[ ${1:-} == --lock ]]; then
     exec "${run[@]}" uv lock
 fi
-exec "${run[@]}" sh -c 'uv sync --frozen --quiet && exec uv run --frozen --no-sync pytest "$@"' sh "$@"
+pytest=(sh -c 'uv sync --frozen --quiet && exec uv run --frozen --no-sync pytest "$@"' sh)
+if [[ $# -gt 0 ]]; then
+    # A pytest selection runs alone.
+    exec "${run[@]}" "${pytest[@]}" "$@"
+fi
+# The whole suite prints a coverage summary and includes the front end, which
+# runs even when pytest fails so one run shows every failure.
+status=0
+"${run[@]}" "${pytest[@]}" --cov --cov-report=term || status=$?
+"$root/scripts/web-test" || status=$?
+exit "$status"

@@ -9,9 +9,7 @@ other image is removed, so opening a report never contacts a third party.
 """
 
 import re
-from collections.abc import Callable
 from functools import cache
-from itertools import pairwise
 from typing import Any
 
 import nh3
@@ -110,47 +108,8 @@ def _drop_sourceless_images(html: str) -> str:
     return "".join(out)
 
 
-# Heading ids, kept by the sanitizer only when a document asks for them.
-_HEADING_IDS = {
-    **nh3.ALLOWED_ATTRIBUTES,
-    **{f"h{n}": {*nh3.ALLOWED_ATTRIBUTES.get(f"h{n}", ()), "id"} for n in range(1, 7)},
-}
-_SLUG_DROP = re.compile(r"[^\w\- ]")
-
-
-def _slug_headings(tokens: list[Any]) -> None:
-    """GitHub's heading anchors: the lowercased text without punctuation,
-    spaces as hyphens, and `-1`, `-2` … on repeats."""
-    seen: dict[str, int] = {}
-    for token, inline in pairwise(tokens):
-        if token.type != "heading_open":
-            continue
-        text = "".join(child.content for child in inline.children or ())
-        slug = _SLUG_DROP.sub("", text.strip().lower()).replace(" ", "-")
-        count = seen.get(slug, 0)
-        seen[slug] = count + 1
-        token.attrSet("id", f"{slug}-{count}" if count else slug)
-
-
-def render_markdown(md: str, link: Callable[[str], str | None] | None = None) -> str:
+def render_markdown(md: str) -> str:
     """Figures are linked relative to the report file (`../../figures/`); the
-    console serves them at `/figures/`.
-
-    A document (rather than a report) passes `link`: it rewrites each link
-    target, or drops it with None, and headings get GitHub's anchor ids so
-    `#heading` links land."""
-    parser = _parser()
-    tokens = parser.parse(md.replace("](../../figures/", "](/figures/"))
-    if link is None:
-        attributes, keep = nh3.ALLOWED_ATTRIBUTES, _attribute
-    else:
-        _slug_headings(tokens)
-        attributes = _HEADING_IDS
-
-        def keep(element: str, attribute: str, value: str) -> str | None:
-            if element == "a" and attribute == "href":
-                return link(value)
-            return _attribute(element, attribute, value)
-
-    html = parser.renderer.render(tokens, parser.options, {})
-    return _drop_sourceless_images(nh3.clean(html, attributes=attributes, attribute_filter=keep))
+    console serves them at `/figures/`."""
+    html = _parser().render(md.replace("](../../figures/", "](/figures/"))
+    return _drop_sourceless_images(nh3.clean(html, attribute_filter=_attribute))

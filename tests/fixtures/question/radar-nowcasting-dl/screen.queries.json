@@ -1,0 +1,65 @@
+{
+ "note": "The queries whose recorded candidates model.screen.json screened (plan.json's and Strata's pre-composer plan, 2026-10-23); replay.screening_plan reads them so the recorded verdicts keep matching.",
+ "queries": [
+  {
+   "id": "q1",
+   "query": "precipitation nowcasting deep learning radar",
+   "priority": 1
+  },
+  {
+   "id": "q2",
+   "query": "radar echo extrapolation neural network",
+   "priority": 2
+  },
+  {
+   "id": "q3",
+   "query": "convolutional LSTM precipitation nowcasting",
+   "priority": 3
+  },
+  {
+   "id": "q4",
+   "query": "generative model precipitation nowcasting radar",
+   "priority": 4
+  },
+  {
+   "id": "q5",
+   "query": "spatiotemporal predictive learning recurrent",
+   "priority": 5
+  },
+  {
+   "id": "q6",
+   "query": "radar (echo OR reflectivity) (extrapolation OR nowcasting)",
+   "priority": 1
+  },
+  {
+   "id": "q7",
+   "query": "(precipitation OR rainfall) nowcasting (extrapolation OR prediction)",
+   "priority": 2
+  },
+  {
+   "id": "q8",
+   "query": "deep learning (precipitation OR rainfall) nowcasting",
+   "priority": 3
+  },
+  {
+   "id": "q9",
+   "query": "(ConvLSTM OR U-Net) radar (echo OR reflectivity)",
+   "priority": 4
+  },
+  {
+   "id": "q10",
+   "query": "(transformer OR diffusion) (precipitation OR rainfall) nowcasting",
+   "priority": 5
+  },
+  {
+   "id": "q11",
+   "query": "ConvLSTM video prediction",
+   "priority": 6
+  },
+  {
+   "id": "q12",
+   "query": "satellite cloud extrapolation",
+   "priority": 7
+  }
+ ]
+}

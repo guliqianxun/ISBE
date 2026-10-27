@@ -165,7 +165,7 @@ class Endpoint:
             else:
                 req.body = b""
         reply = await anyio.to_thread.run_sync(self._handle, req, limiter=self.limiter)
-        await self._send(send, reply, close=not complete)
+        await self._send(send, reply, close=not complete, receive=receive if complete else None)
 
     def _handle(self, req: Request) -> Reply:
         try:
@@ -174,14 +174,69 @@ class Endpoint:
             log.error("%s %s: %s", req.method, req.url, describe(e), exc_info=e)
             return json_reply(500, {"error": INTERNAL})
 
-    async def _send(self, send: Send, reply: Reply, *, close: bool) -> None:
+    async def _send(self, send: Send, reply: Reply, *, close: bool, receive: Receive | None = None) -> None:
         headers = [(k.lower().encode("latin-1"), v.encode("latin-1")) for k, v in reply.headers]
+        if reply.stream is not None and receive is not None:
+            await self._stream(send, receive, reply, headers)
+            return
         headers.append((b"content-length", str(len(reply.body)).encode()))
         if close:
             headers.append((b"connection", b"close"))
         with anyio.fail_after(self.console.limits.send_seconds):
             await send({"type": "http.response.start", "status": reply.status, "headers": headers})
             await send({"type": "http.response.body", "body": reply.body})
+
+
+    async def _stream(self, send: Send, receive: Receive, reply: Reply, headers: list[tuple[bytes, bytes]]) -> None:
+        """Send `reply.stream` until it ends, its time is up or the client goes away.
+        Polls run in the default thread pool, not the handlers' one, so open streams
+        never hold a handler thread while they wait."""
+        stream = reply.stream
+        assert stream is not None
+        limit = self.console.limits.send_seconds
+
+        async def body(chunk: bytes) -> None:
+            with anyio.fail_after(limit):
+                await send({"type": "http.response.body", "body": chunk, "more_body": True})
+
+        async def gone(scope: anyio.CancelScope) -> None:
+            while (await receive())["type"] != "http.disconnect":
+                pass
+            scope.cancel()
+
+        with anyio.fail_after(limit):
+            await send({"type": "http.response.start", "status": reply.status, "headers": headers})
+        try:
+            async with anyio.create_task_group() as group:
+                group.start_soon(gone, group.cancel_scope)
+                with anyio.move_on_after(stream.seconds):
+                    if reply.body:
+                        await body(reply.body)
+                    quiet = 0.0
+                    while True:
+                        chunk = await anyio.to_thread.run_sync(stream.poll)
+                        if chunk is None:
+                            break
+                        if chunk:
+                            await body(chunk)
+                            quiet = 0.0
+                        else:
+                            quiet += stream.interval
+                            if quiet >= stream.heartbeat:
+                                await body(b": keep-alive\n\n")
+                                quiet = 0.0
+                            await anyio.sleep(stream.interval)
+                group.cancel_scope.cancel()
+            with anyio.fail_after(limit):
+                await send({"type": "http.response.body", "body": b""})
+        except (OSError, TimeoutError) as error:
+            log.info("event stream ended: %s", describe(error))
+        except Exception as error:
+            log.error("event stream failed: %s", describe(error), exc_info=error)
+        finally:
+            if stream.close is not None:
+                with anyio.CancelScope(shield=True):
+                    await anyio.to_thread.run_sync(stream.close)
 
 
 def create_app(

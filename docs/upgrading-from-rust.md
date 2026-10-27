@@ -20,7 +20,7 @@ reports. No export or conversion step is needed.
 2. Back up the whole data directory. The Python build applies newer
    migrations, and an older build cannot open the upgraded database.
 3. Build the image and start it on the same data directory, as in the
-   [Docker section of the configuration reference](configuration.md#docker):
+   [Docker guide](deployment.md#docker):
 
    ```bash
    docker build -t isbe .

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:screen_verdict",
+  "title": "screen_verdict@1: the model's screening decision on one paper",
+  "description": "A batch the model failed to judge leaves its papers `unscreened`: they stay in the set like included ones, so screening never loses recall. A person's screen_override@1 takes precedence over the verdict.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "key",
+    "decision",
+    "reason",
+    "score",
+    "model",
+    "batch_id",
+    "plan_version",
+    "created_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "screen_verdict@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "key": {
+      "$ref": "urn:isbe:question:common#/$defs/identity_key"
+    },
+    "decision": {
+      "enum": [
+        "include",
+        "exclude",
+        "unscreened"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "The model's confidence that the paper belongs; null when it gave none."
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "batch_id": {
+      "$ref": "urn:isbe:question:common#/$defs/local_id"
+    },
+    "plan_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The plan whose criteria were applied."
+    },
+    "created_at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "decision": {
+        "const": "unscreened"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "score": {
+        "type": "null"
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "question_plan@1",
+  "run_id": "run-sample-neural-pde-solvers",
+  "version": 1,
+  "parent_version": null,
+  "created_at": "2026-10-22T00:00:00Z",
+  "source": "model",
+  "question": "How are physics-informed neural networks and neural operators used to solve partial differential equations?",
+  "lang": "en",
+  "reformulation": "Physics-informed neural networks and neural operators as solvers for partial differential equations.",
+  "subject_terms": [
+    "partial differential equations",
+    "scientific machine learning"
+  ],
+  "method_terms": [
+    "physics-informed neural network",
+    "neural operator",
+    "deep learning"
+  ],
+  "outcome_terms": [
+    "solution accuracy",
+    "generalization across parameters"
+  ],
+  "keyword_layers": {
+    "canonical": [
+      "physics-informed neural networks",
+      "neural operator"
+    ],
+    "mainstream": [
+      "Fourier neural operator",
+      "DeepONet"
+    ],
+    "emerging": [
+      "physics-informed machine learning"
+    ],
+    "method_centric": [
+      "deep Ritz method",
+      "gradient pathologies physics-informed"
+    ],
+    "cross_domain": [
+      "deep learning library differential equations"
+    ]
+  },
+  "queries": [
+    {
+      "id": "q1",
+      "query": "physics-informed neural networks partial differential equations",
+      "layer": "canonical",
+      "priority": 1
+    },
+    {
+      "id": "q2",
+      "query": "neural operator partial differential equations",
+      "layer": "canonical",
+      "priority": 2
+    },
+    {
+      "id": "q3",
+      "query": "Fourier neural operator",
+      "layer": "mainstream",
+      "priority": 3
+    },
+    {
+      "id": "q4",
+      "query": "DeepONet nonlinear operators",
+      "layer": "mainstream",
+      "priority": 4
+    },
+    {
+      "id": "q5",
+      "query": "deep learning solving differential equations",
+      "layer": "method_centric",
+      "priority": 5
+    }
+  ],
+  "year_from": 2015,
+  "year_to": null,
+  "criteria": {
+    "include": [
+      "Proposes, analyses or benchmarks a neural network method that solves or learns solution operators of PDEs"
+    ],
+    "exclude": [
+      "Classical numerical PDE solvers without a learned component",
+      "Neural networks used only for data post-processing"
+    ]
+  },
+  "rationale": "Splits the field into the two lines named in the question, PINNs and neural operators, plus their foundations."
+}

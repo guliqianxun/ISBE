@@ -1,0 +1,424 @@
+{
+  "schema": "question_samples@1",
+  "checked_on": "2026-10-22",
+  "questions": [
+    {
+      "id": "radar-nowcasting-dl",
+      "question": "基于深度学习的雷达回波外推降水临近预报（0–2 小时）有哪些主要方法？",
+      "lang": "zh",
+      "breadth": "narrow",
+      "topic": "nowcasting",
+      "why": "Chinese question in the existing nowcasting topic. Asked verbatim, the search finds only Chinese papers (0 of 10), so the plan has to translate the terms.",
+      "must_find": [
+        {
+          "title": "Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting",
+          "year": 2015,
+          "keys": [
+            "openalex:W1485009520",
+            "arxiv:1506.04214"
+          ]
+        },
+        {
+          "title": "Deep Learning for Precipitation Nowcasting: A Benchmark and A New Model",
+          "year": 2017,
+          "keys": [
+            "openalex:W2625614184",
+            "arxiv:1706.03458"
+          ]
+        },
+        {
+          "title": "Skilful precipitation nowcasting using deep generative models of radar",
+          "year": 2021,
+          "keys": [
+            "openalex:W3202525453",
+            "doi:10.1038/s41586-021-03854-z",
+            "openalex:W3145849805",
+            "arxiv:2104.00954"
+          ]
+        },
+        {
+          "title": "MetNet: A Neural Weather Model for Precipitation Forecasting",
+          "year": 2020,
+          "keys": [
+            "openalex:W3013229294",
+            "arxiv:2003.12140"
+          ]
+        },
+        {
+          "title": "Skilful nowcasting of extreme precipitation with NowcastNet",
+          "year": 2023,
+          "keys": [
+            "openalex:W4383197616",
+            "doi:10.1038/s41586-023-06184-4"
+          ]
+        },
+        {
+          "title": "PredRNN: A Recurrent Neural Network for Spatiotemporal Predictive Learning",
+          "year": 2021,
+          "keys": [
+            "openalex:W4297069844",
+            "arxiv:2103.09504"
+          ]
+        },
+        {
+          "title": "Earthformer: Exploring Space-Time Transformers for Earth System Forecasting",
+          "year": 2022,
+          "keys": [
+            "openalex:W4285483867",
+            "arxiv:2207.05833"
+          ]
+        },
+        {
+          "title": "RainNet v1.0: a convolutional neural network for radar-based precipitation nowcasting",
+          "year": 2020,
+          "keys": [
+            "openalex:W3009216045",
+            "doi:10.5194/gmd-13-2631-2020"
+          ]
+        },
+        {
+          "title": "Pysteps: an open-source Python library for probabilistic precipitation nowcasting (v1.0)",
+          "year": 2019,
+          "keys": [
+            "openalex:W2945086703",
+            "doi:10.5194/gmd-12-4185-2019"
+          ]
+        },
+        {
+          "title": "Machine Learning for Precipitation Nowcasting from Radar Images",
+          "year": 2019,
+          "keys": [
+            "openalex:W2998557500",
+            "arxiv:1912.12132"
+          ]
+        }
+      ],
+      "year_from": null,
+      "year_to": null
+    },
+    {
+      "id": "ml-medium-range-weather",
+      "question": "How do machine-learning weather models compare with numerical weather prediction for medium-range global forecasting?",
+      "lang": "en",
+      "breadth": "broad",
+      "topic": null,
+      "why": "Broad English question next to the nowcasting topic; several landmark papers exist as both a preprint and a journal version.",
+      "must_find": [
+        {
+          "title": "Learning skillful medium-range global weather forecasting",
+          "year": 2023,
+          "keys": [
+            "openalex:W4388654737",
+            "doi:10.1126/science.adi2336",
+            "openalex:W4312226181",
+            "arxiv:2212.12794"
+          ]
+        },
+        {
+          "title": "Accurate medium-range global weather forecasting with 3D neural networks",
+          "year": 2023,
+          "keys": [
+            "openalex:W4383218913",
+            "doi:10.1038/s41586-023-06185-3",
+            "openalex:W4308505112",
+            "arxiv:2211.02556"
+          ]
+        },
+        {
+          "title": "FourCastNet: A Global Data-driven High-resolution Weather Model using Adaptive Fourier Neural Operators",
+          "year": 2022,
+          "keys": [
+            "openalex:W4225906496",
+            "arxiv:2202.11214"
+          ]
+        },
+        {
+          "title": "FengWu: Pushing the Skillful Global Medium-range Weather Forecast beyond 10 Days Lead",
+          "year": 2023,
+          "keys": [
+            "openalex:W4362706666",
+            "arxiv:2304.02948"
+          ]
+        },
+        {
+          "title": "FuXi: A cascade machine learning forecasting system for 15-day global weather forecast",
+          "year": 2023,
+          "keys": [
+            "openalex:W4381827534",
+            "arxiv:2306.12873"
+          ]
+        },
+        {
+          "title": "GenCast: Diffusion-based ensemble forecasting for medium-range weather",
+          "year": 2023,
+          "keys": [
+            "openalex:W4390306794",
+            "arxiv:2312.15796"
+          ]
+        },
+        {
+          "title": "Forecasting Global Weather with Graph Neural Networks",
+          "year": 2022,
+          "keys": [
+            "openalex:W4221149294",
+            "arxiv:2202.07575"
+          ]
+        },
+        {
+          "title": "A Foundation Model for the Earth System",
+          "year": 2024,
+          "keys": [
+            "openalex:W4398794940",
+            "arxiv:2405.13063"
+          ]
+        },
+        {
+          "title": "WeatherBench: A Benchmark Data Set for Data-Driven Weather Forecasting",
+          "year": 2020,
+          "keys": [
+            "openalex:W3003709258",
+            "arxiv:2002.00469"
+          ]
+        },
+        {
+          "title": "WeatherBench 2: A benchmark for the next generation of data-driven global weather models",
+          "year": 2023,
+          "keys": [
+            "openalex:W4386346187",
+            "arxiv:2308.15560"
+          ]
+        }
+      ],
+      "year_from": null,
+      "year_to": null
+    },
+    {
+      "id": "diffusion-image-generation",
+      "question": "扩散模型在图像生成中是如何发展起来的？",
+      "lang": "zh",
+      "breadth": "broad",
+      "topic": null,
+      "why": "Broad Chinese question in a crowded field, mostly inside the cs.CV archive. A direct search returns only recent minor papers (0 of 10), so it tests the plan and citation expansion.",
+      "must_find": [
+        {
+          "title": "Deep Unsupervised Learning using Nonequilibrium Thermodynamics",
+          "year": 2015,
+          "keys": [
+            "openalex:W2129069237",
+            "arxiv:1503.03585"
+          ]
+        },
+        {
+          "title": "Denoising Diffusion Probabilistic Models",
+          "year": 2020,
+          "keys": [
+            "openalex:W3036167779",
+            "arxiv:2006.11239"
+          ]
+        },
+        {
+          "title": "Denoising Diffusion Implicit Models",
+          "year": 2020,
+          "keys": [
+            "openalex:W3092442149",
+            "arxiv:2010.02502"
+          ]
+        },
+        {
+          "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+          "year": 2020,
+          "keys": [
+            "openalex:W3110257065",
+            "arxiv:2011.13456"
+          ]
+        },
+        {
+          "title": "Diffusion Models Beat GANs on Image Synthesis",
+          "year": 2021,
+          "keys": [
+            "openalex:W3162926177",
+            "arxiv:2105.05233"
+          ]
+        },
+        {
+          "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+          "year": 2021,
+          "keys": [
+            "openalex:W4226317937",
+            "arxiv:2112.10752"
+          ]
+        },
+        {
+          "title": "Classifier-Free Diffusion Guidance",
+          "year": 2022,
+          "keys": [
+            "openalex:W4288099666",
+            "arxiv:2207.12598"
+          ]
+        },
+        {
+          "title": "Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding",
+          "year": 2022,
+          "keys": [
+            "openalex:W4281485151",
+            "arxiv:2205.11487"
+          ]
+        },
+        {
+          "title": "Scalable Diffusion Models with Transformers",
+          "year": 2022,
+          "keys": [
+            "openalex:W4312057601",
+            "arxiv:2212.09748"
+          ]
+        },
+        {
+          "title": "Adding Conditional Control to Text-to-Image Diffusion Models",
+          "year": 2023,
+          "keys": [
+            "openalex:W4320831569",
+            "arxiv:2302.05543"
+          ]
+        }
+      ],
+      "year_from": null,
+      "year_to": null
+    },
+    {
+      "id": "neural-pde-solvers",
+      "question": "How are physics-informed neural networks and neural operators used to solve partial differential equations?",
+      "lang": "en",
+      "breadth": "narrow",
+      "topic": null,
+      "why": "Narrow English question whose papers are mostly outside the essaies archive, so citations come from the mirror rather than the archive.",
+      "must_find": [
+        {
+          "title": "Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations",
+          "year": 2018,
+          "keys": [
+            "openalex:W2899283552",
+            "doi:10.1016/j.jcp.2018.10.045"
+          ]
+        },
+        {
+          "title": "Physics-informed machine learning",
+          "year": 2021,
+          "keys": [
+            "openalex:W3163993681",
+            "doi:10.1038/s42254-021-00314-5"
+          ]
+        },
+        {
+          "title": "Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators",
+          "year": 2021,
+          "keys": [
+            "openalex:W2979786244",
+            "arxiv:1910.03193"
+          ]
+        },
+        {
+          "title": "Fourier Neural Operator for Parametric Partial Differential Equations",
+          "year": 2020,
+          "keys": [
+            "openalex:W3092923133",
+            "arxiv:2010.08895"
+          ]
+        },
+        {
+          "title": "Neural Operator: Learning Maps Between Function Spaces",
+          "year": 2021,
+          "keys": [
+            "openalex:W3194436063",
+            "arxiv:2108.08481"
+          ]
+        },
+        {
+          "title": "DeepXDE: A Deep Learning Library for Solving Differential Equations",
+          "year": 2021,
+          "keys": [
+            "openalex:W2957969499",
+            "arxiv:1907.04502"
+          ]
+        },
+        {
+          "title": "The Deep Ritz method: A deep learning-based numerical algorithm for solving variational problems",
+          "year": 2017,
+          "keys": [
+            "openalex:W2952003181",
+            "arxiv:1710.00211"
+          ]
+        },
+        {
+          "title": "Understanding and mitigating gradient pathologies in physics-informed neural networks",
+          "year": 2020,
+          "keys": [
+            "openalex:W2999467285",
+            "arxiv:2001.04536"
+          ]
+        }
+      ],
+      "year_from": null,
+      "year_to": null
+    },
+    {
+      "id": "green-space-mental-health",
+      "question": "Does exposure to urban green space improve mental health?",
+      "lang": "en",
+      "breadth": "broad",
+      "topic": null,
+      "why": "Broad question outside computer science, with no arXiv papers: checks the pipeline is not tuned to arXiv and that citations work for papers outside the archive.",
+      "must_find": [
+        {
+          "title": "View Through a Window May Influence Recovery from Surgery",
+          "year": 1984,
+          "keys": [
+            "openalex:W1975793762",
+            "doi:10.1126/science.6143402"
+          ]
+        },
+        {
+          "title": "Mental Health Benefits of Long-Term Exposure to Residential Green and Blue Spaces: A Systematic Review",
+          "year": 2015,
+          "keys": [
+            "openalex:W2128386614",
+            "doi:10.3390/ijerph120404354"
+          ]
+        },
+        {
+          "title": "Nature experience reduces rumination and subgenual prefrontal cortex activation",
+          "year": 2015,
+          "keys": [
+            "openalex:W2120527047",
+            "doi:10.1073/pnas.1510459112"
+          ]
+        },
+        {
+          "title": "Exploring pathways linking greenspace to health: Theoretical and methodological guidance",
+          "year": 2017,
+          "keys": [
+            "openalex:W2727275208",
+            "doi:10.1016/j.envres.2017.06.028"
+          ]
+        },
+        {
+          "title": "Residential green space in childhood is associated with lower risk of psychiatric disorders from adolescence into adulthood",
+          "year": 2019,
+          "keys": [
+            "openalex:W2917225355",
+            "doi:10.1073/pnas.1807504116"
+          ]
+        },
+        {
+          "title": "Nature and mental health: An ecosystem service perspective",
+          "year": 2019,
+          "keys": [
+            "openalex:W2964203982",
+            "doi:10.1126/sciadv.aax0903"
+          ]
+        }
+      ],
+      "year_from": null,
+      "year_to": null
+    }
+  ]
+}

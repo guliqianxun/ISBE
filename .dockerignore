@@ -1,6 +1,8 @@
 /data
 /reference
 /.git
+# The test suites and their recordings run in CI, not in the image build.
+/tests
 **/.env
 **/.env.*
 **/*.env
@@ -17,3 +19,7 @@
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+
+# Front end: dependencies and builds are made inside the image.
+**/node_modules
+/isbe/_assets

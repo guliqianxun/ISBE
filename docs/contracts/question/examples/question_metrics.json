@@ -1,0 +1,57 @@
+{
+  "schema": "question_metrics@1",
+  "run_id": "run-20261022-a1",
+  "sample_id": "radar-nowcasting-dl",
+  "recall": {
+    "must_find": 10,
+    "candidates_found": 2,
+    "included_found": 2,
+    "missing": [
+      "MetNet: A Neural Weather Model for Precipitation Forecasting"
+    ]
+  },
+  "screen_audit": {
+    "sampled": 30,
+    "agreed": 27,
+    "seed": 42,
+    "auditor": "zhiheng"
+  },
+  "counts": {
+    "queries_run": 3,
+    "hits": 4,
+    "candidates": 3,
+    "included": 2,
+    "excluded": 1,
+    "overridden": 0,
+    "expanded": 0,
+    "failed_batches": 0
+  },
+  "stage_ms": {
+    "plan": 9400,
+    "search": 7600,
+    "screen": 21000,
+    "expand": 0,
+    "graph": 800,
+    "total": 38800
+  },
+  "tokens": {
+    "input": 5200,
+    "output": 1400,
+    "by_stage": {
+      "plan": {
+        "model": "strata-qwen",
+        "input_tokens": 1840,
+        "output_tokens": 612,
+        "duration_ms": 9400,
+        "calls": 1
+      },
+      "screen": {
+        "model": "strata-qwen",
+        "input_tokens": 3360,
+        "output_tokens": 788,
+        "duration_ms": 21000,
+        "calls": 1
+      }
+    }
+  }
+}

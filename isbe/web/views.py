@@ -154,10 +154,34 @@ def overview(conn: sqlite3.Connection, data: Path, settings_root: Path) -> dict[
             "FROM runs ORDER BY started_at DESC LIMIT 8",
         ),
         "services": {
-            "essaies": bool(values.get("ESSAIES_URL")),
+            "papers": _papers(values),
             "metrail": bool(values.get("METRAIL_API_URL")),
             "llm": provider if snapshot["llm"]["ready"] is True else None,
             "llm_status": snapshot["llm"],
+        },
+    }
+
+
+def _papers(values: dict[str, str]) -> dict[str, Any]:
+    """The paper source of the settings and whether it is ready: the OpenAlex API
+    needs nothing set up, essaies its URL."""
+    source = values.get("ISBE_PAPER_SOURCE") or "openalex"
+    return {"source": source, "ready": source == "openalex" or bool(values.get("ESSAIES_URL"))}
+
+
+def home(conn: sqlite3.Connection, data: Path, settings_root: Path, limit: int = 3) -> dict[str, Any]:
+    """`/api/home`: what the React Home shows besides the galaxies, without the
+    overview's per-topic statistics: the newest `limit` report covers, topic
+    labels for them, and whether the services a first run needs are set up."""
+    snapshot = settings.snapshot(settings_root)
+    values = snapshot["values"]
+    provider = values.get("ISBE_LLM_PROVIDER")
+    return {
+        "topics": [{"id": t.id, "label": t.label} for t in _topics(data)],
+        "reports": recent(conn, data, limit),
+        "services": {
+            "papers": _papers(values),
+            "llm": (provider if isinstance(provider, str) else "anthropic") if snapshot["llm"]["ready"] is True else None,
         },
     }
 

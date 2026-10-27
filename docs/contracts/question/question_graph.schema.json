@@ -1,0 +1,448 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:question_graph",
+  "title": "question_graph@1: the keyword and citation graph of one run",
+  "description": "Paper nodes use the paper's identity key as id; keyword nodes use `kw:` and the normalized keyword. `cites` edges point from the citing to the cited paper and `has_keyword` edges from the paper to the keyword; the other kinds are undirected and list their endpoints in sorted order. The fingerprint changes whenever anything the graph is built from changes, so clients can cache by it. `lineage` and `main_paths` are views for reading the graph over time (docs/question/graph.md); graphs stored before they existed lack them and read stale.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "fingerprint",
+    "built_at",
+    "nodes",
+    "edges",
+    "communities"
+  ],
+  "properties": {
+    "schema": {
+      "const": "question_graph@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16,64}$"
+    },
+    "built_at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "communities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "size",
+          "top_keywords"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "top_keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "description": "How the run's main keywords grow out of and cross each other over time.",
+      "required": [
+        "keywords",
+        "edges"
+      ],
+      "properties": {
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label",
+              "papers",
+              "onset",
+              "last",
+              "per_year",
+              "community"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/keyword_id"
+              },
+              "label": {
+                "type": "string"
+              },
+              "papers": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "onset": {
+                "type": "integer",
+                "description": "The second-earliest year of its papers."
+              },
+              "last": {
+                "type": "integer"
+              },
+              "per_year": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  ],
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "community": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "target",
+              "kind",
+              "weight"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/keyword_id"
+              },
+              "target": {
+                "$ref": "#/$defs/keyword_id"
+              },
+              "kind": {
+                "enum": [
+                  "grows_out_of",
+                  "crosses"
+                ],
+                "description": "grows_out_of: source (later) → target (earlier), weight the citations from source's papers to target's; crosses: undirected, sorted endpoints, weight the shared papers."
+              },
+              "weight": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "main_paths": {
+      "type": "array",
+      "description": "The citation links most source-to-sink paths run through (search path count). source = cited (older), target = citing; weight = its count over the largest, unrounded (a link far below the top can be 0).",
+      "items": {
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "weight"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "urn:isbe:question:common#/$defs/identity_key"
+          },
+          "target": {
+            "$ref": "urn:isbe:question:common#/$defs/identity_key"
+          },
+          "weight": {
+            "type": "number",
+            "maximum": 1,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "papers",
+        "dated",
+        "full_citations"
+      ],
+      "description": "How much of the graph the views can see: kept papers, those with a year, those whose full citations were looked up.",
+      "properties": {
+        "papers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "full_citations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "keyword_id": {
+      "type": "string",
+      "pattern": "^kw:\\S.*$"
+    },
+    "node_id": {
+      "anyOf": [
+        {
+          "$ref": "urn:isbe:question:common#/$defs/identity_key"
+        },
+        {
+          "$ref": "#/$defs/keyword_id"
+        }
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "degree": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pagerank": {
+          "type": "number",
+          "minimum": 0
+        },
+        "betweenness": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bridge": {
+          "type": "boolean",
+          "description": "A paper that links its community to another and is among the most between papers (docs/question/graph.md)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "community",
+        "metrics"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/node_id"
+        },
+        "kind": {
+          "enum": [
+            "paper",
+            "keyword"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "community": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "metrics": {
+          "$ref": "#/$defs/metrics"
+        },
+        "paper": {
+          "$ref": "urn:isbe:question:common#/$defs/paper"
+        },
+        "decision": {
+          "enum": [
+            "include",
+            "exclude",
+            "unscreened"
+          ],
+          "description": "The effective decision after overrides."
+        },
+        "origin": {
+          "enum": [
+            "seed",
+            "expansion"
+          ],
+          "description": "Found by a query, or added by citation expansion."
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "paper"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "paper",
+              "decision",
+              "origin"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "urn:isbe:question:common#/$defs/identity_key"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/keyword_id"
+              },
+              "paper": false,
+              "decision": false,
+              "origin": false
+            }
+          }
+        }
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "required": [
+        "source",
+        "target",
+        "kind",
+        "weight"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/node_id"
+        },
+        "target": {
+          "$ref": "#/$defs/node_id"
+        },
+        "kind": {
+          "enum": [
+            "cites",
+            "has_keyword",
+            "co_citation",
+            "coupling",
+            "keyword_cooccur"
+          ]
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "cites",
+                  "co_citation",
+                  "coupling"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "$ref": "urn:isbe:question:common#/$defs/identity_key"
+              },
+              "target": {
+                "$ref": "urn:isbe:question:common#/$defs/identity_key"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "has_keyword"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "$ref": "urn:isbe:question:common#/$defs/identity_key"
+              },
+              "target": {
+                "$ref": "#/$defs/keyword_id"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "keyword_cooccur"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/keyword_id"
+              },
+              "target": {
+                "$ref": "#/$defs/keyword_id"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

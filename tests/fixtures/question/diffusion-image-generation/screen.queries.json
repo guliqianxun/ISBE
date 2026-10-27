@@ -1,0 +1,65 @@
+{
+ "note": "The queries whose recorded candidates model.screen.json screened (plan.json's and Strata's pre-composer plan, 2026-10-23); replay.screening_plan reads them so the recorded verdicts keep matching.",
+ "queries": [
+  {
+   "id": "q1",
+   "query": "denoising diffusion probabilistic models",
+   "priority": 1
+  },
+  {
+   "id": "q2",
+   "query": "score-based generative modeling stochastic differential equations",
+   "priority": 2
+  },
+  {
+   "id": "q3",
+   "query": "latent diffusion high-resolution image synthesis",
+   "priority": 3
+  },
+  {
+   "id": "q4",
+   "query": "text-to-image diffusion model",
+   "priority": 4
+  },
+  {
+   "id": "q5",
+   "query": "diffusion guidance image synthesis",
+   "priority": 5
+  },
+  {
+   "id": "q6",
+   "query": "(diffusion OR \"denoising diffusion\") (\"image generation\" OR \"image synthesis\")",
+   "priority": 1
+  },
+  {
+   "id": "q7",
+   "query": "(DDPM OR \"denoising diffusion probabilistic model\") (\"image generation\" OR \"image synthesis\")",
+   "priority": 2
+  },
+  {
+   "id": "q8",
+   "query": "(score-based OR \"score matching\") (\"image generation\" OR \"image synthesis\")",
+   "priority": 3
+  },
+  {
+   "id": "q9",
+   "query": "(\"latent diffusion\" OR \"Stable Diffusion\") (\"image generation\" OR \"image synthesis\")",
+   "priority": 4
+  },
+  {
+   "id": "q10",
+   "query": "(DiT OR \"diffusion transformer\") (\"image generation\" OR \"image synthesis\")",
+   "priority": 5
+  },
+  {
+   "id": "q11",
+   "query": "denoising score matching",
+   "priority": 6
+  },
+  {
+   "id": "q12",
+   "query": "(text-to-image OR \"text to image\") diffusion",
+   "priority": 7
+  }
+ ]
+}

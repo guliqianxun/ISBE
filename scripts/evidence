@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Store run evidence (screenshots, logs) on the `evidence` branch of origin and
+# print Markdown links to paste into an issue or merge request note.
+#   scripts/evidence <folder> FILE...
+# The branch is never merged and never pushed to the public mirror.
+# Links are absolute (http://host/group/repo/-/raw/<sha>/...): GitLab rewrites a
+# host-relative link in an issue to the default branch (-/blob/main/...), where
+# the file is not. The web address comes from ISBE_EVIDENCE_WEB (the address
+# the browser uses, http://host:port, with any path prefix GitLab is served
+# under), else from an http(s) remote URL; an ssh remote needs the variable.
+# ISBE_EVIDENCE_REMOTE (default origin) picks the remote.
+set -euo pipefail
+if (( $# < 2 )); then
+    sed -n '2,/^[^#]/{/^#/p;}' "$0" | sed 's/^# \{0,1\}//' >&2
+    exit 2
+fi
+folder=$1; shift
+files=()
+declare -A seen=()
+for f in "$@"; do
+    name=$(basename -- "$f")
+    if [[ -n ${seen[$name]:-} ]]; then
+        echo "two files are named $name; rename one" >&2
+        exit 2
+    fi
+    seen[$name]=1
+    files+=("$(realpath -e -- "$f")")
+done
+cd "$(dirname "$0")/.."
+set -- "${files[@]}"
+remote=${ISBE_EVIDENCE_REMOTE:-origin}
+url=$(git remote get-url "$remote")
+# ssh://git@host:2222/group/repo.git, git@host:group/repo.git, http://host/group/repo.git
+path=${url#*://}; path=${path#*@}; path=${path#*[:/]}
+[[ $url == *://* && $path =~ ^[0-9]+/ ]] && path=${path#*/}
+project=/${path%.git}
+web=${ISBE_EVIDENCE_WEB:-}
+if [[ -n $web ]]; then
+    if [[ ! ${web,,} =~ ^https?:// ]]; then
+        echo "ISBE_EVIDENCE_WEB must start with http:// or https://: $web" >&2
+        exit 2
+    fi
+    # The variable is the whole web root: drop a path prefix the remote repeats.
+    while [[ $web == */ ]]; do web=${web%/}; done
+    prefix=${web#*://}
+    if [[ $prefix == */* && $project == "/${prefix#*/}/"* ]]; then
+        project=${project#"/${prefix#*/}"}
+    fi
+elif [[ ${url,,} =~ ^(https?://)([^/]*@)?([^/@]+) ]]; then
+    # Userinfo is matched greedily so no part of a credential reaches a link.
+    web=${url:0:${#BASH_REMATCH[1]}}${BASH_REMATCH[3]}
+fi
+if [[ -z $web ]]; then
+    echo "set ISBE_EVIDENCE_WEB to the GitLab web address (http://host:port): $remote is $url" >&2
+    exit 2
+fi
+web=${web%/}
+git fetch -q "$remote" "+refs/heads/evidence:refs/remotes/$remote/evidence" 2>/dev/null || true
+parent=$(git rev-parse -q --verify "refs/remotes/$remote/evidence" || true)
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+export GIT_INDEX_FILE=$tmp/index
+if [[ -n $parent ]]; then git read-tree "$parent"; else git read-tree --empty; fi
+for f in "$@"; do
+    blob=$(git hash-object -w -- "$f")
+    git update-index --add --cacheinfo "100644,$blob,$folder/$(basename -- "$f")"
+done
+commit=$(git commit-tree "$(git write-tree)" ${parent:+-p "$parent"} -m "evidence: $folder")
+git push -q "$remote" "$commit:refs/heads/evidence"
+for f in "$@"; do
+    name=$(basename -- "$f")
+    link=$web$project/-/raw/$commit/$folder/$name
+    link=${link//%/%25}; link=${link// /%20}; link=${link//#/%23}; link=${link//\?/%3F}
+    link=${link//(/%28}; link=${link//)/%29}; name=${name//[/\\[}; name=${name//]/\\]}
+    case ${name,,} in
+        *.png|*.jpg|*.jpeg|*.gif|*.webp|*.svg) echo "![$name]($link)" ;;
+        *) echo "[$name]($link)" ;;
+    esac
+done

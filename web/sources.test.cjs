@@ -86,7 +86,11 @@ async function consoleApp({ records = [source()], items = [material()], jobs = [
 test('source edits retain revisions and drafts across refresh, locale changes, conflicts, and navigation', async () => {
   const c = await consoleApp();
   assert.equal(c.requests.some((r) => r.url === '/api/overview'),false);
-  assert.match(c.app.innerHTML,/href="\/sources"/);
+  // Sources sits under System in the shared sidebar.
+  assert.match(c.app.innerHTML,/<a class="nav" href="\/system" aria-current="page">/);
+  // React pages are whole-page loads; classic ones stay in this console.
+  assert.match(c.app.innerHTML,/<a class="nav" href="\/">/);
+  assert.match(c.app.innerHTML,/<a class="nav" data-link href="\/reports">/);
   await c.action('sourceSelect',{ id:'city' });
   c.input('name','Revised <name>'); c.input('id','cannot-rename');
   await c.action('lang',{ v:'zh' }); await c.action('sourcesRefresh');
@@ -195,7 +199,7 @@ test('JSON import is explicit and atomic conflicts retain text; new source valid
 
 test('ordinary shared users cannot navigate to or request sources', async () => {
   const c = await consoleApp({ role:'user' });
-  assert.equal(c.location.pathname,'/');
+  assert.equal(c.location.pathname,'/overview');
   assert.equal(c.requests.some((r) => r.url.startsWith('/api/sources')),false);
   assert.doesNotMatch(c.app.innerHTML,/href="\/sources"/);
   await c.action('sourceCollect'); await c.submit('source-discovery-form');
@@ -586,12 +590,12 @@ test('failed or interrupted rechecks retry the current batch instead of skipping
   }
 });
 
-test('search plans escape imported content and configured keys never populate password controls', async () => {
+test('search plans escape imported content and never render configured keys', async () => {
   const plan = searchPlan(); plan.config.name = '<img src=x onerror=bad()>'; plan.config.queries = ['<script>bad()</script>'];
   const c = await consoleApp({plans:[plan],settings:{values:{GITHUB_TOKEN:'MUST_NOT_BE_RENDERED'},configured:{GITHUB_TOKEN:true}}});
   await c.action('sourceView',{view:'search'}); assert.match(c.app.innerHTML,/&lt;img/); assert.doesNotMatch(c.app.innerHTML,/<img src=x/);
   await c.action('searchSelect',{id:'shanghai-news'}); assert.match(c.app.innerHTML,/&lt;script&gt;/); assert.doesNotMatch(c.app.innerHTML,/<script>bad/);
-  await c.navigate('/settings'); assert.match(c.app.innerHTML,/id="setting-GITHUB_TOKEN"[^>]*type="password" value=""/); assert.doesNotMatch(c.app.innerHTML,/MUST_NOT_BE_RENDERED/);
+  assert.doesNotMatch(c.app.innerHTML,/MUST_NOT_BE_RENDERED/);
 });
 
 test('media weekly uses a completed Sunday, deduplicates report topics and prefers a matching label', async () => {

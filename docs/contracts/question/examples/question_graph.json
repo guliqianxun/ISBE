@@ -1,0 +1,162 @@
+{
+  "schema": "question_graph@1",
+  "run_id": "run-20261022-a1",
+  "fingerprint": "9f2c4a1b7e3d5f60",
+  "built_at": "2026-10-22T10:04:00Z",
+  "nodes": [
+    {
+      "id": "openalex:W1485009520",
+      "kind": "paper",
+      "label": "ConvLSTM (2015)",
+      "community": 0,
+      "metrics": {
+        "degree": 3,
+        "pagerank": 0.41,
+        "bridge": true
+      },
+      "paper": {
+        "key": "openalex:W1485009520",
+        "keys": [
+          "openalex:W1485009520",
+          "doi:10.48550/arxiv.1506.04214",
+          "arxiv:1506.04214"
+        ],
+        "title": "Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting",
+        "year": 2015,
+        "authors": [
+          "Xingjian Shi",
+          "Zhourong Chen",
+          "Hao Wang",
+          "Dit-Yan Yeung",
+          "Wai-kin Wong",
+          "Wang-chun Woo"
+        ],
+        "venue": null,
+        "type": "preprint",
+        "cited_by_count": 6648,
+        "abstract": null,
+        "keywords": [
+          "precipitation nowcasting",
+          "convolutional LSTM"
+        ],
+        "url": "https://arxiv.org/abs/1506.04214",
+        "in_archive": true
+      },
+      "decision": "include",
+      "origin": "seed"
+    },
+    {
+      "id": "openalex:W3202525453",
+      "kind": "paper",
+      "label": "DGMR (2021)",
+      "community": 0,
+      "metrics": {
+        "degree": 2,
+        "pagerank": 0.33,
+        "bridge": false
+      },
+      "paper": {
+        "key": "openalex:W3202525453",
+        "keys": [
+          "openalex:W3202525453",
+          "doi:10.1038/s41586-021-03854-z"
+        ],
+        "title": "Skilful precipitation nowcasting using deep generative models of radar",
+        "year": 2021,
+        "authors": [
+          "Suman Ravuri"
+        ],
+        "venue": "Nature",
+        "type": "article",
+        "cited_by_count": 916,
+        "keywords": [
+          "precipitation nowcasting",
+          "generative model"
+        ],
+        "url": "https://doi.org/10.1038/s41586-021-03854-z",
+        "in_archive": false
+      },
+      "decision": "include",
+      "origin": "seed"
+    },
+    {
+      "id": "kw:precipitation nowcasting",
+      "kind": "keyword",
+      "label": "precipitation nowcasting",
+      "community": 0,
+      "metrics": {
+        "degree": 2,
+        "pagerank": 0.26
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "openalex:W3202525453",
+      "target": "openalex:W1485009520",
+      "kind": "cites",
+      "weight": 1
+    },
+    {
+      "source": "openalex:W1485009520",
+      "target": "kw:precipitation nowcasting",
+      "kind": "has_keyword",
+      "weight": 1
+    },
+    {
+      "source": "openalex:W3202525453",
+      "target": "kw:precipitation nowcasting",
+      "kind": "has_keyword",
+      "weight": 1
+    }
+  ],
+  "communities": [
+    {
+      "id": 0,
+      "label": "Deep learning nowcasting",
+      "size": 3,
+      "top_keywords": [
+        "precipitation nowcasting"
+      ]
+    }
+  ],
+  "lineage": {
+    "keywords": [
+      {
+        "id": "kw:precipitation nowcasting",
+        "label": "precipitation nowcasting",
+        "papers": 5,
+        "onset": 2015,
+        "last": 2021,
+        "per_year": [
+          [
+            2015,
+            1
+          ],
+          [
+            2019,
+            2
+          ],
+          [
+            2021,
+            2
+          ]
+        ],
+        "community": 0
+      }
+    ],
+    "edges": []
+  },
+  "main_paths": [
+    {
+      "source": "openalex:W1485009520",
+      "target": "openalex:W3202525453",
+      "weight": 1
+    }
+  ],
+  "coverage": {
+    "papers": 2,
+    "dated": 2,
+    "full_citations": 1
+  }
+}

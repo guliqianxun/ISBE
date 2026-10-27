@@ -2,11 +2,13 @@ import queue
 import re
 import sqlite3
 import threading
+import time
+from contextlib import closing
 from pathlib import Path
 
 import pytest
 
-from isbe.core import db
+from isbe.core import db, paperrefs
 
 
 def raw(*migrations: str) -> sqlite3.Connection:
@@ -130,7 +132,7 @@ def test_migrates_once_and_enforces_constraints() -> None:
     conn = raw()
     db._migrate(conn)
     db._migrate(conn)  # second run is a no-op
-    assert conn.execute("PRAGMA user_version").fetchone()[0] == len(db._migrations()) == 10
+    assert conn.execute("PRAGMA user_version").fetchone()[0] == len(db._migrations()) == 19
     conn.execute(
         "INSERT INTO items (id, kind, source, title, url, lang, published_at) VALUES "
         "('arxiv:2609.34836', 'paper', 'essaies', 'MW-Nowcast', "
@@ -242,3 +244,89 @@ def test_a_refused_open_closes_its_connection(tmp_path: Path, monkeypatch: pytes
         db.connect(path)
     with pytest.raises(sqlite3.ProgrammingError, match="closed"):
         opened[0].execute("SELECT 1")
+
+
+def test_an_opener_waits_for_another_connections_migration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # A database one migration behind, its migration held open by another
+    # connection for longer than the busy budget of an ordinary open.
+    monkeypatch.setattr(db, "_OPEN_SECONDS", 0.3)
+    path = tmp_path / "isbe.db"
+    first = sqlite3.connect(path, autocommit=True, check_same_thread=False)
+    first.execute("PRAGMA journal_mode=WAL")
+    paperrefs.register(first)
+    for sql in db._migrations()[:-1]:
+        first.executescript(sql)
+    first.execute(f"PRAGMA user_version = {len(db._migrations()) - 1}")
+    first.execute("BEGIN IMMEDIATE")
+    release = threading.Timer(1.0, lambda: first.execute("COMMIT"))
+    release.start()
+    started = time.monotonic()
+    lines: list[str] = []
+    try:
+        conn = db.connect(path, lines.append)
+    finally:
+        release.join()
+        first.close()
+    assert time.monotonic() - started >= 1.0
+    # It says why it waits, then (the other connection only held the lock) migrates.
+    assert lines[0] == f"waiting for {path}: another process is writing to it…"
+    assert lines[1].startswith(f"migrating {path} from schema v{len(db._migrations()) - 1}")
+    assert conn.execute("PRAGMA user_version").fetchone()[0] == len(db._migrations())
+    assert conn.execute("PRAGMA busy_timeout").fetchone()[0] == 5000
+    conn.close()
+
+
+def filled(path: Path) -> sqlite3.Connection:
+    """A current database whose file is mostly free pages."""
+    conn = db.connect(path)
+    conn.execute("CREATE TABLE filler (body TEXT)")
+    conn.executemany("INSERT INTO filler VALUES (?)", [("x" * 4000,) for _ in range(3000)])
+    conn.execute("DELETE FROM filler")
+    assert conn.execute("PRAGMA freelist_count").fetchone()[0] > 2000
+    return conn
+
+
+def test_compact_gives_free_pages_back_and_says_when_it_cannot(tmp_path: Path, caplog) -> None:  # type: ignore[no-untyped-def]
+    conn = filled(tmp_path / "isbe.db")
+    conn.execute("PRAGMA busy_timeout = 0")
+    writer = sqlite3.connect(tmp_path / "isbe.db", autocommit=True)
+    writer.execute("BEGIN IMMEDIATE")
+    with caplog.at_level("WARNING", logger="isbe.core.db"):
+        assert db.compact(conn) is False
+    assert "could not compact the database" in caplog.text
+    assert conn.execute("PRAGMA freelist_count").fetchone()[0] > 2000
+    writer.execute("COMMIT")
+    writer.close()
+    assert db.compact(conn) is True
+    assert conn.execute("PRAGMA freelist_count").fetchone()[0] == 0
+    # A file with little free space is left alone.
+    assert db.compact(conn) is True
+
+
+def test_upgrade_says_what_takes_time_and_retries_compaction(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "isbe.db"
+    raw = sqlite3.connect(path, autocommit=True)
+    for sql in db._migrations()[:5]:
+        raw.executescript(sql)
+    raw.execute("PRAGMA user_version = 5")
+    raw.close()
+    lines: list[str] = []
+    monkeypatch.setattr(db, "_PROGRESS_SECONDS", 0.0)
+    monkeypatch.setattr(db, "_PROGRESS_STEPS", 1)
+    db.upgrade(path, lines.append)
+    assert lines[0].startswith(f"migrating {path} from schema v5 to v")
+    assert lines[1].startswith(f"still migrating {path} (") and len(lines) > 3
+    assert re.fullmatch(rf"migrated {re.escape(str(path))} in \d+\.\d s", lines[-1])
+    monkeypatch.setattr(db, "_PROGRESS_SECONDS", 30.0)
+    # Up to date: silent, but a file left mostly free (a compaction that failed
+    # earlier) is compacted now.
+    filled(path).close()
+    lines.clear()
+    db.upgrade(path, lines.append)
+    assert lines == []
+    with closing(sqlite3.connect(path)) as conn:
+        assert conn.execute("PRAGMA freelist_count").fetchone()[0] == 0
+    # It only upgrades: a missing file is an error, not a new database.
+    with pytest.raises(sqlite3.OperationalError):
+        db.upgrade(tmp_path / "missing.db", lines.append)
+    assert not (tmp_path / "missing.db").exists()

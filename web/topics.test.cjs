@@ -1,4 +1,4 @@
-// Run with: node --test web/settings.test.cjs web/topics.test.cjs
+// Run with: node --test web/topics.test.cjs
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -141,8 +141,8 @@ test('new topics start with an invalid empty arxiv query and save typed values a
   } });
   assert.match(c.app.innerHTML, /Topic saved/);
   assert.match(c.app.innerHTML, /class="card first-report-guide"/);
-  assert.equal(c.elements.get('#report-guide').open, true);
-  assert.match(c.elements.get('#report-guide').innerHTML, /Saving checks configuration, not connectivity/);
+  // Saving no longer opens a dialog: the card links to the guide on Help.
+  assert.match(c.app.innerHTML, /href="\/help\?topic=robotics#report-guide"/);
   assert.doesNotMatch(c.app.innerHTML, /isbe --data|uv run|\/srv\/research/);
   assert.equal(c.requests.some((r) => r.url === '/api/generation' && r.method === 'POST'), false);
   assert.match(c.app.innerHTML, /id="topic-id"[^>]*disabled[^>]*value="robotics"/);
@@ -288,22 +288,22 @@ test('search and appearance keep drafts, and topic switching, page navigation, a
   assert.match(c.app.innerHTML, /id="topic-search"[^>]*value="vision"/);
   await c.action('topicSelect', { id: 'vision' }); await c.action('topicNew');
   assert.match(c.app.innerHTML, /value="Draft label"/);
-  await c.navigate('/settings'); assert.equal(c.location.pathname, '/topics');
+  await c.navigate('/reports'); assert.equal(c.location.pathname, '/topics');
   let prevented = false; c.windowEvents.beforeunload({ preventDefault() { prevented = true; } }); assert.equal(prevented, true);
-  c.location.pathname = '/settings'; c.windowEvents.popstate({ state: { isbeIndex: -1 } });
+  c.location.pathname = '/reports'; c.windowEvents.popstate({ state: { isbeIndex: -1 } });
   assert.deepEqual(c.history.movements, [1]);
   c.location.pathname = '/topics'; c.windowEvents.popstate({ state: { isbeIndex: 0 } });
   c.browser.allowLeave = true; await c.action('topicSelect', { id: 'vision' });
   assert.match(c.app.innerHTML, /value="Research vision"/);
   prevented = false; c.windowEvents.beforeunload({ preventDefault() { prevented = true; } }); assert.equal(prevented, false);
-  await c.navigate('/settings'); assert.equal(c.location.pathname, '/settings');
+  await c.navigate('/reports'); assert.equal(c.location.pathname, '/reports');
 });
 
 test('pending writes disable the form and prevent double submission or page departure', async () => {
   const c = await consoleApp(); await c.action('topicSelect', { id: 'papers' }); c.input('label', 'Pending');
   const release = c.holdWrites(); const pending = c.save(); await c.settle();
   assert.match(c.app.innerHTML, /<fieldset disabled>/);
-  await c.save(); await c.navigate('/settings');
+  await c.save(); await c.navigate('/reports');
   assert.equal(c.location.pathname, '/topics');
   assert.equal(c.requests.filter((r) => r.method === 'PUT').length, 1);
   release(); await pending;

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:screen_override",
+  "title": "screen_override@1: a person's decision on one paper",
+  "description": "The latest override for a paper that has not been revoked decides it. Undoing an override is a new record with `decision: null` and `revokes` naming it; nothing is deleted.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "override_id",
+    "key",
+    "decision",
+    "note",
+    "actor",
+    "revokes",
+    "created_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "screen_override@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "override_id": {
+      "$ref": "urn:isbe:question:common#/$defs/local_id"
+    },
+    "key": {
+      "$ref": "urn:isbe:question:common#/$defs/identity_key"
+    },
+    "decision": {
+      "anyOf": [
+        {
+          "$ref": "urn:isbe:question:common#/$defs/decision"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "note": {
+      "type": "string"
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The account that made the change."
+    },
+    "revokes": {
+      "anyOf": [
+        {
+          "$ref": "urn:isbe:question:common#/$defs/local_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "decision": {
+        "type": "null"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "revokes": {
+        "$ref": "urn:isbe:question:common#/$defs/local_id"
+      }
+    }
+  }
+}

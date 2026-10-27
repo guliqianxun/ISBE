@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "contains": "基于深度学习的雷达回波外推降水临近预报（0–2 小时）有哪些主要方法？",
+   "reply": "{\"reformulation\": \"Deep learning methods for radar-echo extrapolation in precipitation nowcasting at 0–2 hour lead times.\", \"subject_terms\": [\"precipitation nowcasting\", \"radar echo extrapolation\"], \"method_terms\": [\"deep learning\", \"recurrent neural network\", \"generative model\"], \"outcome_terms\": [\"forecast skill\", \"critical success index\"], \"keyword_layers\": {\"canonical\": [\"precipitation nowcasting\", \"radar echo extrapolation\"], \"mainstream\": [\"ConvLSTM precipitation nowcasting\", \"U-Net radar nowcasting\"], \"emerging\": [\"generative precipitation nowcasting\", \"transformer earth system forecasting\"], \"method_centric\": [\"spatiotemporal predictive learning\"], \"cross_domain\": [\"video prediction\"]}, \"queries\": [{\"id\": \"q1\", \"query\": \"precipitation nowcasting deep learning radar\", \"layer\": \"canonical\", \"priority\": 1}, {\"id\": \"q2\", \"query\": \"radar echo extrapolation neural network\", \"layer\": \"canonical\", \"priority\": 2}, {\"id\": \"q3\", \"query\": \"convolutional LSTM precipitation nowcasting\", \"layer\": \"mainstream\", \"priority\": 3}, {\"id\": \"q4\", \"query\": \"generative model precipitation nowcasting radar\", \"layer\": \"emerging\", \"priority\": 4}, {\"id\": \"q5\", \"query\": \"spatiotemporal predictive learning recurrent\", \"layer\": \"method_centric\", \"priority\": 5}], \"year_from\": 2012, \"year_to\": null, \"criteria\": {\"include\": [\"Proposes, evaluates or benchmarks a data-driven method for radar-based precipitation nowcasting up to a few hours ahead\"], \"exclude\": [\"Seasonal or climate-scale forecasting\", \"Rain gauge interpolation without a forecast\"]}, \"rationale\": \"Translates the Chinese terms into English and spans extrapolation baselines, recurrent models and generative models.\"}"
+  }
+ ]
+}

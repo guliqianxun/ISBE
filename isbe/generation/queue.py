@@ -21,6 +21,7 @@ from isbe import topics
 from isbe.core import db, jsonfmt, locks, paths, settings
 from isbe.core.errors import describe
 from isbe.core.llm import Llm
+from isbe.question import flow
 from isbe.topics import Flavor
 
 from . import worker
@@ -70,6 +71,7 @@ class Manager:
         *,
         stages: Stages | None = None,
         read_settings: worker.ReadSettings = settings.for_task,
+        questions: flow.Services | None = None,
     ) -> Manager:
         """Take the worker lock of `root`, recover interrupted tasks and start the worker.
 
@@ -78,7 +80,8 @@ class Manager:
         `paths`/`sqlite3` errors of an unusable root. A broken *owner*
         workspace does not fail it. `stages` replaces the pipeline and
         `read_settings` the settings snapshot (tests); both apply to the
-        worker and, for the settings, to `submit`.
+        worker and, for the settings, to `submit`; `questions` what question
+        runs use (tests).
         """
         root = paths.workspace(root, "local")
         lock = locks.worker_lock(root)
@@ -88,7 +91,7 @@ class Manager:
             signal = worker.Signal()
             thread = threading.Thread(
                 target=worker.loop,
-                args=(root, lock, read_settings, stages or Stages(), signal),
+                args=(root, lock, read_settings, stages or Stages(), signal, questions),
                 name="report-queue",
                 # A task can take minutes; a process exiting without close() leaves
                 # it running in the database, and the next open marks it interrupted.

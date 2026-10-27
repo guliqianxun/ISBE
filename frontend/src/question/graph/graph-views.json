@@ -1,0 +1,1538 @@
+{
+  "nodes": [
+    {
+      "id": "arxiv:2101.00001",
+      "kind": "paper",
+      "label": "Paper 1 (1996)",
+      "community": 2,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.08312105,
+        "betweenness": 0.04215456,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00001",
+        "keys": ["arxiv:2101.00001"],
+        "title": "Paper 1",
+        "year": 1996,
+        "cited_by_count": 10,
+        "keywords": ["ensemble spread"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00002",
+      "kind": "paper",
+      "label": "Paper 2 (1997)",
+      "community": 1,
+      "metrics": {
+        "degree": 9,
+        "pagerank": 0.18622574,
+        "betweenness": 0.03666326,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00002",
+        "keys": ["arxiv:2101.00002"],
+        "title": "Paper 2",
+        "year": 1997,
+        "cited_by_count": 20,
+        "keywords": ["ensemble spread"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00003",
+      "kind": "paper",
+      "label": "Paper 3 (1998)",
+      "community": 1,
+      "metrics": {
+        "degree": 9,
+        "pagerank": 0.18598716,
+        "betweenness": 0.03485112,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00003",
+        "keys": ["arxiv:2101.00003"],
+        "title": "Paper 3",
+        "year": 1998,
+        "cited_by_count": 30,
+        "keywords": ["ensemble spread"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00004",
+      "kind": "paper",
+      "label": "Paper 4 (1999)",
+      "community": 0,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.08315161,
+        "betweenness": 0.03831385,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00004",
+        "keys": ["arxiv:2101.00004"],
+        "title": "Paper 4",
+        "year": 1999,
+        "cited_by_count": 40,
+        "keywords": ["ensemble spread"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00005",
+      "kind": "paper",
+      "label": "Paper 5 (2000)",
+      "community": 0,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.08738127,
+        "betweenness": 0.02842561,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00005",
+        "keys": ["arxiv:2101.00005"],
+        "title": "Paper 5",
+        "year": 2000,
+        "cited_by_count": 50,
+        "keywords": ["ensemble spread"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00006",
+      "kind": "paper",
+      "label": "Paper 6 (2001)",
+      "community": 2,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.08711213,
+        "betweenness": 0.02709172,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00006",
+        "keys": ["arxiv:2101.00006"],
+        "title": "Paper 6",
+        "year": 2001,
+        "cited_by_count": 60,
+        "keywords": ["ensemble spread"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00007",
+      "kind": "paper",
+      "label": "Paper 7 (2005)",
+      "community": 2,
+      "metrics": {
+        "degree": 10,
+        "pagerank": 0.0228244,
+        "betweenness": 0.17823156,
+        "bridge": true
+      },
+      "paper": {
+        "key": "arxiv:2101.00007",
+        "keys": ["arxiv:2101.00007"],
+        "title": "Paper 7",
+        "year": 2005,
+        "cited_by_count": 70,
+        "keywords": ["forecast calibration"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00008",
+      "kind": "paper",
+      "label": "Paper 8 (2006)",
+      "community": 1,
+      "metrics": {
+        "degree": 11,
+        "pagerank": 0.02898695,
+        "betweenness": 0.0600965,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00008",
+        "keys": ["arxiv:2101.00008"],
+        "title": "Paper 8",
+        "year": 2006,
+        "cited_by_count": 80,
+        "keywords": ["forecast calibration"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00009",
+      "kind": "paper",
+      "label": "Paper 9 (2007)",
+      "community": 0,
+      "metrics": {
+        "degree": 11,
+        "pagerank": 0.02242933,
+        "betweenness": 0.16311387,
+        "bridge": true
+      },
+      "paper": {
+        "key": "arxiv:2101.00009",
+        "keys": ["arxiv:2101.00009"],
+        "title": "Paper 9",
+        "year": 2007,
+        "cited_by_count": 90,
+        "keywords": ["forecast calibration"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00010",
+      "kind": "paper",
+      "label": "Paper 10 (2008)",
+      "community": 0,
+      "metrics": {
+        "degree": 8,
+        "pagerank": 0.0171228,
+        "betweenness": 0.09100902,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00010",
+        "keys": ["arxiv:2101.00010"],
+        "title": "Paper 10",
+        "year": 2008,
+        "cited_by_count": 100,
+        "keywords": ["forecast calibration", "verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00011",
+      "kind": "paper",
+      "label": "Paper 11 (2009)",
+      "community": 0,
+      "metrics": {
+        "degree": 8,
+        "pagerank": 0.01683614,
+        "betweenness": 0.06505653,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00011",
+        "keys": ["arxiv:2101.00011"],
+        "title": "Paper 11",
+        "year": 2009,
+        "cited_by_count": 110,
+        "keywords": ["forecast calibration", "verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00012",
+      "kind": "paper",
+      "label": "Paper 12 (2010)",
+      "community": 2,
+      "metrics": {
+        "degree": 8,
+        "pagerank": 0.01559706,
+        "betweenness": 0.15715597,
+        "bridge": true
+      },
+      "paper": {
+        "key": "arxiv:2101.00012",
+        "keys": ["arxiv:2101.00012"],
+        "title": "Paper 12",
+        "year": 2010,
+        "cited_by_count": 120,
+        "keywords": ["forecast calibration", "verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00013",
+      "kind": "paper",
+      "label": "Paper 13 (2018)",
+      "community": 3,
+      "metrics": {
+        "degree": 4,
+        "pagerank": 0.01283035,
+        "betweenness": 0.00883698,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00013",
+        "keys": ["arxiv:2101.00013"],
+        "title": "Paper 13",
+        "year": 2018,
+        "cited_by_count": 130,
+        "keywords": ["machine learning"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00014",
+      "kind": "paper",
+      "label": "Paper 14 (2019)",
+      "community": 3,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.0129875,
+        "betweenness": 0.0229345,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00014",
+        "keys": ["arxiv:2101.00014"],
+        "title": "Paper 14",
+        "year": 2019,
+        "cited_by_count": 140,
+        "keywords": ["machine learning"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00015",
+      "kind": "paper",
+      "label": "Paper 15 (2020)",
+      "community": 0,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.01318327,
+        "betweenness": 0.04303157,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00015",
+        "keys": ["arxiv:2101.00015"],
+        "title": "Paper 15",
+        "year": 2020,
+        "cited_by_count": 150,
+        "keywords": ["machine learning"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00016",
+      "kind": "paper",
+      "label": "Paper 16 (2021)",
+      "community": 0,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.01274137,
+        "betweenness": 0.03402843,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00016",
+        "keys": ["arxiv:2101.00016"],
+        "title": "Paper 16",
+        "year": 2021,
+        "cited_by_count": 160,
+        "keywords": ["machine learning"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00017",
+      "kind": "paper",
+      "label": "Paper 17 (2022)",
+      "community": 0,
+      "metrics": {
+        "degree": 5,
+        "pagerank": 0.01154404,
+        "betweenness": 0.02808916,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00017",
+        "keys": ["arxiv:2101.00017"],
+        "title": "Paper 17",
+        "year": 2022,
+        "cited_by_count": 170,
+        "keywords": ["machine learning"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00018",
+      "kind": "paper",
+      "label": "Paper 18 (2023)",
+      "community": 0,
+      "metrics": {
+        "degree": 3,
+        "pagerank": 0.00677201,
+        "betweenness": 0.0,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00018",
+        "keys": ["arxiv:2101.00018"],
+        "title": "Paper 18",
+        "year": 2023,
+        "cited_by_count": 180,
+        "keywords": ["machine learning"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00019",
+      "kind": "paper",
+      "label": "Paper 19 (2003)",
+      "community": 1,
+      "metrics": {
+        "degree": 9,
+        "pagerank": 0.02159846,
+        "betweenness": 0.01012072,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00019",
+        "keys": ["arxiv:2101.00019"],
+        "title": "Paper 19",
+        "year": 2003,
+        "cited_by_count": 190,
+        "keywords": ["verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00020",
+      "kind": "paper",
+      "label": "Paper 20 (2004)",
+      "community": 1,
+      "metrics": {
+        "degree": 9,
+        "pagerank": 0.02159846,
+        "betweenness": 0.01012072,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00020",
+        "keys": ["arxiv:2101.00020"],
+        "title": "Paper 20",
+        "year": 2004,
+        "cited_by_count": 200,
+        "keywords": ["verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00021",
+      "kind": "paper",
+      "label": "Paper 21 (2006)",
+      "community": 1,
+      "metrics": {
+        "degree": 9,
+        "pagerank": 0.02159846,
+        "betweenness": 0.01012072,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00021",
+        "keys": ["arxiv:2101.00021"],
+        "title": "Paper 21",
+        "year": 2006,
+        "cited_by_count": 210,
+        "keywords": ["verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00022",
+      "kind": "paper",
+      "label": "Paper 22",
+      "community": 1,
+      "metrics": {
+        "degree": 9,
+        "pagerank": 0.02159846,
+        "betweenness": 0.01012072,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00022",
+        "keys": ["arxiv:2101.00022"],
+        "title": "Paper 22",
+        "year": null,
+        "cited_by_count": 220,
+        "keywords": ["verification"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "arxiv:2101.00023",
+      "kind": "paper",
+      "label": "Paper 23 (2015)",
+      "community": null,
+      "metrics": {
+        "degree": 0,
+        "pagerank": 0.00677201,
+        "betweenness": 0.0,
+        "bridge": false
+      },
+      "paper": {
+        "key": "arxiv:2101.00023",
+        "keys": ["arxiv:2101.00023"],
+        "title": "Paper 23",
+        "year": 2015,
+        "cited_by_count": 230,
+        "keywords": ["a topic of its own"]
+      },
+      "decision": "unscreened",
+      "origin": "seed"
+    },
+    {
+      "id": "kw:verification",
+      "kind": "keyword",
+      "label": "verification",
+      "community": 1,
+      "metrics": {
+        "degree": 8
+      }
+    },
+    {
+      "id": "kw:ensemble spread",
+      "kind": "keyword",
+      "label": "ensemble spread",
+      "community": 2,
+      "metrics": {
+        "degree": 6
+      }
+    },
+    {
+      "id": "kw:forecast calibration",
+      "kind": "keyword",
+      "label": "forecast calibration",
+      "community": 0,
+      "metrics": {
+        "degree": 7
+      }
+    },
+    {
+      "id": "kw:machine learning",
+      "kind": "keyword",
+      "label": "machine learning",
+      "community": 0,
+      "metrics": {
+        "degree": 6
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00001",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00002",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00002",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00003",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00003",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00004",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "arxiv:2101.00004",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "arxiv:2101.00005",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "arxiv:2101.00005",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "arxiv:2101.00006",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00012",
+      "target": "arxiv:2101.00001",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00012",
+      "target": "arxiv:2101.00006",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00013",
+      "target": "arxiv:2101.00007",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00014",
+      "target": "arxiv:2101.00008",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00014",
+      "target": "arxiv:2101.00013",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00015",
+      "target": "arxiv:2101.00009",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00015",
+      "target": "arxiv:2101.00014",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00016",
+      "target": "arxiv:2101.00010",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00016",
+      "target": "arxiv:2101.00015",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00017",
+      "target": "arxiv:2101.00011",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00017",
+      "target": "arxiv:2101.00016",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00018",
+      "target": "arxiv:2101.00012",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00018",
+      "target": "arxiv:2101.00017",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00019",
+      "target": "arxiv:2101.00002",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00019",
+      "target": "arxiv:2101.00003",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00020",
+      "target": "arxiv:2101.00002",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00020",
+      "target": "arxiv:2101.00003",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00021",
+      "target": "arxiv:2101.00002",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00021",
+      "target": "arxiv:2101.00003",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00022",
+      "target": "arxiv:2101.00002",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00022",
+      "target": "arxiv:2101.00003",
+      "kind": "cites",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00001",
+      "target": "arxiv:2101.00002",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00001",
+      "target": "arxiv:2101.00006",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "arxiv:2101.00003",
+      "kind": "co_citation",
+      "weight": 5.0
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "arxiv:2101.00004",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00004",
+      "target": "arxiv:2101.00005",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00005",
+      "target": "arxiv:2101.00006",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00013",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00014",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "arxiv:2101.00015",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "arxiv:2101.00016",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00012",
+      "target": "arxiv:2101.00017",
+      "kind": "co_citation",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00008",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00012",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00019",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00020",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00021",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00022",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00009",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00019",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00020",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00021",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00022",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00010",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00019",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00020",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00021",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00022",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "arxiv:2101.00011",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "arxiv:2101.00012",
+      "kind": "coupling",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00019",
+      "target": "arxiv:2101.00020",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00019",
+      "target": "arxiv:2101.00021",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00019",
+      "target": "arxiv:2101.00022",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00020",
+      "target": "arxiv:2101.00021",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00020",
+      "target": "arxiv:2101.00022",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00021",
+      "target": "arxiv:2101.00022",
+      "kind": "coupling",
+      "weight": 2.0
+    },
+    {
+      "source": "arxiv:2101.00001",
+      "target": "kw:ensemble spread",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "kw:ensemble spread",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "kw:ensemble spread",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00004",
+      "target": "kw:ensemble spread",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00005",
+      "target": "kw:ensemble spread",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00006",
+      "target": "kw:ensemble spread",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "kw:forecast calibration",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "kw:forecast calibration",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "kw:forecast calibration",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "kw:forecast calibration",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "kw:forecast calibration",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00012",
+      "target": "kw:forecast calibration",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00012",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00013",
+      "target": "kw:machine learning",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00014",
+      "target": "kw:machine learning",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00015",
+      "target": "kw:machine learning",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00016",
+      "target": "kw:machine learning",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00017",
+      "target": "kw:machine learning",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00018",
+      "target": "kw:machine learning",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00019",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00020",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00021",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00022",
+      "target": "kw:verification",
+      "kind": "has_keyword",
+      "weight": 1.0
+    },
+    {
+      "source": "kw:forecast calibration",
+      "target": "kw:verification",
+      "kind": "keyword_cooccur",
+      "weight": 3.0
+    }
+  ],
+  "communities": [
+    {
+      "id": 0,
+      "label": "machine learning",
+      "size": 9,
+      "top_keywords": ["machine learning", "forecast calibration"]
+    },
+    {
+      "id": 1,
+      "label": "verification",
+      "size": 7,
+      "top_keywords": ["verification", "ensemble spread"]
+    },
+    {
+      "id": 2,
+      "label": "ensemble spread",
+      "size": 4,
+      "top_keywords": ["ensemble spread", "forecast calibration"]
+    },
+    {
+      "id": 3,
+      "label": "machine learning",
+      "size": 2,
+      "top_keywords": ["machine learning"]
+    }
+  ],
+  "lineage": {
+    "keywords": [
+      {
+        "id": "kw:ensemble spread",
+        "label": "ensemble spread",
+        "papers": 6,
+        "onset": 1997,
+        "last": 2001,
+        "per_year": [
+          [1996, 1],
+          [1997, 1],
+          [1998, 1],
+          [1999, 1],
+          [2000, 1],
+          [2001, 1]
+        ],
+        "community": 0
+      },
+      {
+        "id": "kw:forecast calibration",
+        "label": "forecast calibration",
+        "papers": 6,
+        "onset": 2006,
+        "last": 2010,
+        "per_year": [
+          [2005, 1],
+          [2006, 1],
+          [2007, 1],
+          [2008, 1],
+          [2009, 1],
+          [2010, 1]
+        ],
+        "community": 0
+      },
+      {
+        "id": "kw:machine learning",
+        "label": "machine learning",
+        "papers": 6,
+        "onset": 2019,
+        "last": 2023,
+        "per_year": [
+          [2018, 1],
+          [2019, 1],
+          [2020, 1],
+          [2021, 1],
+          [2022, 1],
+          [2023, 1]
+        ],
+        "community": 0
+      },
+      {
+        "id": "kw:verification",
+        "label": "verification",
+        "papers": 6,
+        "onset": 2004,
+        "last": 2010,
+        "per_year": [
+          [2003, 1],
+          [2004, 1],
+          [2006, 1],
+          [2008, 1],
+          [2009, 1],
+          [2010, 1]
+        ],
+        "community": 1
+      }
+    ],
+    "edges": [
+      {
+        "source": "kw:forecast calibration",
+        "target": "kw:ensemble spread",
+        "kind": "grows_out_of",
+        "weight": 12.0
+      },
+      {
+        "source": "kw:machine learning",
+        "target": "kw:forecast calibration",
+        "kind": "grows_out_of",
+        "weight": 6.0
+      },
+      {
+        "source": "kw:verification",
+        "target": "kw:ensemble spread",
+        "kind": "grows_out_of",
+        "weight": 12.0
+      },
+      {
+        "source": "kw:forecast calibration",
+        "target": "kw:verification",
+        "kind": "crosses",
+        "weight": 3.0
+      }
+    ]
+  },
+  "main_paths": [
+    {
+      "source": "arxiv:2101.00017",
+      "target": "arxiv:2101.00018",
+      "weight": 1.0
+    },
+    {
+      "source": "arxiv:2101.00016",
+      "target": "arxiv:2101.00017",
+      "weight": 0.8
+    },
+    {
+      "source": "arxiv:2101.00015",
+      "target": "arxiv:2101.00016",
+      "weight": 0.6
+    },
+    {
+      "source": "arxiv:2101.00014",
+      "target": "arxiv:2101.00015",
+      "weight": 0.4
+    },
+    {
+      "source": "arxiv:2101.00007",
+      "target": "arxiv:2101.00013",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00008",
+      "target": "arxiv:2101.00014",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00009",
+      "target": "arxiv:2101.00015",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00010",
+      "target": "arxiv:2101.00016",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00011",
+      "target": "arxiv:2101.00017",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00012",
+      "target": "arxiv:2101.00018",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00013",
+      "target": "arxiv:2101.00014",
+      "weight": 0.2
+    },
+    {
+      "source": "arxiv:2101.00001",
+      "target": "arxiv:2101.00007",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00001",
+      "target": "arxiv:2101.00012",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "arxiv:2101.00007",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "arxiv:2101.00008",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "arxiv:2101.00019",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "arxiv:2101.00020",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00002",
+      "target": "arxiv:2101.00021",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "arxiv:2101.00008",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "arxiv:2101.00009",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "arxiv:2101.00019",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "arxiv:2101.00020",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00003",
+      "target": "arxiv:2101.00021",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00004",
+      "target": "arxiv:2101.00009",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00004",
+      "target": "arxiv:2101.00010",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00005",
+      "target": "arxiv:2101.00010",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00005",
+      "target": "arxiv:2101.00011",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00006",
+      "target": "arxiv:2101.00011",
+      "weight": 0.1
+    },
+    {
+      "source": "arxiv:2101.00006",
+      "target": "arxiv:2101.00012",
+      "weight": 0.1
+    }
+  ],
+  "coverage": {
+    "papers": 23,
+    "dated": 22,
+    "full_citations": 0
+  },
+  "without_machine_learning": {
+    "lineage": {
+      "keywords": [
+        {
+          "id": "kw:ensemble spread",
+          "label": "ensemble spread",
+          "papers": 6,
+          "onset": 1997,
+          "last": 2001,
+          "per_year": [
+            [1996, 1],
+            [1997, 1],
+            [1998, 1],
+            [1999, 1],
+            [2000, 1],
+            [2001, 1]
+          ],
+          "community": 0
+        },
+        {
+          "id": "kw:forecast calibration",
+          "label": "forecast calibration",
+          "papers": 6,
+          "onset": 2006,
+          "last": 2010,
+          "per_year": [
+            [2005, 1],
+            [2006, 1],
+            [2007, 1],
+            [2008, 1],
+            [2009, 1],
+            [2010, 1]
+          ],
+          "community": 0
+        },
+        {
+          "id": "kw:verification",
+          "label": "verification",
+          "papers": 6,
+          "onset": 2004,
+          "last": 2010,
+          "per_year": [
+            [2003, 1],
+            [2004, 1],
+            [2006, 1],
+            [2008, 1],
+            [2009, 1],
+            [2010, 1]
+          ],
+          "community": 1
+        }
+      ],
+      "edges": [
+        {
+          "source": "kw:forecast calibration",
+          "target": "kw:ensemble spread",
+          "kind": "grows_out_of",
+          "weight": 12.0
+        },
+        {
+          "source": "kw:verification",
+          "target": "kw:ensemble spread",
+          "kind": "grows_out_of",
+          "weight": 12.0
+        },
+        {
+          "source": "kw:forecast calibration",
+          "target": "kw:verification",
+          "kind": "crosses",
+          "weight": 3.0
+        }
+      ]
+    },
+    "main_paths": [
+      {
+        "source": "arxiv:2101.00001",
+        "target": "arxiv:2101.00007",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00001",
+        "target": "arxiv:2101.00012",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00002",
+        "target": "arxiv:2101.00007",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00002",
+        "target": "arxiv:2101.00008",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00002",
+        "target": "arxiv:2101.00019",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00002",
+        "target": "arxiv:2101.00020",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00002",
+        "target": "arxiv:2101.00021",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00003",
+        "target": "arxiv:2101.00008",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00003",
+        "target": "arxiv:2101.00009",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00003",
+        "target": "arxiv:2101.00019",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00003",
+        "target": "arxiv:2101.00020",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00003",
+        "target": "arxiv:2101.00021",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00004",
+        "target": "arxiv:2101.00009",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00004",
+        "target": "arxiv:2101.00010",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00005",
+        "target": "arxiv:2101.00010",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00005",
+        "target": "arxiv:2101.00011",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00006",
+        "target": "arxiv:2101.00011",
+        "weight": 1.0
+      },
+      {
+        "source": "arxiv:2101.00006",
+        "target": "arxiv:2101.00012",
+        "weight": 1.0
+      }
+    ]
+  }
+}

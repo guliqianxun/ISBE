@@ -189,6 +189,8 @@ def test_member_overview_hides_runs_and_provider_details(data: Path) -> None:
     console = make_console(data, shared=True)
     overview = call(console, "GET", "/api/overview", cookie=login(console, "dave")).body
     assert overview["runs"] == [] and overview["services"] == {"llm": None}
+    home = call(console, "GET", "/api/home", cookie=login(console, "dave")).body
+    assert home == {"topics": [], "reports": [], "services": {"llm": None}}
 
 
 def test_overview_services_read_root_settings(data: Path) -> None:
@@ -201,7 +203,11 @@ def test_overview_services_read_root_settings(data: Path) -> None:
     assert second.id != "local"
     for path in ["/api/overview", f"/api/overview?owner={member.id}"]:
         services = call(console, "GET", path, cookie=token).body["services"]
-        assert (services["essaies"], services["metrail"]) == (True, True), path
+        # ESSAIES_URL set and no ISBE_PAPER_SOURCE: an existing deployment keeps essaies.
+        assert (services["papers"], services["metrail"]) == ({"source": "essaies", "ready": True}, True), path
+    for path in ["/api/home", f"/api/home?owner={member.id}"]:
+        assert call(console, "GET", path, cookie=token).body["services"] == {
+            "papers": {"source": "essaies", "ready": True}, "llm": None}, path
 
 
 class SpyLimiter(mail.Limiter):
@@ -265,7 +271,7 @@ def test_broken_topic_file_keeps_overview_and_triage(data: Path) -> None:
     assert call(console, "GET", "/api/triage").body["topic"] == "good"
 
 
-@pytest.mark.parametrize("path", ["/api/settings", "/help", "/api/runs", "/api/call", "/api/triage", "/api/mail/test"])
+@pytest.mark.parametrize("path", ["/api/settings", "/help/service", "/api/runs", "/api/call", "/api/triage", "/api/mail/test"])
 def test_members_cannot_reach_administration(data: Path, path: str) -> None:
     add_user(data, "admin", admin=True)
     add_user(data, "gina")

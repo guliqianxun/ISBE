@@ -5,13 +5,13 @@ const vm = require('node:vm');
 
 function harness(fetch, owner = '', role = 'admin') {
   const source = fs.readFileSync(`${__dirname}/app.js`, 'utf8');
-  const startup = "  render().then(() => { if (session?.user) { guide.observed = readGenerationMarker(); if (guide.observed) openGuide(guide.observed.topic); } });";
+  const startup = '  render();\n})();';
   assert.ok(source.includes(startup));
   const window = { addEventListener() {} };
   vm.runInNewContext(source.replace(startup, `
     session = { user: { id: 'local', role: '${role}' }, csrf_token: 'token' };
     window.article = { attachReportArticles, toggleReportArticle };
-  `), {
+  })();`), {
     window, fetch, document: { addEventListener() {} }, URL, URLSearchParams,
     location: new URL(`/reports${owner ? '?owner=' + owner : ''}`, 'http://localhost'),
     history: { replaceState() {} }, navigator: { language: 'zh' },

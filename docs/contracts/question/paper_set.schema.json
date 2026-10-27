@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:paper_set",
+  "title": "paper_set@1: a set of papers, the unit every step reads and writes",
+  "description": "Members are unique by identity: no two members share a key in `keys`. A set made by an operation names it in `made_by`; a set made by a query or by hand has `made_by: null`.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "set_id",
+    "kind",
+    "label",
+    "made_by",
+    "created_at",
+    "members"
+  ],
+  "properties": {
+    "schema": {
+      "const": "paper_set@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "set_id": {
+      "$ref": "urn:isbe:question:common#/$defs/local_id"
+    },
+    "kind": {
+      "enum": [
+        "query",
+        "candidates",
+        "screened",
+        "expansion",
+        "final",
+        "manual"
+      ]
+    },
+    "label": {
+      "type": "string"
+    },
+    "made_by": {
+      "anyOf": [
+        {
+          "$ref": "urn:isbe:question:common#/$defs/local_id"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The set_op that produced this set."
+    },
+    "created_at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "paper",
+          "provenance"
+        ],
+        "properties": {
+          "paper": {
+            "$ref": "urn:isbe:question:common#/$defs/paper"
+          },
+          "provenance": {
+            "description": "Every way the paper reached the run. Repeated hits add entries rather than members.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/provenance"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "required": [
+        "via"
+      ],
+      "properties": {
+        "via": {
+          "enum": [
+            "search",
+            "cites",
+            "cited_by",
+            "manual"
+          ]
+        },
+        "query_id": {
+          "$ref": "urn:isbe:question:common#/$defs/local_id"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "from_key": {
+          "$ref": "urn:isbe:question:common#/$defs/identity_key",
+          "description": "The included paper an expansion started from."
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "via": {
+                "const": "search"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "query_id",
+              "rank"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "via": {
+                "enum": [
+                  "cites",
+                  "cited_by"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "from_key"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

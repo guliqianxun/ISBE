@@ -382,7 +382,7 @@ _MAIL = frozenset(
     }
 )
 _SERVICE_URLS = frozenset(
-    {"ISBE_LLM_BASE_URL", "ESSAIES_URL", "METRAIL_API_URL", "ARXIV_API_URL", "GITHUB_API_URL"}
+    {"ISBE_LLM_BASE_URL", "ESSAIES_URL", "OPENALEX_API_URL", "METRAIL_API_URL", "ARXIV_API_URL", "GITHUB_API_URL"}
 )
 
 
@@ -437,6 +437,12 @@ def setting(name: str, value: str | None) -> str | None:
                 raise Invalid(f"{name} must be an integer from 1 to {limit}")
         case "ISBE_ARTICLE_DNS" if value not in ("system", "cloudflare"):
             raise Invalid("ISBE_ARTICLE_DNS must be system or cloudflare")
+        case "ISBE_PAPER_SOURCE" if value not in ("openalex", "essaies"):
+            raise Invalid("ISBE_PAPER_SOURCE must be openalex or essaies")
+        case "OPENALEX_MAILTO" if not address(value):
+            raise Invalid("OPENALEX_MAILTO must be one email address")
+        case "OPENALEX_API_KEY" if not all(c.isascii() and c.isprintable() and not c.isspace() for c in value):
+            raise Invalid("OPENALEX_API_KEY must be printable ASCII without spaces")
         case "SEARXNG_URL":
             try:
                 value = validate_url(value)

@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "prompt_sha": "aa7b64dc467fab5de42ca485a96ff4bb05d0d2c26273ef33ac4274ea606e496e",
+   "reply": "{\"reformulation\": \"This question concerns the application of physics-informed neural networks and neural operator architectures to the numerical solution of partial differential equations.\", \"concepts\": [{\"role\": \"subject\", \"terms\": [\"partial differential equation\", \"PDE\", \"differential equation\"]}, {\"role\": \"method\", \"terms\": [\"PINN\", \"physics informed network\", \"physics informed NN\", \"physics informed model\", \"physics constrained network\"]}, {\"role\": \"method\", \"terms\": [\"neural operator\", \"Fourier neural operator\", \"DeepONet\", \"deep operator network\", \"operator learning\"]}, {\"role\": \"landmark\", \"terms\": [\"Fourier neural operator\", \"DeepONet\", \"PINN\", \"PDEBench\"]}, {\"role\": \"outcome\", \"terms\": [\"numerical solution\", \"forward simulation\", \"inverse problem\", \"PDE solution\"]}], \"year_from\": null, \"year_to\": null, \"criteria\": {\"include\": [\"Papers that apply physics-informed neural networks or neural operator models to solve, approximate, or learn solutions of partial differential equations.\", \"Papers that evaluate these models on PDE forward problems, inverse problems, or numerical benchmarks.\"], \"exclude\": [\"Papers that use neural networks for PDE-related tasks without physics-informed or operator-learning formulations.\", \"Papers that mention PDEs only as background or use neural operators for non-PDE domains such as computer vision or graph learning.\", \"Papers focused solely on classical PDE theory or numerical methods without neural network models.\"]}, \"rationale\": \"The concepts require papers to mention partial differential equations and then cross them with physics-informed neural network methods, neural operator methods, named architectures, and PDE solution outcomes.\"}"
+  }
+ ]
+}

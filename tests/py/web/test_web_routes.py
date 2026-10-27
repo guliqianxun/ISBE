@@ -1,14 +1,23 @@
 """Console routes: generation, settings, topics, research evidence, host parsing and the read views."""
 
 import json
+import re
 from contextlib import closing
 from pathlib import Path
 
 from conftest import TOKEN, FakeManager, call, make_console
 
 from isbe.core import db
+from isbe.web.console import Static
 from isbe.web.guards import Access, authority
 from isbe.web.pages import figure, research_evidence_page
+from isbe.web.routes import (
+    CLASSIC_PATHS,
+    REACT_HOME,
+    REACT_PATHS,
+    REACT_PREFIXES,
+    react_page,
+)
 from isbe.web.wire import Request
 
 TOPIC = "id: papers\nlabel: Papers\ncadence: weekly\narxiv:\n  categories: [cs.LG]\n  include_keywords: [learning]\n"
@@ -287,19 +296,95 @@ def test_not_found_method_and_static_replies(data: Path) -> None:
     assert (posted.status, posted.raw, posted.header("Content-Type")) == (405, b"method not allowed", "text/plain")
     runs = call(console, "POST", "/api/runs", {})
     assert (runs.status, runs.raw, runs.header("Cache-Control")) == (405, b"method not allowed", "no-store")
-    page = call(console, "GET", "/topics/anything", host="attacker.example")
+    page = call(console, "GET", "/topics", host="attacker.example")
     assert page.status == 200 and page.header("Content-Type") == "text/html; charset=utf-8"
     assert page.header("Cache-Control") == "no-cache"
     assert b'<script src="/app.js"></script>' in page.raw
     assert call(console, "GET", "/app.js").header("Content-Type") == "text/javascript; charset=utf-8"
     assert call(console, "GET", "/app.css").header("Content-Type") == "text/css; charset=utf-8"
-    help = call(console, "GET", "/help")
+    help = call(console, "GET", "/help/service")
     assert help.status == 200 and help.header("Cache-Control") == "no-store"
-    assert "<h1 id=" in help.text
-    doc = call(console, "GET", "/help?doc=configuration")
-    assert doc.status == 200 and doc.header("Content-Type") == "text/html; charset=utf-8"
-    for name in ["nope", "../pyproject.toml", "README.md"]:
-        assert call(console, "GET", f"/help?doc={name}").status == 404, name
+    assert "<h1>服务配置</h1>" in help.text and "<h1>Docker 部署、升级与备份</h1>" in help.text
+
+
+def test_react_pages_and_build_files(data: Path, tmp_path: Path) -> None:
+    build = tmp_path / "app"
+    (build / "assets/nested").mkdir(parents=True)
+    (build / "index.html").write_text('<!doctype html><script type="module" src="/app/assets/index-1.js"></script>')
+    (build / "assets/index-1.js").write_text("console.log(1)")
+    (build / "assets/index-1.css").write_text("a{}")
+    (build / "assets/nested/font.woff2").write_bytes(b"woff")
+    (build / "assets/notes.txt").write_text("not served")
+    (tmp_path / "secret.js").write_text("outside")
+    (build / "assets/link.js").symlink_to(tmp_path / "secret.js")
+    console = make_console(data)
+    console.static = Static(app_dir=build)
+    # /settings moved here from the classic console (#79): its old links open the React page.
+    for path in ("/", "/?g=run-1", "/galaxies", "/system", "/settings", "/help", "/question", "/question/", "/question/runs/7?x=1"):
+        page = call(console, "GET", path, host="attacker.example")
+        assert page.status == 200 and page.header("Content-Type") == "text/html; charset=utf-8", path
+        assert page.header("Cache-Control") == "no-cache"
+        assert b"/app/assets/index-1.js" in page.raw
+    # The classic console's pages, exactly.
+    for path in CLASSIC_PATHS:
+        page = call(console, "GET", path)
+        assert page.status == 200 and b'<script src="/app.js"></script>' in page.raw, path
+    # Any other path: the React console's not-found page, with a 404.
+    for path in (
+        "/nope", "/questions", "/systems", "/topics/anything", "/overview/", "/galaxies/x", "/settings/x", "/help/x",
+        "/question/runs/", "/question/runs/7/x", "/index.html",
+    ):
+        page = call(console, "GET", path, host="attacker.example")
+        assert page.status == 404 and b"/app/assets/index-1.js" in page.raw, path
+        assert page.header("Content-Type") == "text/html; charset=utf-8", path
+    script = call(console, "GET", "/app/assets/index-1.js", host="attacker.example")
+    assert (script.status, script.raw) == (200, b"console.log(1)")
+    assert script.header("Content-Type") == "text/javascript; charset=utf-8"
+    assert script.header("Cache-Control") == "public, max-age=31536000, immutable"
+    assert call(console, "GET", "/app/assets/index-1.css").header("Content-Type") == "text/css; charset=utf-8"
+    assert call(console, "GET", "/app/assets/nested/font.woff2").raw == b"woff"
+    for path in (
+        "/app/assets/notes.txt", "/app/assets/link.js", "/app/index.html", "/app/assets/../index.html",
+        "/app/assets/%2e%2e/index.html", "/app/", "/app/assets/missing.js",
+    ):
+        assert call(console, "GET", path).status == 404, path
+    assert call(console, "POST", "/question", {}).status == 405
+
+
+def test_react_pages_without_a_build(data: Path, tmp_path: Path) -> None:
+    console = make_console(data)
+    console.static = Static(app_dir=tmp_path / "missing")
+    page = call(console, "GET", "/question")
+    assert page.status == 503 and b"npm --prefix frontend run build" in page.raw
+    assert page.header("Cache-Control") == "no-store"
+    assert call(console, "GET", "/app/assets/index.js").status == 404
+    assert b'<script src="/app.js"></script>' in call(console, "GET", "/overview").raw
+    missing = call(console, "GET", "/nope")
+    assert missing.status == 404 and b"npm --prefix frontend run build" in missing.raw
+
+
+def test_classic_paths_are_the_classic_consoles_pages() -> None:
+    app = (Path(__file__).parents[3] / "web/app.js").read_text(encoding="utf-8")
+    pages = re.search(r"const PAGES = \{([^}]*)\}", app)
+    assert pages is not None
+    assert set(re.findall(r"'(/[a-z]+)'", pages.group(1))) == set(CLASSIC_PATHS)
+
+
+def test_react_paths_are_the_react_consoles_routes() -> None:
+    app = (Path(__file__).parents[3] / "frontend/src/App.tsx").read_text(encoding="utf-8")
+    pages = re.search(r"export function Pages\(\)(.*?)\n}", app, re.S)
+    assert pages is not None
+    routes = set(re.findall(r'<Route path="([^"*]+)"', pages.group(1)))
+    fixed = {r for r in routes if ":" not in r}
+    assert fixed == {REACT_HOME, *REACT_PATHS}
+    # A route with a parameter is exactly one segment under a prefix.
+    params = routes - fixed
+    assert {r.split(":")[0] for r in params} == set(REACT_PREFIXES)
+    for route in params:
+        prefix, param = route.split(":", 1)
+        assert "/" not in param, f"{route} is deeper than one segment under {prefix}"
+    for path in [REACT_HOME, *REACT_PATHS, *(r.replace(":id", "x") for r in params)]:
+        assert react_page(path), path
 
 
 def test_read_views_answer_the_established_shapes(data: Path) -> None:
@@ -317,7 +402,12 @@ def test_read_views_answer_the_established_shapes(data: Path) -> None:
     assert topic["daily"] == [0] * 7 and topic["cadence"] == "weekly" and topic["flavor"] == "papers"
     assert topic["since"].endswith("T00:00:00Z")
     assert overview["llm"] == {"calls": 1, "tokens_in": 3, "tokens_out": 4}
-    assert overview["services"]["llm"] is None and overview["services"]["essaies"] is False
+    assert overview["services"]["llm"] is None and overview["services"]["papers"] == {
+        "source": "openalex", "ready": True}
+    # Home's slim view: labels, the newest report covers and two service flags, no statistics.
+    home = call(console, "GET", "/api/home").body
+    assert home == {"topics": [{"id": "papers", "label": home["topics"][0]["label"]}], "reports": [],
+                    "services": {"papers": {"source": "openalex", "ready": True}, "llm": None}}
     triage = call(console, "GET", "/api/triage").body
     assert (triage["topic"], triage["topics"], triage["items"]) == ("papers", ["papers"], [])
     runs = call(console, "GET", "/api/runs").body

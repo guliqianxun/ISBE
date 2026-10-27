@@ -1,0 +1,10 @@
+{
+ "schema": "model_replies@1",
+ "replies": [
+  {
+   "purpose": "plan",
+   "prompt_sha": "dd2b402f9fb560b0e2c3c50519f2af71d6ba7109754c69ce43f73bd5985312ad",
+   "reply": "{\"reformulation\": \"How diffusion models have developed for image generation.\", \"concepts\": [{\"role\": \"subject\", \"terms\": [\"image generation\", \"image synthesis\"]}, {\"role\": \"method\", \"terms\": [\"diffusion model\", \"diffusion models\", \"diffusion probabilistic model\", \"denoising diffusion\", \"diffusion sampling\"]}, {\"role\": \"method\", \"terms\": [\"score matching\", \"score based model\", \"score SDE\"]}, {\"role\": \"method\", \"terms\": [\"latent diffusion\", \"latent diffusion model\", \"latent space diffusion\"]}, {\"role\": \"landmark\", \"terms\": [\"DDPM\", \"DDIM\", \"Stable Diffusion\", \"guided diffusion\", \"score SDE\", \"latent diffusion\"]}, {\"role\": \"outcome\", \"terms\": [\"image quality\", \"FID\", \"sample quality\"]}], \"year_from\": null, \"year_to\": null, \"criteria\": {\"include\": [\"Papers that study diffusion-based generative models for creating images, including denoising diffusion, score-based, latent, or guided diffusion approaches.\", \"Papers that trace, compare, or evaluate the development of diffusion models for image synthesis.\"], \"exclude\": [\"Diffusion models applied to non-image modalities such as audio, molecules, or tabular data.\", \"Image restoration, denoising, or reconstruction tasks that do not generate new images.\", \"Generative image models that do not use diffusion, such as GANs or VAEs, unless they are compared with diffusion models.\"]}, \"rationale\": \"Image generation anchors the subject, diffusion and score-based methods capture the generative mechanism, landmark model names cover key developments, and image quality captures evaluation.\"}"
+  }
+ ]
+}

@@ -1,0 +1,776 @@
+/* The galaxy console: the ask bar, Home's universe and its panels, Galaxies
+   and System. The sky keeps its own night colors in either mode. */
+.isbe {
+  --sky: #0a0e18;
+  --space: #06080e;
+  --glow: #f1c27d;
+  --good: #72d4a4;
+}
+
+/* Ask bar */
+.g-ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+.g-ask-box {
+  flex: 1 1 420px;
+  max-width: 760px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 5px 5px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.g-ask-box:focus-within {
+  border-color: var(--accent);
+}
+.g-ask-box svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.g-ask-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  color: var(--text);
+  font: 14px var(--sans);
+  padding: 7px 0;
+}
+.g-ask-box input::placeholder {
+  color: var(--faint);
+}
+.isbe .g-ask-more {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.isbe .g-ask-more:hover {
+  color: var(--text);
+}
+.g-ask-error {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 13px;
+}
+.btn.g-small {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.g-title {
+  font-family: var(--sans);
+  font-size: clamp(22px, 2.4vw, 30px);
+}
+
+/* Home fills the window under the ask bar. */
+.main[data-page='home'] {
+  padding: 0;
+  gap: 0;
+  height: 100vh;
+}
+.main[data-page='home'] > .g-ask {
+  padding: 12px clamp(16px, 2vw, 24px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.main[data-page='home'] > .chip {
+  margin: 10px 20px 0;
+}
+.g-home {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+.g-sky {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  color: #e4e8f3;
+  background: radial-gradient(ellipse at 50% 45%, var(--sky), var(--space) 75%);
+}
+.g-universe,
+.g-universe canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.g-universe canvas {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+.g-universe canvas:active {
+  cursor: grabbing;
+}
+.g-universe canvas[data-over] {
+  cursor: pointer;
+}
+.g-hud {
+  position: absolute;
+  left: 20px;
+  top: 16px;
+  pointer-events: none;
+}
+.g-hud h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+.g-hud p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #8a93aa;
+}
+.g-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: min(420px, calc(100% - 40px));
+  margin: 0;
+  text-align: center;
+  color: #8a93aa;
+}
+.g-zoom {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.g-zoom button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #222a3e;
+  background: #0f1422;
+  color: #8a93aa;
+  font-size: 15px;
+  cursor: pointer;
+}
+.g-zoom button:hover {
+  color: #e4e8f3;
+}
+.g-tip {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #0f1422;
+  border: 1px solid #222a3e;
+  /* Over the paper list, which may cover the lit paper's side of the map. */
+  z-index: 4;
+}
+.g-tip span {
+  color: #8a93aa;
+}
+/* A paper's title can be long: it wraps in the tip on the map. */
+.g-star-tip {
+  white-space: normal;
+  width: max-content;
+  max-width: 340px;
+}
+.g-star-tip span {
+  display: block;
+  margin-top: 2px;
+}
+/* How to read a galaxy's map, under it on the right. */
+.g-key {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  max-width: min(420px, 45%);
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #8a93aa;
+  text-align: right;
+  pointer-events: none;
+}
+
+/* The galaxies as a list: hidden until a keyboard reaches it, then a panel. */
+.g-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.g-list:focus-within {
+  width: auto;
+  height: auto;
+  max-height: calc(100% - 120px);
+  overflow: auto;
+  clip-path: none;
+  left: 18px;
+  top: 72px;
+  z-index: 3;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid #222a3e;
+  background: rgb(15 20 34 / 0.95);
+}
+/* The map's papers: a narrow panel on the right, so the lit paper stays in sight. */
+.g-papers:focus-within {
+  left: auto;
+  right: 60px;
+  width: min(300px, 45%);
+  max-height: calc(100% - 150px);
+  white-space: normal;
+}
+.g-papers ul {
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+.g-papers > li > span {
+  display: block;
+  padding: 6px 8px 2px;
+  font-size: 11.5px;
+  color: #8a93aa;
+}
+.g-papers button {
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.g-list button {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #e4e8f3;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.g-list button[aria-pressed='true'] {
+  background: #1a2236;
+}
+.g-list button:focus-visible,
+.g-universe canvas:focus-visible {
+  outline: 2px solid #a9c1ff;
+  outline-offset: -2px;
+}
+
+/* The preview card over the sky */
+.g-peek {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  width: min(390px, calc(100% - 36px));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #222a3e;
+  background: rgb(15 20 34 / 0.92);
+  backdrop-filter: blur(8px);
+}
+.g-peek-head {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.g-peek h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.g-peek-head p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #8a93aa;
+  overflow-wrap: anywhere;
+}
+.g-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+.g-peek-head .g-dot {
+  margin-top: 6px;
+}
+.g-x {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: #5b6378;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.g-x:hover {
+  color: #e4e8f3;
+}
+.g-stats {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+}
+.g-stats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.g-stats dt {
+  font-size: 12px;
+  color: #8a93aa;
+}
+.g-stats dd {
+  margin: 0;
+  font: 500 17px var(--mono);
+}
+.g-status {
+  margin: 0;
+  font: 12px var(--mono);
+  color: #a9c1ff;
+}
+.g-status[data-done] {
+  color: var(--good);
+}
+.g-peek-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.g-grow {
+  flex: 1;
+}
+.g-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8a93aa;
+  cursor: not-allowed;
+}
+.g-track {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: #222a3e;
+}
+.g-track::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #5b6378;
+}
+
+/* Needs you */
+.g-rail {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-left: 1px solid var(--line-soft);
+  background: var(--bg);
+}
+.g-rail h2 {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.g-rail h2 span {
+  font: 12px var(--mono);
+  letter-spacing: 0;
+  color: var(--glow);
+}
+.g-rail > p {
+  margin: 0;
+  font-size: 13px;
+}
+.g-needs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.g-need {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+}
+.g-need-kind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.g-need-kind i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--glow);
+}
+.g-need[data-kind='failed'] .g-need-kind i {
+  background: var(--danger);
+}
+.g-need[data-kind='done'] .g-need-kind i {
+  background: var(--good);
+}
+.g-need-name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: 500 13.5px/1.4 var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+.g-need-name:hover {
+  color: var(--accent);
+}
+.g-need p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* The first-run guide, over the empty sky. */
+.g-welcome {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100% - 96px);
+  overflow: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid #222a3e;
+  background: rgba(12, 16, 28, 0.88);
+  color: #c9cfdd;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.g-welcome h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #e4e8f3;
+}
+.g-welcome p {
+  margin: 0;
+}
+.g-welcome a {
+  color: #9fd8cc;
+}
+.g-welcome-facts {
+  margin: 4px 0 0;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 14px;
+}
+.g-welcome-facts > div {
+  display: contents;
+}
+.g-welcome-facts dt {
+  color: #8a93aa;
+}
+.g-welcome-facts dd {
+  margin: 0;
+}
+.g-ready::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #e0a458;
+}
+.g-ready[data-on]::before {
+  background: #6fcf97;
+}
+.g-welcome-steps {
+  margin: 4px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.g-welcome-note {
+  font-size: 12.5px;
+  color: #8a93aa;
+}
+/* A phone: the guide sits under the title in the page's flow, and the sky
+   grows to hold it. */
+@media (max-width: 720px) {
+  .g-home:has(.g-welcome) {
+    grid-template-rows: auto auto;
+  }
+  .g-home:has(.g-welcome) .g-zoom {
+    display: none;
+  }
+  .g-welcome {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: auto;
+    max-height: none;
+    margin: 72px 12px 12px;
+  }
+}
+@media (max-width: 520px) {
+  .g-welcome-facts {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .g-welcome-facts dd {
+    margin-bottom: 6px;
+  }
+}
+
+/* The newest topic reports, over Needs you. */
+.g-reports {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.g-reports > p {
+  margin: 0;
+  font-size: 13px;
+}
+.g-report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.isbe .g-report-list a {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.isbe .g-report-list a:hover {
+  background: var(--sunken);
+}
+.g-report-list small {
+  color: var(--muted);
+  font: 12px var(--mono);
+}
+
+/* Galaxies */
+.g-row-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* System */
+.g-tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+}
+.isbe .g-tile {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+}
+.isbe a.g-tile:hover {
+  border-color: var(--line);
+}
+.g-tile[aria-disabled='true'] {
+  opacity: 0.55;
+}
+.g-tile-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.g-tile-head svg {
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 980px) {
+  .main[data-page='home'] {
+    height: auto;
+  }
+  .g-home {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(420px, 64vh) auto;
+  }
+  .g-rail {
+    border-left: 0;
+    border-top: 1px solid var(--line-soft);
+    overflow: visible;
+  }
+}
+/* A phone: the sidebar becomes a bar over the page. */
+@media (max-width: 720px) {
+  /* Short pages keep the bar its own height instead of sharing the screen. */
+  .isbe {
+    align-content: flex-start;
+  }
+  .isbe .side {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 6px;
+    padding: 8px 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .isbe .brand {
+    padding: 0;
+  }
+  .brand span {
+    display: none;
+  }
+  .brand svg {
+    width: 28px;
+    height: 28px;
+  }
+  .isbe .navs {
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  .isbe .nav {
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    min-height: 0;
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  .isbe .nav span {
+    flex: none !important;
+  }
+  .isbe .side-foot {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 6px 0 0;
+  }
+  .side-foot .btn {
+    min-height: 32px;
+  }
+  .side-foot .seg button {
+    min-height: 26px;
+    padding: 0 10px;
+  }
+  .main[data-page='home'] > .g-ask {
+    padding: 10px 12px;
+  }
+  .g-ask-more {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .side-foot .seg button {
+    white-space: nowrap;
+  }
+}
+
+/* An upstream that is down or not set, before anyone asks */
+.g-health {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--danger);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.g-health p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.g-health small {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}

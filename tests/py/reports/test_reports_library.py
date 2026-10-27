@@ -208,7 +208,7 @@ def test_shelf_reader_and_overview_counts(conn: sqlite3.Connection, data: Path) 
     recent = library.recent(conn, data)
     assert [r["period"] for r in recent] == ["2026-W41", "2026-W41", "2026-W40", "p"]
     assert recent[0] == {"topic_id": "old-topic", "period": "2026-W41", "kind": "research", "created_at": "2026-10-08",
-                         "path": "reports/old-topic/2026-W41.md", "papers": 0, "media": True, "materials": 2}
+                         "path": "reports/old-topic/2026-W41.md", "papers": 0, "media": True, "materials": 2, "label": "行业周报"}
     assert recent[-1]["materials"] == 0, "the overview counts a broken fingerprint as no materials"
     assert len(library.recent(conn, data, 2)) == 2
     assert library.latest(conn, data, "old-topic") == {"period": "2026-W41", "kind": "research",

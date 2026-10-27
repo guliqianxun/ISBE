@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Run the front-end tests: the classic console's node:test files, then the
+# React console's lint, the formatting of scripts/*.mjs, the type check and
+# production build, and last Vitest with its coverage table.
+#   scripts/web-test
+# Uses the local Node (22 or later) when there is one, else the pinned Node container.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+steps='node --test web/*.test.cjs tests/*.test.cjs
+cd frontend
+if [ ! -f node_modules/.package-lock.json ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then npm ci --no-audit --no-fund; fi
+npm run lint
+npx prettier --config .prettierrc.json --check ../scripts/*.mjs
+npm run build
+npm run coverage'
+major=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)
+if (( major >= 22 )); then
+    cd "$root" && exec sh -ec "$steps"
+fi
+cache=${ISBE_NPM_CACHE:-$HOME/.cache/isbe-npm}
+mkdir -p "$cache"
+exec docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -e npm_config_cache=/npm-cache \
+    -v "$root:/src" -v "$cache:/npm-cache" -w /src node:24-slim sh -ec "$steps"

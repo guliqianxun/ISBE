@@ -1,0 +1,89 @@
+{
+  "schema": "question_plan@1",
+  "run_id": "run-sample-ml-medium-range-weather",
+  "version": 1,
+  "parent_version": null,
+  "created_at": "2026-10-22T00:00:00Z",
+  "source": "model",
+  "question": "How do machine-learning weather models compare with numerical weather prediction for medium-range global forecasting?",
+  "lang": "en",
+  "reformulation": "Machine-learning global weather models versus numerical weather prediction at medium range (3–15 days).",
+  "subject_terms": [
+    "medium-range weather forecasting",
+    "global weather model"
+  ],
+  "method_terms": [
+    "machine learning",
+    "graph neural network",
+    "neural operator",
+    "diffusion model"
+  ],
+  "outcome_terms": [
+    "forecast skill",
+    "comparison with numerical weather prediction"
+  ],
+  "keyword_layers": {
+    "canonical": [
+      "data-driven weather forecasting",
+      "numerical weather prediction"
+    ],
+    "mainstream": [
+      "graph neural network weather forecasting",
+      "transformer global weather forecast"
+    ],
+    "emerging": [
+      "diffusion ensemble weather forecasting",
+      "foundation model earth system"
+    ],
+    "method_centric": [
+      "Fourier neural operator weather"
+    ],
+    "cross_domain": [
+      "weather benchmark dataset"
+    ]
+  },
+  "queries": [
+    {
+      "id": "q1",
+      "query": "machine learning medium-range global weather forecasting",
+      "layer": "canonical",
+      "priority": 1
+    },
+    {
+      "id": "q2",
+      "query": "data-driven global weather model",
+      "layer": "canonical",
+      "priority": 2
+    },
+    {
+      "id": "q3",
+      "query": "graph neural network weather forecasting",
+      "layer": "mainstream",
+      "priority": 3
+    },
+    {
+      "id": "q4",
+      "query": "diffusion ensemble weather forecasting",
+      "layer": "emerging",
+      "priority": 4
+    },
+    {
+      "id": "q5",
+      "query": "benchmark data-driven weather forecasting",
+      "layer": "cross_domain",
+      "priority": 5
+    }
+  ],
+  "year_from": 2018,
+  "year_to": null,
+  "criteria": {
+    "include": [
+      "Proposes or evaluates a machine-learning model of global weather at lead times of days to weeks"
+    ],
+    "exclude": [
+      "Nowcasting or regional short-range forecasting only",
+      "Climate projection over decades"
+    ]
+  },
+  "rationale": "Covers the model families that compete with numerical prediction and the benchmarks used to compare them."
+}

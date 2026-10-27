@@ -16,4 +16,15 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.uv-cache/
+.npm-cache/
+.coverage
+coverage.xml
+report.xml
 .parity/
+
+# Front end: dependencies, and the build that `isbe serve` ships (frontend/ → isbe/_assets/app)
+node_modules/
+frontend/coverage/
+*.tsbuildinfo
+/isbe/_assets/

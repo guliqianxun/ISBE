@@ -53,6 +53,11 @@ _LEGACY_EXCLUDED = frozenset(
         "ISBE_SEARCH_DAILY_LIMIT",
         "ISBE_ARTICLE_DNS",
         "ISBE_EMAIL_DEFAULT_RECIPIENTS",
+        # The question runs' paper source (#121); topic reports do not read it.
+        "ISBE_PAPER_SOURCE",
+        "OPENALEX_API_URL",
+        "OPENALEX_API_KEY",
+        "OPENALEX_MAILTO",
     }
 )
 

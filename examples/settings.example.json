@@ -1,0 +1,17 @@
+{
+  "format": "isbe-settings",
+  "version": 1,
+  "settings": {
+    "ISBE_LLM_PROVIDER": "openai",
+    "ISBE_LLM_BASE_URL": "http://127.0.0.1:8080/v1",
+    "ISBE_LLM_MODEL_FAST": "example-fast-model",
+    "ISBE_LLM_MODEL_SMART": "example-smart-model",
+    "ISBE_LLM_TIMEOUT_S": 900,
+    "ISBE_LLM_EXTRA_BODY": { "chat_template_kwargs": { "enable_thinking": false } },
+    "ISBE_FULLTEXT_EXTRACTOR": "llm",
+    "ISBE_PAPER_SOURCE": "openalex",
+    "OPENALEX_MAILTO": "you@example.org",
+    "SEARXNG_URL": null,
+    "SMTP_PORT": 465
+  }
+}

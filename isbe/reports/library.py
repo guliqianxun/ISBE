@@ -262,7 +262,8 @@ def _articles(
 
 def recent(conn: sqlite3.Connection, data: Path, limit: int = 6) -> list[Row]:
     """The overview's newest reports: their rows (without the fingerprint) plus
-    paper, media and material counts."""
+    paper, media and material counts and the cover's `label` (the report's
+    title; a survey's topic is a run id, not a topic with a label)."""
     out = []
     for r in rows(
         conn,
@@ -271,7 +272,9 @@ def recent(conn: sqlite3.Connection, data: Path, limit: int = 6) -> list[Row]:
         (limit,),
     ):
         fingerprint = _fingerprint(r.pop("fingerprint"))
-        r["papers"] = papers_in(data, _text(r["path"]))
+        md = _read(data, _text(r["path"]))
+        r["papers"] = sum(1 for line in lines(md) if trim_start(line).startswith("### ["))
+        r["label"] = cover(md)["label"]
         r["media"] = _media(fingerprint)
         r["materials"] = _materials(fingerprint)
         out.append(r)

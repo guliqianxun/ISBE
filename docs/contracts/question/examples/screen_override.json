@@ -1,0 +1,11 @@
+{
+  "schema": "screen_override@1",
+  "run_id": "run-20261022-a1",
+  "override_id": "o1",
+  "key": "doi:10.1000/example.seasonal",
+  "decision": "include",
+  "note": "Keep as a contrast case.",
+  "actor": "zhiheng",
+  "revokes": null,
+  "created_at": "2026-10-22T10:03:00Z"
+}

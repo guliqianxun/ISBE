@@ -25,7 +25,7 @@ workspace under one data directory. The code layout is in
 [architecture.md](architecture.md); an earlier Rust build is covered in
 [upgrading-from-rust.md](upgrading-from-rust.md).
 This document also includes planned stages such as scheduling and memory review;
-see the [README](../README.md) for the current feature status.
+see [features.md](features.md) for the current feature status.
 
 ## 1. Two systems, one direction
 
@@ -198,7 +198,14 @@ The root database also stores `tasks` and `task_requests` (writer:
 for accounts, sessions and login throttling. Web stage runs carry a `task_id`
 link to their queue entry. The search and source-inbox tables (`search_*`,
 `source_*`) and `article_text` are described in
-[source-interface.md](source-interface.md). See `migrations/` for the complete
+[source-interface.md](source-interface.md). Question-run search plans
+(`question_plans`) are described in [question/planning.md](question/planning.md);
+question runs, their events, queries, hits, paper sets and set operations
+(`question_runs`, `question_events`, `question_queries`, `question_hits`,
+`question_papers`, `question_paper_uses`, `paper_sets`, `set_ops`) in [question/search.md](question/search.md); screening verdicts and
+overrides (`screen_verdicts`, `screen_overrides`) in [question/screening.md](question/screening.md); the
+root database's queue of question runs (`question_tasks`, writer: `question/queue.py`) in
+[question/api.md](question/api.md). See `migrations/` for the complete
 current schema.
 
 ## 5. Jobs and modules
@@ -216,8 +223,9 @@ configuration editors and report queue; it does not execute cron schedules.
 | `isbe review` (planned) | `.pending/` | memory (human) |
 | `isbe import-reports <dir>` | `<dir>/<topic>/<period>/latest.md` | report files, `reports`, `figures/` |
 | `isbe serve` | database and local configuration | Web console, report queue, manual email, service settings and topic files |
+| `isbe settings import <file>` / `isbe settings export [--secrets]` | a settings file ([settings.md](settings.md)) / the settings in effect | `settings.json` / the file on stdout, keys only with `--secrets` |
 | `isbe account-add <username> --password-file <file> [--admin]` | protected password file | account |
-| `isbe sources …`, `isbe media-weekly`, `isbe media-briefing`, `isbe research` | source configs, saved search candidates, editor input, fixed-material manifests | see [source-interface.md](source-interface.md) and the [README](../README.md) |
+| `isbe sources …`, `isbe media-weekly`, `isbe media-briefing`, `isbe research` | source configs, saved search candidates, editor input, fixed-material manifests | see [source-interface.md](source-interface.md) and [research.md](research.md) |
 
 Topic schedules (`collect`, `digest`, `monthly`) are validated configuration,
 not active timers. The current `digest` command runs triage → enrich → digest;
@@ -226,7 +234,7 @@ enrichment reuse their caches where valid; digest generation and review still
 make LLM calls on a rerun.
 
 The package layout and the dependency rule between its parts are in
-[architecture.md](architecture.md#layout). `web/` (the UI), `prompts/{zh,en}/`,
+[architecture.md](architecture.md#layout). `frontend/` and `web/` (the UI), `prompts/{zh,en}/`,
 `migrations/` and `examples/` live beside the package. `cli.py` and
 `generation/` chain the stages.
 
@@ -470,9 +478,14 @@ papers digest, otherwise the articles digest.
 
 | Page | Purpose | Writes |
 |---|---|---|
+| Home (`/`) | the universe: every question run drawn as a galaxy (its papers are stars, citations the lines between them), a preview of the selected one, what needs the person, the newest topic reports, and a first-run guide while there are no galaxies | asks a new question |
+| Galaxies (`/galaxies`) | every galaxy as a list row, newest first | — |
+| Question run (`/question/runs/<id>`) | one run as a search flow: plan, queries, merge, AI screening, star map and papers | pause, resume, cancel, edit the plan |
+| System (`/system`) | the working pages that are not in the sidebar | — |
+| Help (`/help`) | what ISBE does and how to start, the report guide (check the model, confirm a topic, generate and follow one report), and for administrators the setup guide (docs/configuration.md and docs/deployment.md at `/help/service`) | submits one report task |
 | Overview | signal map per topic, week funnel, topic cards, today's runs | — |
 | Reports | a shelf of every issue as a cover; then the report as a paper sheet with older/newer, its sections, Save as PDF and .md | manual email of the selected report |
-| Generate / Tasks | guided paper-report generation, queue position, stage progress and history | submit tasks; cancel queued tasks |
+| Tasks | queue position, stage progress and history; each own task opens in the report guide on Help | cancel queued tasks |
 | Triage explorer | every item with its gate trace and judge reason | feedback draft planned |
 | Memory review (planned) | pending drafts as diffs; accept / edit / reject | memory |
 | Runs & LLM | 8-day swimlane, run ledger, tokens by purpose, replayable calls | run again planned |
@@ -480,6 +493,10 @@ papers digest, otherwise the articles digest.
 | Topics | create, edit, enable/disable and delete topic configurations | `topics/<id>.yaml` or `.yml`; history retained |
 | Accounts (shared mode) | administrator account management | create users, reset passwords, activate/deactivate accounts |
 
+- **Navigation:** one sidebar on every page of both consoles: Home,
+  Galaxies, Reports, Topics, Settings (administrators) and System, which
+  lists Overview, Tasks, Triage, Runs & LLM, Sources and Accounts. Unknown
+  paths get a not-found page with a 404 status.
 - **Look:** dark "observatory" shell by default; reports keep the email's
   academic-ink paper look (Source Serif 4). IBM Plex Sans/Mono for UI and
   data. 中文 / EN toggle.
@@ -489,19 +506,26 @@ papers digest, otherwise the articles digest.
   (`prefers-color-scheme`). Presets: Signal 175 (default), Glacier 235,
   Iris 290, Coral 22, Ember 62, Moss 145, Graphite (chroma 0), plus a custom
   hue slider. Reading surface for reports: paper / sepia / night. Warning and
-  danger colors stay fixed across themes. Stored in `localStorage`; the
-  tokens live at the top of `web/app.css`.
-- **Stack:** plain HTML, CSS and JavaScript in `web/`, packaged with the
-  Python code; no Node toolchain or npm build. `isbe serve` runs uvicorn with bounded connections
+  danger colors stay fixed across themes. Stored in `localStorage` (`isbe.ui`,
+  read by both consoles); the tokens live at the top of `web/app.css`.
+- **Stack:** the console is moving to React (React 19, TypeScript, Vite) in
+  `frontend/`, decided for M3; pages move over route by route and `web/`
+  (plain HTML, CSS and JavaScript) serves the rest until it is retired. The
+  React build is made in the Docker image's Node stage and packaged with the
+  Python code as `isbe/_assets/app`; the runtime image has no Node. See
+  [architecture.md](architecture.md#two-consoles-during-the-move-to-react).
+  `isbe serve` runs uvicorn with bounded connections
   and request bodies, handlers in a thread pool, and a separate report-queue
-  worker. It answers `/api/overview`, `/api/report`,
+  worker. It answers `/api/home` (Home's topics, newest reports and service readiness),
+  `/api/overview`, `/api/report`,
   `/api/report.md`, `/api/triage`, `/api/runs`, `/api/call`, task, account,
-  settings and mail APIs, plus `/figures/<file>`, and the UI
-  for any other path. Reports are rendered to HTML on the server
+  settings and mail APIs, plus `/figures/<file>`, the React build's files
+  under `/app/assets/`, and the console's pages; any other path is a 404. Reports are rendered to HTML on the server
   (`markdown-it-py`) and sanitized with `nh3`; the UI escapes every other
   value and links only http(s) URLs. The font stacks name the design's faces
   first and fall back to system fonts; no web fonts are loaded.
-- **Built so far:** Overview, Reports (shelf and reader), Triage explorer,
+- **Built so far:** Home with the galaxy universe, Galaxies, question runs
+  with their star map, Overview, Reports (shelf and reader), Triage explorer,
   Runs & LLM, service Settings, Topics, guided generation, Tasks and shared
   Accounts. Generated reports can be sent by email; run ledgers remain
   read-only. A report prints as a clean PDF through the
@@ -537,7 +561,9 @@ With `ESSAIES_URL` set, ISBE relies on these parts of the essaies API:
 
 ## 9. Status and roadmap
 
-Implemented: collection (essaies, arXiv, RSS, GitHub), triage, full text and
+Implemented: question runs (search plan, search, AI screening, one-hop
+citation expansion, drawn as galaxies on Home), collection (essaies, arXiv,
+RSS, GitHub), triage, full text and
 evidence cards (arXiv HTML + LLM, or metrail-web), the digest with reviewer,
 the durable report queue, manual email, the console (overview, reports,
 triage, runs, settings, topics, tasks, accounts), shared mode, fixed-material

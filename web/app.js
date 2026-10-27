@@ -53,8 +53,6 @@
       taskCreated: "提交时间",
       taskActive: "活动任务",
       taskHistory: "历史任务",
-      taskNew: "生成另一主题的报告",
-      taskUnknown: "提交结果待确认。可重新检查，或点击生成重试同一请求；系统不会自动重新提交。",
       users: "账户管理",
       usersNote: "由管理员创建账户。重设密码或停用账户会使其登录失效。",
       username: "用户名",
@@ -79,16 +77,13 @@
       userDisableConfirm: "停用这个账户并使其登录失效？",
       userPasswordConfirm: "重设密码并使这个账户的现有登录失效？",
       actionFailed: "操作未完成，请重试。",
-      modelManaged: "模型由管理员配置。",
-      modelContact: "模型尚未就绪，请联系管理员。",
       topicOwnNote: "管理自己的论文主题、关键词与筛选规则。",
       topicBatchNote: "不加入默认批量任务时，仍可在此页面生成报告。",
-      guideNoData: '当前时间范围内没有可用于报告的论文。请在主题设置中检查来源、关键词和筛选规则后重试。', guideReviewTriage: '查看论文与排除原因', guideAgain: '生成另一份报告',
-      mailTransport: '发信方式', smtp: '通用 SMTP', zeptomail_api: 'ZeptoMail API', mailHost: 'SMTP 服务器', mailPort: 'SMTP 端口（留空按加密方式选择）', mailSecurity: '连接加密', tls: 'TLS（通常为 465）', starttls: 'STARTTLS（通常为 587）', mailUser: 'SMTP 用户名（可选）', mailPassword: 'SMTP 密码 / 授权码', mailSmtpNote: '使用邮箱服务商提供的 SMTP 地址和授权码；无需登录的中继可同时留空用户名和密码。', mailEndpoint: 'ZeptoMail HTTPS 发信地址', mailToken: 'ZeptoMail Send Mail Token', mailSenderName: '发件人显示名称（可选）', mailSettings: '报告邮件', mailDefault: '默认收件人（可选）', mailNote: '默认收件人可留空；发送时修改只对本次生效。发件人与凭据在服务设置中配置；保存后生效。',
-      mailOpen: '发送邮件', mailTest: '发送测试邮件', mailSend: '确认发送', mailSending: '正在提交…', mailCancel: '关闭邮件表单', mailRecipients: '本次收件人', mailRecipientsHint: '最多 20 个邮箱，用逗号、分号或空格分隔。', mailSubject: '邮件标题', mailPeriod: '期号', mailSender: '发件人', mailConfirm: '确认提交以下邮件？', mailRequired: '请填写至少一个收件人。',
+      mailNote: '默认收件人可留空；发送时修改只对本次生效。发件人与凭据在服务设置中配置；保存后生效。',
+      mailOpen: '发送邮件', mailSend: '确认发送', mailSending: '正在提交…', mailCancel: '关闭邮件表单', mailRecipients: '本次收件人', mailRecipientsHint: '最多 20 个邮箱，用逗号、分号或空格分隔。', mailSubject: '邮件标题', mailPeriod: '期号', mailSender: '发件人', mailConfirm: '确认提交以下邮件？', mailRequired: '请填写至少一个收件人。',
       mailAccepted: '服务商已接受，尚未确认到达收件箱。', mailFailed: '发送失败。', mailUnknown: '结果待确认。请先检查服务商日志与收件箱，再决定是否重新发送；系统不会自动重试。', mailRequest: '请求编号',
       radar: '科研雷达', overview: '总览', reports: '周报', triage: '筛选', review: 'Memory 审核', runs: '运行与 LLM',
-      reviewSoon: '审核页随 memory 合并一起上线', topics: '主题', onPage: '本页', customize: '外观', help: '帮助', online: '已配置', off: '未配置',
+      reviewSoon: '审核页随 memory 合并一起上线', home: '首页', galaxies: '星系', system: '系统', help: '帮助', topics: '主题', onPage: '本页', customize: '外观', online: '已配置', off: '未配置',
       ovTitle: '本周雷达', topicsN: '个主题', kept: '入选', of: '/', collected: '采集', window: '窗口',
       signal: '信号图', signalNote: '离中心越远 = 本窗口入选越多', healthy: '配置有效', failed: '失败', drafts: '份草稿', inactive: '停用',
       draftWaiting: 'memory 草稿待审', lastFailed: '最近一次运行失败',
@@ -97,9 +92,9 @@
       lastRun: '最近运行', none: '无', topicsNote: '柱 = 近 7 天每天采集条数', keptOf: '入选 / 采集', last: '最近一期', noRuns: '尚无运行', runDetails: '查看逐篇详情', runPaperFailure: '论文处理失败', runFigureFailure: '配图问题', runAbstractFallback: '仅使用摘要',
       latestReports: '最新周报', recentRuns: '最近运行', ledger: '运行记录 →', papers: '篇',
       noReports: '这个主题还没有报告。', topic: '主题', download: '下载 .md', issues: '各期', file: '文件', generated: '生成于',
-      firstReport: '生成第一份报告', firstModel: '在服务设置中选择要使用的模型并完成配置。保存只校验配置，不验证连接。', firstSchedule: '报告周期决定内容的时间范围。保存或启用主题不会自动生成报告。', firstChoose: '先创建或选择一个主题。', firstArticles: '此主题只有文章来源；目前仅支持生成 arXiv 论文报告。请在主题设置中添加 arXiv 来源。',
-      guideOpen: '开始生成报告', guideIntro: '检查模型、确认主题，再生成报告。', guideClose: '关闭生成向导', guideNext: '下一步', guideBack: '上一步', guideStep: '第 {n} 步，共 3 步', guideModel: '确认模型', guideTopic: '确认主题与来源', guideGenerate: '生成报告', guideSourceReady: '已配置 arXiv 分类和关键词。实际采集结果将在运行后确认。', guideSourceInvalid: '主题配置不完整，请补齐 arXiv 分类和关键词后保存。', guideSavedOnly: '生成使用已保存的设置。请先保存或放弃页面中的草稿。', guideStartNote: '点击后将采集论文、筛选、补充全文并生成报告。会使用已保存的模型设置。', guideRunning: '正在为「{topic}」生成报告', guideBackground: '关闭此窗口不会取消任务。重新打开可查看进度。', guideComplete: '报告已生成。', guideFailed: '未能生成报告。请检查主题分类、关键词和模型设置，再重新尝试。', guideInterrupted: '上次任务已中断或无法找到。请先查看已有报告，再决定是否重新生成。', guideUnavailable: '暂时无法获取任务状态。请重新检查；系统不会自动重新生成。', guideLoadFailed: '暂时无法检查已保存的配置，请重试。', guideStarting: '正在提交生成任务…', guideStartFailed: '无法启动任务，请检查设置后重试。', guideCheck: '重新检查', guideOpenReport: '打开报告', guideViewReports: '查看已有报告', guideWaiting: '等待开始', guideDone: '已完成', guideCurrent: '进行中', guideStopped: '已停止', guideCollect: '采集论文', guideTriage: '筛选论文', guideEnrich: '补充全文', guideDigest: '生成报告',
-      llmReady: '模型配置完整；连接未验证', llmIncomplete: '模型配置不完整；请在服务设置中补齐', llmUnsaved: '有未保存修改；保存后检查配置，连接仍需实际运行验证', noAuth: '本地免鉴权（仅 OpenAI compatible）', authRequired: '使用 API Key', authNone: '不发送鉴权信息', noAuthNote: '免鉴权需明确选择，并填写 localhost、回环或私有 IP 地址。不会发送 Authorization，即使已有旧密钥。公网服务仍需 Key。', providerDefaultsNote: '切换 Provider 时，仅默认来源且未编辑的地址和模型随之更新。文件、环境变量和手动输入的值保留；清空普通字段可恢复当前 Provider 默认值。',
+      firstReport: '生成第一份报告', firstSchedule: '报告周期决定内容的时间范围。保存或启用主题不会自动生成报告。',
+      guideOpen: '开始生成报告', guideIntro: '检查模型、确认主题，再生成报告。', guideFailed: '未能生成报告。请检查主题分类、关键词和模型设置，再重新尝试。', guideInterrupted: '上次任务已中断或无法找到。请先查看已有报告，再决定是否重新生成。', guideUnavailable: '暂时无法获取任务状态。请重新检查；系统不会自动重新生成。', guideCheck: '重新检查', guideOpenReport: '打开报告', guideCollect: '采集论文', guideTriage: '筛选论文', guideEnrich: '补充全文', guideDigest: '生成报告',
+      llmReady: '模型配置完整；连接未验证', llmIncomplete: '模型配置不完整；请在服务设置中补齐',
       triageEyebrow: '筛选 · 每条为何入选或剔除', stCollected: '采集', stGates: '过规则门', stKept: '判定入选', stFull: '全文',
       stCollectedNote: '本窗口内的条目', stGatesNote: '规则门剔除 {n} 条，不花 LLM', stKeptNote: '{core} 核心 · {sec} 次级 · 判定剔除 {jd}',
       stFullNote: '{n} 篇已有全文', all: '全部', fKeptChip: '入选', judgeDropped: '判定剔除', gateDropped: '规则剔除', untriaged: '未筛选',
@@ -111,22 +106,10 @@
       mode: '模式', light: '浅色', dark: '深色', device: '跟随系统', color: '颜色', customHue: '自定义色相', surface: '阅读底色',
       paper: '纸张', sepia: '米黄', night: '夜间', surfaceNote: '周报纸面有自己的底色，长文在两种模式下都好读。', reset: '恢复默认',
       customTitle: '自定义 ISBE', customNote: '保存在本浏览器 · 对所有页面生效', close: '关闭外观面板', custom: '自定义', loading: '加载中…',
-      shelf: '书架', shelfEyebrow: '报告 · 每一期都在这里', issuesN: '期', pdf: '导出 PDF', weekly: '周报', daily: '日报', monthly: '月报', research: '专题研究', materials: '份材料',
-      settings: '服务设置', settingsNote: '配置模型、论文来源与全文解析服务。保存后用于后续任务。',
-      llmSettings: '语言模型', llmSettingsNote: '选择服务商，填写对应密钥。其他服务商的密钥可以保留。', provider: '服务商',
-      baseUrl: '模型 API 地址', fastModel: '快速模型', smartModel: '深度模型', advanced: '高级模型选项', maxTokens: '最大输出 token', timeout: '超时（秒）', extraBody: '额外请求参数（JSON 对象）',
-      fulltextSettings: '全文提取', extractor: '提取方式', extractorLlm: 'LLM 提取（arXiv HTML）', extractorMetrail: 'metrail PDF 服务', extractorOff: '关闭全文获取',
-      extractorLlmNote: '获取可用的 arXiv HTML，复用上方服务商、快速模型和 API Key，提取方法、数据与结果，并核验原文引文。HTML 不可用时使用摘要，不进行 PDF OCR 或图片内容识别。',
-      extractorLlmFigures: '自动保存有图注的原文配图供报告展示，优先方法、架构与流程图，其次概览或首张有图注的图；组图保留多个面板，不增加视觉模型调用。没有合适配图或下载失败时仍生成文字报告；已有 HTML 缓存可在下次补充全文时补图。',
-      extractorMetrailNote: '调用 metrail PDF 服务提取全文，后续分析使用上方配置的模型。', extractorOffNote: '不获取新全文，也不创建或刷新事实卡片；保留已有全文和卡片缓存。未获取全文的论文使用摘要。', metrailRequired: '此模式需要服务地址，也可在主题的 metrail.base_url 中单独配置。',
-      extractorDefaultNote: '尚未固定全局方式：每个主题若启用了 metrail 且配置了地址，就沿用 metrail，否则使用 LLM。手动切换后保存可固定全局选择。',
-      sourceSettings: '内容来源与联网检索', sourceSettingsNote: '默认直接访问公开 arXiv API。可选接入 essaies 自托管文献库，GitHub Token 也可留空。', sourceAdvanced: '高级来源选项',
-      essaiesUrl: 'essaies 地址（可选）', metrailUrl: 'metrail 地址', arxivUrl: 'arXiv API 地址', githubUrl: 'GitHub API 地址', githubToken: 'GitHub Token（可选）',
-      sourceEnvironment: '环境变量', sourceFile: '本地设置', sourceDefault: '默认值', environmentLock: '由环境变量提供，请在运行环境中修改。',
-      keepSecret: '留空保留已有密钥', newSecret: '输入密钥', removeSecret: '移除已保存密钥', undoRemove: '撤销移除', removingSecret: '保存后移除密钥',
-      settingsStorage: '密钥仅保存在服务器本地，不会回传到页面。环境变量优先于本页设置；普通字段留空可恢复默认值。',
-      saveSettings: '保存设置', savingSettings: '保存中…', savedSettings: '设置已保存。请查看上方模型配置状态；尚未验证连接。', unsavedSettings: '有未保存的修改', discardSettings: '放弃修改',
-      leaveSettings: '有未保存的服务设置。确定放弃这些修改并离开？', invalidExtraBody: '额外请求参数必须是 JSON 对象。', settingsUnavailable: '无法加载服务设置。', retry: '重试',
+      shelf: '书架', shelfEyebrow: '报告 · 每一期都在这里', issuesN: '期', pdf: '导出 PDF', weekly: '周报', daily: '日报', monthly: '月报', research: '专题研究', survey: '综述', materials: '份材料',
+      settings: '服务设置',
+      discardSettings: '放弃修改',
+      retry: '重试',
       topicSettings: '主题设置', topicSettingsNote: '管理关注的内容、采集来源和筛选规则。模型与服务地址在服务设置中配置。',
       topicNew: '新建主题', topicSearch: '搜索名称或 ID', topicChoose: '选择一个主题查看和编辑，或新建主题。', topicEmpty: '还没有主题。创建第一个主题后即可采集。', topicNoMatch: '没有匹配的主题。',
       topicBasic: '基本信息', topicId: '主题 ID', topicLabel: '主题名称', topicLang: '报告语言', topicCadence: '报告周期', topicWindow: '回看天数', topicMaxPapers: '每期最多论文数', topicActive: '加入默认批量任务', topicActiveNote: '停用后仍可用命令指定此主题运行。',
@@ -145,10 +128,9 @@
       webSearchRetryBatch: 'Retry this batch',
       webSearchRecheck: 'Recheck dates', webSearchContinue: 'Continue checking {n} remaining', webSearchRecheckStats: 'Checked {checked} this batch · {remaining} remaining', webSearchPlanContext: 'Current plan: {name}', webSearchPlanWindow: 'Plan window: {start} to {end}', webSearchRetainedDate: 'The latest date check could not finish; the previous record is retained.',
       webSearchRegion: 'Region (optional)', webSearchInstitution: 'Institution (optional)', webSearchRegionHint: 'Region and institution are added to every query as quoted phrases. The search service cannot filter on them, so check them in the results.', webSearchSyntax: 'Syntax as in Google Scholar: spaces mean all words; uppercase OR means either; "phrase" matches exactly; -word excludes; site:domain; intitle:word. Example: Shanghai "green finance" ESG OR sustainability -jobs. author: and source: are not supported.', webSearchUnexecuted: 'Not applied by the search service; check in the results: {items}', webSearchListSep: ', ', webSearchC_terms: 'Search words', webSearchC_phrase: 'Exact phrase', webSearchC_boolean: 'OR groups', webSearchC_exclusion: 'Excluded words', webSearchC_site: 'Site filter (site:)', webSearchC_title: 'Title filter (intitle:)', webSearchC_institution: 'Institution', webSearchC_region: 'Region', webSearchC_language: 'Language', webSearchC_publication_window: 'Publication window',
-      articleDns: 'Original-page address resolution', articleDnsSystem: 'System default', articleDnsCloudflare: 'Cloudflare encrypted DNS', articleDnsNote: 'Used to read original articles and publication dates. Cloudflare receives public domain names and can resolve failures caused by virtual IP addresses.',
       webSearchNoDateMatches: 'No material matches the current date filter.',
       webSearchWindow: 'Search date window', webSearchDateRead: 'Original date information checked', webSearchDateNotRead: 'Original date not checked yet', webSearchDateReadFailed: 'Original page could not be read', webSearchLimited: 'Only the first batch of results was collected; more reporting may be available.', webSearchEnginesUnavailable: '{n} search engines did not respond.', webSearchSearxngWindow: 'When available, SearXNG receives a month/year hint that upstream engines may ignore. Original dates are checked against your exact range for up to 20 pages per run; all other results are retained.', webSearchBaiduRemoved: 'Baidu (removed)', webSearchBaiduRemovedHint: 'Baidu search has been removed. Switch this plan to SearXNG and save it to search again; its materials can still be viewed and rechecked.',
-      webSearch: 'Web discovery', webSearchNote: 'Find reporting across media and public websites by topic, then check original dates in the material inbox.', webSearchPlans: 'Search plans', webSearchNew: 'New plan', webSearchEmpty: 'No saved plans yet. Start with the example form.', webSearchName: 'Plan name', webSearchId: 'Plan ID', webSearchProvider: 'Search service', webSearchQueries: 'Search queries (one per line)', webSearchQueriesHint: 'Up to 8 queries, 200 characters each. Each runs separately. Search syntax, including site: filters, depends on the provider.', webSearchStart: 'Start date', webSearchEnd: 'End date', webSearchLanguage: 'Search language', webSearchMax: 'Maximum results per query', webSearchSave: 'Save plan', webSearchRun: 'Save & search', webSearchRunSaved: 'Run search', webSearchSaved: 'Search plan saved.', webSearchInvalid: 'Enter an ID, name, topic, 1–8 queries and a valid date range. Queries allow up to 200 characters; results must be 1–20.', webSearchUnavailable: 'This search service is not configured. You can save a plan and configure the service before running it.', webSearchSettings: 'Configure search service', webSearchReady: 'Service configured; the connection will be checked during search.', webSearchWindowNote: 'Request a date window, then check original publication dates. Unknown, out-of-range and conflicting dates remain available for review.', webSearchManual: 'Runs on demand; saving a plan does not schedule it. Search and date checks do not use an LLM.', webSearchRecent7: 'Last 7 days', webSearchRecent30: 'Last 30 days', webSearchAdvanced: 'Plan ID & result count', webSearchDateFilter: 'Original date check', webSearchInRange: 'In range', webSearchOutOfRange: 'Out of range', webSearchUnknown: 'Date unverified', webSearchConflict: 'Conflicting dates', webSearchTrace: 'Search provenance', webSearchDateHint: 'Search date hint (not original publication)', webSearchSummary: 'Search excerpt', webSearchOriginalDate: 'Original publication', webSearchSourceNote: 'Use your own SearXNG URL; the instance must enable JSON output.', webSearchSearxng: 'SearXNG URL',
+      webSearch: 'Web discovery', webSearchNote: 'Find reporting across media and public websites by topic, then check original dates in the material inbox.', webSearchPlans: 'Search plans', webSearchNew: 'New plan', webSearchEmpty: 'No saved plans yet. Start with the example form.', webSearchName: 'Plan name', webSearchId: 'Plan ID', webSearchProvider: 'Search service', webSearchQueries: 'Search queries (one per line)', webSearchQueriesHint: 'Up to 8 queries, 200 characters each. Each runs separately. Search syntax, including site: filters, depends on the provider.', webSearchStart: 'Start date', webSearchEnd: 'End date', webSearchLanguage: 'Search language', webSearchMax: 'Maximum results per query', webSearchSave: 'Save plan', webSearchRun: 'Save & search', webSearchRunSaved: 'Run search', webSearchSaved: 'Search plan saved.', webSearchInvalid: 'Enter an ID, name, topic, 1–8 queries and a valid date range. Queries allow up to 200 characters; results must be 1–20.', webSearchUnavailable: 'This search service is not configured. You can save a plan and configure the service before running it.', webSearchSettings: 'Configure search service', webSearchReady: 'Service configured; the connection will be checked during search.', webSearchWindowNote: 'Request a date window, then check original publication dates. Unknown, out-of-range and conflicting dates remain available for review.', webSearchManual: 'Runs on demand; saving a plan does not schedule it. Search and date checks do not use an LLM.', webSearchRecent7: 'Last 7 days', webSearchRecent30: 'Last 30 days', webSearchAdvanced: 'Plan ID & result count', webSearchDateFilter: 'Original date check', webSearchInRange: 'In range', webSearchOutOfRange: 'Out of range', webSearchUnknown: 'Date unverified', webSearchConflict: 'Conflicting dates', webSearchTrace: 'Search provenance', webSearchDateHint: 'Search date hint (not original publication)', webSearchSummary: 'Search excerpt', webSearchOriginalDate: 'Original publication',
       sourceCounts: '{hits} hits · {materials} materials · {versions} versions · {articles} articles', sourceDuplicates: 'Seen {n} more times · timeline', sourceTimelineHide: 'Hide timeline', sourceTimeline: 'Where this article appeared (newest first)', sourceTimelineCounts: '{hits} hits · {materials} materials · {versions} versions', sourceTimelineNote: 'The same article is matched by DOI, the site’s own article ID or the link without tracking parameters, never by title. Several appearances are not several independent sources.', sourceTimelineHit: 'Search hit · {plan} · “{query}” rank {rank}', sourceTimelineVersion: 'Source collection · {source}', sourceTimelineFirstSeen: 'Found by search · {plan}', sourceTimelineLoading: 'Loading timeline…', sourceTimelineFailed: 'Could not load the timeline.',
       sources: 'Sources & materials', sourcesNote: 'Search the web by topic or collect from selected websites, then review new material in the inbox.',
       sourceCatalog: 'Source management', sourceHistory: 'Collection history', sourceOverview: 'Whole catalog', sourceTotal: 'All sources', sourceActive: 'Enabled', sourceInactive: 'Disabled', sourceFailed: 'Collection failed', sourceNoEntries: 'No material found', sourceSearch: 'Search names, URLs, or IDs', sourceWebsite: 'Website', sourceStatus: 'Status', sourceApply: 'Apply filters', sourceReset: 'Clear filters', sourceMatches: '{n} matching sources · Up to 50 per page', sourceNoMatches: 'No sources match these filters.', sourceFacetHint: 'Website and topic match exactly. Up to 20 matching suggestions are shown; you can also type a value.', sourceConfigure: 'Configure', sourceViewMaterials: 'View material', sourceCount: 'Materials', sourceActions: 'Actions', sourceSelectPage: 'Select current page', sourceSelectOne: 'Select {name}', sourceSelected: '{n} selected on this page', sourceEnableBatch: 'Enable selected', sourceDisableBatch: 'Disable selected', sourceClearSelection: 'Clear selection', sourceBatchSaved: '{n} sources updated.', sourceBatchConflict: 'Selected sources changed or collection is running. Nothing was changed. Selection is kept; refresh, clear and reselect before submitting again.', sourceTools: 'Add, discover & import', sourceCloseEditor: 'Close configuration', sourceAllMaterials: 'All material', sourceMaterialContext: 'Current source: {name}', sourceLatestJobs: 'Latest 20 collection records', sourceSuccess: 'Collection succeeded',
@@ -173,8 +155,6 @@
       taskCreated: "Submitted",
       taskActive: "Active tasks",
       taskHistory: "Task history",
-      taskNew: "Generate for another topic",
-      taskUnknown: "Submission is unconfirmed. Check again, or click Generate to retry the same request. It will not be resubmitted automatically.",
       users: "Accounts",
       usersNote: "Administrators create accounts. Password resets and deactivation end existing sessions.",
       username: "Username",
@@ -199,16 +179,13 @@
       userDisableConfirm: "Deactivate this account and end its existing sessions?",
       userPasswordConfirm: "Reset this password and end the account’s existing sessions?",
       actionFailed: "The action could not be completed. Please try again.",
-      modelManaged: "Your administrator manages the model configuration.",
-      modelContact: "The model is not ready. Please contact your administrator.",
       topicOwnNote: "Manage your paper topics, keywords, and filtering rules.",
       topicBatchNote: "A topic excluded from default batch jobs can still generate reports here.",
-      guideNoData: 'No usable papers remain in this topic’s current window. Review its sources, keywords, and filters in Topics before trying again.', guideReviewTriage: 'Review papers and exclusion reasons', guideAgain: 'Generate another report',
-      mailTransport: 'Delivery method', smtp: 'SMTP', zeptomail_api: 'ZeptoMail API', mailHost: 'SMTP server', mailPort: 'SMTP port (blank uses TLS mode default)', mailSecurity: 'Connection security', tls: 'TLS (usually 465)', starttls: 'STARTTLS (usually 587)', mailUser: 'SMTP username (optional)', mailPassword: 'SMTP password / app password', mailSmtpNote: 'Use your mail provider’s SMTP host and app password. Leave both username and password empty for an unauthenticated relay.', mailEndpoint: 'ZeptoMail HTTPS endpoint', mailToken: 'ZeptoMail Send Mail Token', mailSenderName: 'Sender display name (optional)', mailSettings: 'Report email', mailDefault: 'Default recipients (optional)', mailNote: 'Defaults may be empty. Recipient edits at send time apply only to that email. Configure the sender and credentials in Service settings, then save.',
-      mailOpen: 'Send email', mailTest: 'Send test email', mailSend: 'Confirm send', mailSending: 'Submitting…', mailCancel: 'Close email form', mailRecipients: 'Recipients for this email', mailRecipientsHint: 'Up to 20 addresses, separated by commas, semicolons or spaces.', mailSubject: 'Subject', mailPeriod: 'Period', mailSender: 'Sender', mailConfirm: 'Submit this email?', mailRequired: 'Enter at least one recipient.',
+      mailNote: 'Defaults may be empty. Recipient edits at send time apply only to that email. Configure the sender and credentials in Service settings, then save.',
+      mailOpen: 'Send email', mailSend: 'Confirm send', mailSending: 'Submitting…', mailCancel: 'Close email form', mailRecipients: 'Recipients for this email', mailRecipientsHint: 'Up to 20 addresses, separated by commas, semicolons or spaces.', mailSubject: 'Subject', mailPeriod: 'Period', mailSender: 'Sender', mailConfirm: 'Submit this email?', mailRequired: 'Enter at least one recipient.',
       mailAccepted: 'Accepted by the provider; inbox delivery is not confirmed.', mailFailed: 'Sending failed.', mailUnknown: 'Result unknown. Check the provider log and inbox before sending again; the app will not retry automatically.', mailRequest: 'Request ID',
       radar: 'Research radar', overview: 'Overview', reports: 'Reports', triage: 'Triage', review: 'Memory review', runs: 'Runs & LLM',
-      reviewSoon: 'Memory review comes with the memory merge milestone', topics: 'Topics', onPage: 'On this page', customize: 'Customize', help: 'Help',
+      reviewSoon: 'Memory review comes with the memory merge milestone', home: 'Home', galaxies: 'Galaxies', system: 'System', help: 'Help', topics: 'Topics', onPage: 'On this page', customize: 'Customize',
       online: 'configured', off: 'not set', ovTitle: 'This week on the radar', topicsN: 'topics', kept: 'kept', of: 'of', collected: 'collected',
       window: 'window', signal: 'Signal map', signalNote: 'distance from centre = items kept this window', healthy: 'configuration valid', failed: 'failed',
       drafts: 'drafts', inactive: 'inactive', draftWaiting: 'memory draft waiting', lastFailed: 'last run failed', pipeline: 'Pipeline',
@@ -217,9 +194,9 @@
       lastRun: 'Last run', none: 'none', topicsNote: 'bars = items collected per day, last 7 days', keptOf: 'kept of', last: 'last',
       noRuns: 'no runs yet', runDetails: 'View paper details', runPaperFailure: 'Paper processing failed', runFigureFailure: 'Figure issue', runAbstractFallback: 'Abstract only', latestReports: 'Latest reports', recentRuns: 'Recent runs', ledger: 'ledger →', papers: 'papers',
       noReports: 'No reports for this topic yet.', topic: 'Topic', download: 'Download .md', issues: 'Issues',
-      firstReport: 'Create the first report', firstModel: 'Choose your models and complete their configuration in Settings. Saving checks configuration, not connectivity.', firstSchedule: 'Report cadence sets the time period. Saving or enabling a topic does not generate a report automatically.', firstChoose: 'Create or select a topic first.', firstArticles: 'This topic has article sources only. Reports currently require arXiv papers; add an arXiv source in Topics.',
-      guideOpen: 'Start report guide', guideIntro: 'Check your model, confirm a topic, then generate a report.', guideClose: 'Close report guide', guideNext: 'Next', guideBack: 'Back', guideStep: 'Step {n} of 3', guideModel: 'Check your model', guideTopic: 'Confirm topic and sources', guideGenerate: 'Generate report', guideSourceReady: 'arXiv categories and keywords are configured. Available papers will be checked during collection.', guideSourceInvalid: 'Complete and save the topic’s arXiv categories and keywords.', guideSavedOnly: 'Generation uses saved settings. Save or discard the draft on this page first.', guideStartNote: 'This collects papers, filters them, retrieves full text, and creates a report using saved model settings.', guideRunning: 'Generating a report for “{topic}”', guideBackground: 'Closing this window does not cancel the task. Reopen it to check progress.', guideComplete: 'Your report is ready.', guideFailed: 'A report could not be created. Check the topic’s categories, keywords, and model settings before trying again.', guideInterrupted: 'The previous task was interrupted or could not be found. Check existing reports before generating again.', guideUnavailable: 'Task status is temporarily unavailable. Check again; the app will not restart generation automatically.', guideLoadFailed: 'Saved configuration could not be checked. Try again.', guideStarting: 'Starting generation…', guideStartFailed: 'Generation could not start. Check settings and try again.', guideCheck: 'Check again', guideOpenReport: 'Open report', guideViewReports: 'View existing reports', guideWaiting: 'Waiting', guideDone: 'Complete', guideCurrent: 'In progress', guideStopped: 'Stopped', guideCollect: 'Collect papers', guideTriage: 'Filter papers', guideEnrich: 'Retrieve full text', guideDigest: 'Generate report',
-      llmReady: 'Model configuration complete; connection not verified', llmIncomplete: 'Model configuration incomplete; complete it in Settings', llmUnsaved: 'Unsaved changes; save to check configuration, then run a task to verify the connection', noAuth: 'Local no-auth (OpenAI compatible only)', authRequired: 'Use API key', authNone: 'Send no authentication', noAuthNote: 'No-auth must be explicitly selected with a localhost, loopback or private IP URL. Authorization is omitted even if an old key exists. Public services still require a key.', providerDefaultsNote: 'Switching Provider updates only unedited fields whose source is Default. File, environment and manually entered values are kept. Clear a regular field to restore the current Provider default.',
+      firstReport: 'Create the first report', firstSchedule: 'Report cadence sets the time period. Saving or enabling a topic does not generate a report automatically.',
+      guideOpen: 'Start report guide', guideIntro: 'Check your model, confirm a topic, then generate a report.', guideFailed: 'A report could not be created. Check the topic’s categories, keywords, and model settings before trying again.', guideInterrupted: 'The previous task was interrupted or could not be found. Check existing reports before generating again.', guideUnavailable: 'Task status is temporarily unavailable. Check again; the app will not restart generation automatically.', guideCheck: 'Check again', guideOpenReport: 'Open report', guideCollect: 'Collect papers', guideTriage: 'Filter papers', guideEnrich: 'Retrieve full text', guideDigest: 'Generate report',
+      llmReady: 'Model configuration complete; connection not verified', llmIncomplete: 'Model configuration incomplete; complete it in Settings',
       file: 'File', generated: 'generated', triageEyebrow: 'Triage · why each item was kept or dropped', stCollected: 'Collected',
       stGates: 'Passed gates', stKept: 'Kept by judge', stFull: 'Full text', stCollectedNote: 'items in this window',
       stGatesNote: '{n} dropped by rules · no LLM cost', stKeptNote: '{core} core · {sec} secondary · {jd} judged out',
@@ -235,22 +212,10 @@
       paper: 'Paper', sepia: 'Sepia', night: 'Night', surfaceNote: 'The report sheet keeps its own surface, so long reads stay comfortable in either mode.',
       reset: 'Reset to default', customTitle: 'Customize ISBE', customNote: 'Saved in this browser · applies to every page',
       close: 'Close customize panel', custom: 'Custom', loading: 'Loading…',
-      shelf: 'Library', shelfEyebrow: 'Reports · every issue, newest first', issuesN: 'issues', pdf: 'Save as PDF', weekly: 'weekly', daily: 'daily', monthly: 'monthly', research: 'research', materials: 'sources',
-      settings: 'Settings', settingsNote: 'Connect models, paper sources, and full-text services. Saved settings apply to future tasks.',
-      llmSettings: 'Language model', llmSettingsNote: 'Choose a provider and add its API key. Keys for other providers can stay saved.', provider: 'Provider',
-      baseUrl: 'Model API URL', fastModel: 'Fast model', smartModel: 'Smart model', advanced: 'Advanced model options', maxTokens: 'Maximum output tokens', timeout: 'Timeout (seconds)', extraBody: 'Extra request parameters (JSON object)',
-      fulltextSettings: 'Full-text extraction', extractor: 'Extraction method', extractorLlm: 'LLM extraction (arXiv HTML)', extractorMetrail: 'metrail PDF service', extractorOff: 'Disable full-text fetching',
-      extractorLlmNote: 'Fetch available arXiv HTML and use the provider, fast model, and key above to extract methods, data, and results with verbatim quote checks. Papers without HTML use abstracts. This mode does not run PDF OCR or recognize image content.',
-      extractorLlmFigures: 'Save captioned source figures locally for reports, preferring methods, architectures, or workflows, then overviews or the first captioned figure. Keep panels together without extra vision-model calls. Missing or failed images leave a text report; cached HTML papers can gain figures on the next enrichment run.',
-      extractorMetrailNote: 'Use the metrail PDF service to extract full text, then analyze it with the model configured above.', extractorOffNote: 'Do not fetch new full text or create or refresh fact cards. Keep existing text and card caches. Papers without full text use abstracts.', metrailRequired: 'This mode needs a service URL, which may also be set in a topic’s metrail.base_url.',
-      extractorDefaultNote: 'No global method is fixed yet: each topic uses metrail when enabled with a URL, otherwise LLM. Change the selection and save to fix the global method.',
-      sourceSettings: 'Content sources & web search', sourceSettingsNote: 'Use the public arXiv API by default. An essaies self-hosted library and a GitHub token are optional.', sourceAdvanced: 'Advanced source options',
-      essaiesUrl: 'essaies URL (optional)', metrailUrl: 'metrail URL', arxivUrl: 'arXiv API URL', githubUrl: 'GitHub API URL', githubToken: 'GitHub token (optional)',
-      sourceEnvironment: 'Environment', sourceFile: 'Local settings', sourceDefault: 'Default', environmentLock: 'Set by an environment variable. Edit it in your runtime environment.',
-      keepSecret: 'Leave blank to keep the existing key', newSecret: 'Enter a key', removeSecret: 'Remove saved key', undoRemove: 'Undo removal', removingSecret: 'Key will be removed on save',
-      settingsStorage: 'Keys are stored locally on the server and never returned to this page. Environment variables take priority; clear a regular field to restore its default.',
-      saveSettings: 'Save settings', savingSettings: 'Saving…', savedSettings: 'Settings saved. See the model configuration status above; no connection test was run.', unsavedSettings: 'Unsaved changes', discardSettings: 'Discard changes',
-      leaveSettings: 'You have unsaved service settings. Discard these changes and leave?', invalidExtraBody: 'Extra request parameters must be a JSON object.', settingsUnavailable: 'Could not load service settings.', retry: 'Retry',
+      shelf: 'Library', shelfEyebrow: 'Reports · every issue, newest first', issuesN: 'issues', pdf: 'Save as PDF', weekly: 'weekly', daily: 'daily', monthly: 'monthly', research: 'research', survey: 'survey', materials: 'sources',
+      settings: 'Settings',
+      discardSettings: 'Discard changes',
+      retry: 'Retry',
       topicSettings: 'Topic settings', topicSettingsNote: 'Manage what to follow, where to collect it, and how to filter it. Configure models and service URLs in Settings.',
       topicNew: 'New topic', topicSearch: 'Search name or ID', topicChoose: 'Choose a topic to view and edit, or create a new one.', topicEmpty: 'No topics yet. Create your first topic to start collecting.', topicNoMatch: 'No matching topics.',
       topicBasic: 'Basics', topicId: 'Topic ID', topicLabel: 'Topic name', topicLang: 'Report language', topicCadence: 'Report cadence', topicWindow: 'Lookback days', topicMaxPapers: 'Maximum papers per report', topicActive: 'Include in default batch jobs', topicActiveNote: 'An inactive topic can still run when explicitly named in a command.',
@@ -270,7 +235,6 @@
     for (const [n, v] of Object.entries(vars || {})) s = s.replace(`{${n}}`, () => String(v));
     return s;
   };
-
   // ---------- formatting ----------
   const locale = () => (prefs.lang === 'zh' ? 'zh-CN' : 'en-US');
   const num = (n) => Number(n || 0).toLocaleString(locale());
@@ -320,12 +284,10 @@
     return { ok: response.ok, status: response.status, json: async () => { const data = await response.json(); if (epoch !== sessionEpoch) throw new Error(tr('sessionExpired')); return data; } };
   }
   function expireSession() {
-    ++sessionEpoch; ++seq; ++guide.request; ++tasksRequest; closeGuide(); clearTimeout(tasksTimer);
+    ++sessionEpoch; ++seq; ++tasksRequest; clearTimeout(tasksTimer);
     memo.clear(); session = { mode: 'shared', user: null, csrf_token: '' }; sessionRequest = null;
     authError = 'sessionExpired'; authBusy = false;
-    settingsSnapshot = null; settingsEdits = {}; settingsSaving = false; settingsNotice = ''; settingsError = '';
     topicsSnapshot = null; topicDetail = null; topicOriginal = null; topicEdits = {}; topicSearch = ''; topicBusy = false; topicError = ''; topicNotice = ''; topicConflict = false; ++topicRequest;
-    guide.job = null; guide.observed = null; guide.topic = ''; guide.detail = null; guide.topics = []; guide.csrf = '';
     mailDraft = null; mailResult = null; mailError = ''; mailBusy = false;
     tasks = []; users = []; usersError = ''; usersNotice = ''; userBusy = false;
     resetSources();
@@ -353,15 +315,13 @@
       const response = await http('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': current.csrf_token }, body: JSON.stringify({ username, password }) });
       if (!response.ok) throw new Error();
       session = await response.json(); sessionRequest = Promise.resolve(session); memo.clear();
-      guide.observed = readGenerationMarker();
       await render();
-      if (guide.observed) await openGuide(guide.observed.topic);
     } catch { authError = 'loginFailed'; }
     finally { authBusy = false; if (!session?.user) { $('#app').innerHTML = loginHtml(); $('#login-username').value = username; $('#login-password')?.focus(); } }
   }
   async function signOut() {
-    if (authBusy || mailBusy || settingsSaving || topicBusy || sourceBusy) return;
-    if (!leaveSettings('/login') || !leaveTopics('/login') || !leaveSources('/login')) return;
+    if (authBusy || mailBusy || topicBusy || sourceBusy) return;
+    if (!leaveTopics('/login') || !leaveSources('/login')) return;
     authBusy = true;
     try {
       const response = await http('/api/logout', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': session.csrf_token }, body: '{}' });
@@ -382,10 +342,13 @@
     settings: svg('<path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="3" style="fill:var(--nav)"></circle><circle cx="15" cy="17" r="3" style="fill:var(--nav)"></circle>'),
     topicSettings: svg('<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"></path>'),
     sources: svg('<path d="M4 5h16v14H4zM4 10h16M9 10v9"></path>'),
+    question: svg('<circle cx="6" cy="17" r="2"></circle><circle cx="12" cy="6" r="2"></circle><circle cx="18" cy="15" r="2"></circle><path d="M7 15.2 11 7.8M13.1 7.7l3.9 5.6M8 17h8"></path>'),
+    system: svg('<rect x="4" y="4" width="16" height="6" rx="1"></rect><rect x="4" y="14" width="16" height="6" rx="1"></rect><path d="M8 7h2M8 17h2"></path>'),
+    help: svg('<circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5v.7M12 17h.01"></path>'),
     brush: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke:var(--accent)"><path d="M4 20h4L19 9l-4-4L4 16z"></path><path d="M13.5 6.5l4 4"></path></svg>',
     close: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>',
   };
-  const BRAND = `<a class="brand" data-link href="/"><svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="none" stroke-width="1.5" style="stroke:var(--line)"></circle><circle cx="18" cy="18" r="9" fill="none" stroke-width="1.5" style="stroke:var(--line)"></circle><path d="M18 18 L18 2 A16 16 0 0 1 31.86 10 Z" style="fill:var(--accent);fill-opacity:.32"></path><circle cx="24.5" cy="11" r="2.4" style="fill:var(--accent)"></circle></svg><span><b>ISBE</b><small>${esc(tr('radar'))}</small></span></a>`;
+  const BRAND = `<a class="brand" href="/"><svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="none" stroke-width="1.5" style="stroke:var(--line)"></circle><circle cx="18" cy="18" r="9" fill="none" stroke-width="1.5" style="stroke:var(--line)"></circle><path d="M18 18 L18 2 A16 16 0 0 1 31.86 10 Z" style="fill:var(--accent);fill-opacity:.32"></path><circle cx="24.5" cy="11" r="2.4" style="fill:var(--accent)"></circle></svg><span><b>ISBE</b><small>${esc(tr('radar'))}</small></span></a>`;
 
   // ---------- topic status ----------
   const status = (t) => {
@@ -409,20 +372,40 @@
   };
 
   // ---------- shell ----------
+  // The sidebar, the same one the React console draws: keep it equal to `NAV`
+  // in frontend/src/shell/nav.ts (a Vitest test compares the two). `react`
+  // pages are the other console's and load as whole pages; the pages under
+  // System are listed on /system.
+  const NAV = [
+    { href: '/', label: 'home', icon: 'overview', react: true },
+    { href: '/galaxies', label: 'galaxies', icon: 'question', react: true, also: ['/question'] },
+    { href: '/reports', label: 'reports', icon: 'reports' },
+    { href: '/topics', label: 'topics', icon: 'topicSettings' },
+    { href: '/settings', label: 'settings', icon: 'settings', react: true, admin: true },
+    {
+      href: '/system',
+      label: 'system',
+      icon: 'system',
+      react: true,
+      also: ['/overview', '/tasks', '/triage', '/runs', '/sources', '/users'],
+    },
+    { href: '/help', label: 'help', icon: 'help', react: true },
+  ];
   function shell(page, ov, body) {
-    const nav = (href, key) => `<a class="nav" data-link href="${href}"${page === href ? ' aria-current="page"' : ''}>${ICON[key] || ICON.reports}<span style="flex:1">${esc(tr(key))}</span></a>`;
-    const pending = ov ? ov.pending.length : 0;
-    const review = `<span class="nav" aria-disabled="true" title="${esc(tr('reviewSoon'))}">${ICON.review}<span style="flex:1">${esc(tr('review'))}</span>${pending ? `<span class="badge">${pending}</span>` : ''}</span>`;
+    const nav = (item) => {
+      const current = page === item.href || item.also?.includes(page) ? ' aria-current="page"' : '';
+      return `<a class="nav"${item.react ? '' : ' data-link'} href="${item.href}"${current}>${ICON[item.icon]}<span style="flex:1">${esc(tr(item.label))}</span></a>`;
+    };
     const side = body.side ?? (ov ? `<div class="side-section"><div class="side-label">${esc(tr('topics'))}</div><div class="side-list">${ov.topics.map((t) => `<a class="side-item" data-link href="${isAdmin() && !ownerQuery() ? '/triage' : '/reports'}?topic=${enc(t.id)}${ownerQuery()}"><span class="dot" style="background:${status(t).fg}"></span><span class="mono" style="flex:1">${esc(t.id)}</span><span class="mono muted">${t.kept}</span></a>`).join('')}</div></div>` : '');
     const svc = ov ? [['essaies', ov.services.essaies], ['metrail', ov.services.metrail], ['LLM', ov.services.llm]]
       .map(([name, v]) => `<div class="svc"><span class="dot" style="background:${v ? 'var(--accent)' : 'var(--faint)'}"></span><span>${name}</span><span class="mono muted">${esc(typeof v === 'string' ? v : v ? tr('online') : tr('off'))}</span></div>`).join('') : '';
-    return `<nav class="side" aria-label="Main">${BRAND}<div class="navs">${nav('/', 'overview')}${nav('/reports', 'reports')}${nav('/tasks', 'tasks')}${isAdmin() ? nav('/triage', 'triage') + review + nav('/runs', 'runs') : ''}${nav('/topics', 'topicSettings')}${isAdmin() ? nav('/sources', 'sources') + nav('/settings', 'settings') + (session?.mode === 'shared' ? nav('/users', 'users') : '') : ''}</div>${side}
-      <div class="side-foot">${isAdmin() ? svc : ''}${isAdmin() && ov ? `<a data-link href="/settings" class="setting-hint">${esc(tr(ov.services.llm ? 'llmReady' : 'llmIncomplete'))}</a>` : ''}${isAdmin() ? `<a href="/help" class="setting-hint">${esc(tr('help'))}</a>` : ''}
+    return `<nav class="side" aria-label="Main">${BRAND}<div class="navs">${NAV.filter((item) => !item.admin || isAdmin()).map(nav).join('')}</div>${side}
+      <div class="side-foot">${isAdmin() ? svc : ''}${isAdmin() && ov ? `<a href="/settings" class="setting-hint">${esc(tr(ov.services.llm ? 'llmReady' : 'llmIncomplete'))}</a>` : ''}
         ${session?.mode === 'shared' ? `<span class="setting-hint">${esc(session.user.username)}</span><button type="button" class="btn" data-act="logout">${esc(tr('logout'))}</button><span role="status" class="error">${esc(tr(authError))}</span>` : ''}
         <button type="button" class="btn" data-act="panel" aria-expanded="${panel}">${ICON.brush}${esc(tr('customize'))}</button>
         <div class="seg" role="group" aria-label="Language"><button type="button" data-act="lang" data-v="zh" aria-pressed="${prefs.lang === 'zh'}">中文</button><button type="button" data-act="lang" data-v="en" aria-pressed="${prefs.lang === 'en'}">EN</button></div>
       </div></nav>
-      <main class="main">${body.main}</main>${panel ? customPanel() : ''}<dialog id="report-guide" class="report-guide" aria-labelledby="guide-title"></dialog>`;
+      <main class="main">${body.main}</main>${panel ? customPanel() : ''}`;
   }
 
   // ---------- overview ----------
@@ -453,7 +436,7 @@
   async function overviewPage(ov) {
     if (!isAdmin()) {
       const data = await api('/api/topics');
-      return { main: '<header class="head"><h1 class="title">'+esc(tr('overview'))+'</h1><button type="button" class="btn primary" data-act="guideOpen" data-fresh="true">'+esc(tr('guideOpen'))+'</button></header><section class="card"><h2>'+esc(tr('topics'))+'</h2><div class="list">'+(data.topics.map((t) => '<a class="li" data-link href="/reports?topic='+enc(t.id)+'"><span>'+esc(t.label || t.id)+'</span></a>').join('') || '<p>'+esc(tr('topicEmpty'))+'</p>')+'</div><a class="btn" data-link href="/topics">'+esc(tr('topicSettings'))+'</a></section><a class="btn" data-link href="/tasks">'+esc(tr('tasks'))+'</a>' };
+      return { main: '<header class="head"><h1 class="title">'+esc(tr('overview'))+'</h1>'+guideLink({ fresh: true }, true)+'</header><section class="card"><h2>'+esc(tr('topics'))+'</h2><div class="list">'+(data.topics.map((t) => '<a class="li" data-link href="/reports?topic='+enc(t.id)+'"><span>'+esc(t.label || t.id)+'</span></a>').join('') || '<p>'+esc(tr('topicEmpty'))+'</p>')+'</div><a class="btn" data-link href="/topics">'+esc(tr('topicSettings'))+'</a></section><a class="btn" data-link href="/tasks">'+esc(tr('tasks'))+'</a>' };
     }
     const ts = ov.topics;
     const sum = (k) => ts.reduce((a, t) => a + (t[k] || 0), 0);
@@ -481,7 +464,7 @@
         <div class="mid"><div style="display:flex;align-items:baseline;gap:8px"><span class="big">${t.kept}</span><span class="muted" style="font-size:13px">${esc(tr('keptOf'))} ${num(t.collected)}</span></div><span class="spark" aria-hidden="true">${spark(t.daily)}</span></div>
         <div class="foot"><span>${esc(tr('last'))} <span class="mono" style="color:var(--text)">${esc(t.report ? t.report.period : '—')}</span></span><span>${t.last_run ? `${esc(t.last_run.job)} · ${esc(when(t.last_run.started_at))}` : esc(tr('noRuns'))}</span></div></a>`;
     }).join('');
-    const reports = ov.reports.length ? ov.reports.map((r) => `<a class="li" data-link href="/reports?topic=${enc(r.topic_id)}&period=${enc(r.period)}"><span class="when">${esc(when(r.created_at))}</span><span class="what"><span>${esc((ts.find((t) => t.id === r.topic_id) || {}).label || r.topic_id)} — ${esc(r.period)}</span><small>${esc(r.topic_id)} · ${esc(r.kind)}</small></span><span class="right">${r.media ? r.materials : r.papers} ${esc(tr(r.media ? 'materials' : 'papers'))}</span></a>`).join('') : `<div class="empty">${esc(tr('noReports'))}</div>`;
+    const reports = ov.reports.length ? ov.reports.map((r) => `<a class="li" data-link href="/reports?topic=${enc(r.topic_id)}&period=${enc(r.period)}"><span class="when">${esc(when(r.created_at))}</span><span class="what"><span>${esc((ts.find((t) => t.id === r.topic_id) || {}).label || r.label || r.topic_id)} — ${esc(r.period)}</span><small>${esc(r.topic_id)} · ${esc(r.kind)}</small></span><span class="right">${r.media ? r.materials : r.papers} ${esc(tr(r.media ? 'materials' : 'papers'))}</span></a>`).join('') : `<div class="empty">${esc(tr('noReports'))}</div>`;
     const runs = ov.runs.length ? ov.runs.map((r) => `<div class="li"><span class="when">${esc(when(r.started_at))}</span><span class="dot" style="width:9px;height:9px;background:${runColor(r.status)}"></span><span class="what"><span><span class="mono">${esc(r.topic_id || '—')}</span> <span class="muted">${esc(r.job)}</span></span><small${r.status === 'failed' ? ' style="color:var(--danger)"' : ''}>${esc(r.error || statsLine(r.stats))}</small></span><span class="right muted">${esc(dur(r.started_at, r.finished_at))}</span></div>`).join('') : `<div class="empty">${esc(tr('noRuns'))}</div>`;
     return {
       main: `<header class="head"><div style="display:flex;flex-direction:column;gap:8px"><div class="eyebrow">${esc(stamp)}</div><h1 class="title">${esc(tr('ovTitle'))}</h1>
@@ -506,17 +489,21 @@
   const reportOwner = () => isAdmin() ? new URLSearchParams(location.search).get('owner') || '' : '';
   const ownerQuery = (owner = reportOwner()) => owner && owner !== session?.user?.id ? `&owner=${enc(owner)}` : '';
   const issueHref = (topic, period, owner = reportOwner()) => `/reports?topic=${enc(topic)}&period=${enc(period)}${ownerQuery(owner)}`;
+  // The report guide lives on Help, in the React console (frontend/src/help/HelpPage.tsx reads
+  // `topic`, `task` and `new`; one of them is enough).
+  const guideHref = ({ topic = '', task = '', fresh = false } = {}) => `/help${topic ? `?topic=${enc(topic)}` : task ? `?task=${enc(task)}` : fresh ? '?new=1' : ''}#report-guide`;
+  const guideLink = (options, primary = false) => `<a class="btn${primary ? ' primary' : ''}" href="${guideHref(options)}">${esc(tr('guideOpen'))}</a>`;
 
   function firstReportGuide(topic = '') {
     if (ownerQuery()) return '';
-    return `<section class="card first-report-guide"><h2>${esc(tr('firstReport'))}</h2><p>${esc(tr('guideIntro'))}</p><button type="button" class="btn primary" data-act="guideOpen" data-topic="${esc(topic)}">${esc(tr('guideOpen'))}</button></section>`;
+    return `<section class="card first-report-guide"><h2>${esc(tr('firstReport'))}</h2><p>${esc(tr('guideIntro'))}</p>${guideLink({ topic }, true)}</section>`;
   }
 
   // ---------- persistent tasks and administrator accounts ----------
   let tasks = [], tasksTimer = null, tasksError = '', taskBusy = '', tasksRequest = 0;
   const taskStateKey = (state) => 'task' + state[0].toUpperCase() + state.slice(1);
   function taskListHtml() {
-    const rows = (items) => items.map((job) => '<article class="card task-card"><div class="card-head"><h3>'+esc(job.topic)+'</h3><span class="chip '+(['failed','interrupted'].includes(job.state) ? 'danger' : '')+'">'+esc(tr(taskStateKey(job.state)))+'</span></div><p class="setting-hint">'+esc(tr('taskCreated'))+' '+esc(when(job.created_at))+(isAdmin() ? ' · '+esc(tr('taskOwner'))+' '+esc(job.owner) : '')+'</p><p>'+esc(job.state === 'queued' ? tr('taskPosition', { n: job.position ?? '—' }) : generationStages.includes(job.stage) ? tr('guide'+job.stage[0].toUpperCase()+job.stage.slice(1)) : tr(taskStateKey(job.state)))+'</p>'+(['failed','interrupted'].includes(job.state) ? '<p class="error">'+esc(tr(job.state === 'interrupted' ? 'guideInterrupted' : 'guideFailed'))+'</p>' : '')+'<div class="settings-actions">'+(job.result?.topic && job.result?.period ? '<a class="btn primary" data-link href="'+issueHref(job.result.topic, job.result.period, job.owner)+'">'+esc(tr('guideOpenReport'))+'</a>' : '')+(job.state === 'queued' ? '<button class="btn" type="button" id="cancel-'+esc(job.id)+'" data-act="taskCancel" data-id="'+esc(job.id)+'"'+(taskBusy ? ' disabled' : '')+'>'+esc(tr('taskCancel'))+'</button>' : '')+(job.owner === session?.user?.id ? '<button class="btn" type="button" data-act="taskOpen" data-id="'+esc(job.id)+'">'+esc(tr('guideCheck'))+'</button>' : '')+'</div></article>').join('');
+    const rows = (items) => items.map((job) => '<article class="card task-card"><div class="card-head"><h3>'+esc(job.topic)+'</h3><span class="chip '+(['failed','interrupted'].includes(job.state) ? 'danger' : '')+'">'+esc(tr(taskStateKey(job.state)))+'</span></div><p class="setting-hint">'+esc(tr('taskCreated'))+' '+esc(when(job.created_at))+(isAdmin() ? ' · '+esc(tr('taskOwner'))+' '+esc(job.owner) : '')+'</p><p>'+esc(job.state === 'queued' ? tr('taskPosition', { n: job.position ?? '—' }) : generationStages.includes(job.stage) ? tr('guide'+job.stage[0].toUpperCase()+job.stage.slice(1)) : tr(taskStateKey(job.state)))+'</p>'+(['failed','interrupted'].includes(job.state) ? '<p class="error">'+esc(tr(job.state === 'interrupted' ? 'guideInterrupted' : 'guideFailed'))+'</p>' : '')+'<div class="settings-actions">'+(job.result?.topic && job.result?.period ? '<a class="btn primary" data-link href="'+issueHref(job.result.topic, job.result.period, job.owner)+'">'+esc(tr('guideOpenReport'))+'</a>' : '')+(job.state === 'queued' ? '<button class="btn" type="button" id="cancel-'+esc(job.id)+'" data-act="taskCancel" data-id="'+esc(job.id)+'"'+(taskBusy ? ' disabled' : '')+'>'+esc(tr('taskCancel'))+'</button>' : '')+(job.owner === session?.user?.id ? '<a class="btn" href="'+guideHref({ task: job.id })+'">'+esc(tr('guideCheck'))+'</a>' : '')+'</div></article>').join('');
     return '<p class="error" role="status" aria-live="polite">'+esc(tr(tasksError))+'</p>'+[true, false].map((active) => {
       const items = tasks.filter((job) => activeTask(job) === active);
       const content = items.length ? rows(items) : tasksError ? '' : '<p class="empty">'+esc(tr(active ? 'taskActiveEmpty' : 'taskHistoryEmpty'))+'</p>';
@@ -548,7 +535,7 @@
   }
   async function tasksPage() {
     await refreshTasks();
-    return { main: '<header class="head"><div class="settings-intro"><h1 id="tasks-heading" tabindex="-1" class="title">'+esc(tr('tasks'))+'</h1><p class="sub">'+esc(tr('tasksNote'))+'</p></div><div class="settings-actions"><button class="btn" type="button" data-act="tasksRefresh">'+esc(tr('taskRefresh'))+'</button><button class="btn primary" type="button" data-act="guideOpen" data-fresh="true">'+esc(tr('guideOpen'))+'</button></div></header><div id="task-list" class="task-list">'+taskListHtml()+'</div>' };
+    return { main: '<header class="head"><div class="settings-intro"><h1 id="tasks-heading" tabindex="-1" class="title">'+esc(tr('tasks'))+'</h1><p class="sub">'+esc(tr('tasksNote'))+'</p></div><div class="settings-actions"><button class="btn" type="button" data-act="tasksRefresh">'+esc(tr('taskRefresh'))+'</button>'+guideLink({ fresh: true }, true)+'</div></header><div id="task-list" class="task-list">'+taskListHtml()+'</div>' };
   }
   async function cancelTask(button) {
     if (taskBusy || !window.confirm(tr('taskCancelConfirm'))) return;
@@ -557,7 +544,6 @@
       const response = await http('/api/tasks/'+enc(taskBusy)+'/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': session.csrf_token }, body: '{}' });
       if (!response.ok) throw new Error();
       const data = await response.json();
-      if (guide.job?.id === data.job.id) { generationState(data); updateGuide(); }
       await refreshTasks();
     } catch { tasksError = 'actionFailed'; }
     finally { taskBusy = ''; updateTasks(); }
@@ -592,155 +578,7 @@
     return changeUser('/api/users/'+enc(id), 'PUT', { password: $('#password-'+id).value });
   }
 
-  // The per-user marker recovers the task or the idempotent submission after refresh.
-  const readGenerationMarker = () => { try { return JSON.parse(sessionStorage.getItem(session?.user?.id === 'local' ? 'isbe.generation' : 'isbe.generation.' + session?.user?.id) || 'null'); } catch { return null; } };
-  const guide = { open: false, step: 1, topic: '', topics: [], detail: null, model: false, loading: false, starting: false, checked: false, csrf: '', job: null, lastJobId: null, error: '', statusError: '', interrupted: false, observed: null, timer: null, request: 0 };
   const generationStages = ['collect', 'triage', 'enrich', 'digest'];
-  const guideDraft = () => settingsDirty() || topicDirty() || settingsSaving || topicBusy;
-  const guideSourceReady = () => guide.detail?.id === guide.topic && !guide.detail?.error && !!guide.detail?.config?.arxiv?.categories?.length && !!guide.detail?.config?.arxiv?.include_keywords?.length;
-  const guideCanStart = () => guide.checked && guide.csrf && !guide.loading && !guide.starting && !guide.statusError && !guide.error && !activeTask(guide.job) && guide.model && guideSourceReady() && !guideDraft();
-  function rememberGeneration(marker) {
-    guide.observed = marker;
-    try { if (marker) sessionStorage.setItem(session.user.id === 'local' ? 'isbe.generation' : 'isbe.generation.' + session.user.id, JSON.stringify(marker)); else sessionStorage.removeItem(session.user.id === 'local' ? 'isbe.generation' : 'isbe.generation.' + session.user.id); } catch { /* private mode */ }
-  }
-
-  function generationState(data) {
-    const job = data.job;
-    if (typeof data.csrf_token === 'string') guide.csrf = data.csrf_token;
-    if (job && (!job.id || !job.topic || !['queued','running','succeeded','failed','interrupted','cancelled'].includes(job.state) || !['queued', ...generationStages].includes(job.stage))) throw new Error();
-    guide.job = job || null; guide.lastJobId = job?.id || guide.lastJobId;
-    guide.interrupted = job?.state === 'interrupted';
-    if (job) guide.topic = job.topic;
-    if (activeTask(job)) rememberGeneration({ id: job.id, topic: job.topic });
-    else if (job) rememberGeneration(null);
-    guide.checked = true; guide.statusError = '';
-    if (job || guide.observed) guide.step = 3;
-  }
-
-  function guideHtml() {
-    const job = guide.job;
-    const busy = guide.starting || activeTask(job);
-    const settingsLink = isAdmin() ? `<a class="btn" data-link href="/settings">${esc(tr('settings'))} →</a>` : '';
-    const topicsLink = `<a class="btn" data-link href="/topics">${esc(tr('topicSettings'))} →</a>`;
-    const heading = `<header class="guide-head"><div><p class="eyebrow">${esc(tr('guideStep', { n: guide.step }))}</p><h2 id="guide-title" tabindex="-1">${esc(tr('firstReport'))}</h2></div><button type="button" id="guide-close" class="btn" data-act="guideClose" aria-label="${esc(tr('guideClose'))}">${ICON.close}</button></header><ol class="guide-steps">${['guideModel', 'guideTopic', 'guideGenerate'].map((key, i) => `<li${guide.step === i + 1 ? ' aria-current="step"' : ''}><span>${i + 1}</span>${esc(tr(key))}</li>`).join('')}</ol>`;
-    const warnings = `${guideDraft() ? `<p class="topic-warning">${esc(tr('guideSavedOnly'))}</p>` : ''}${guide.error ? `<p role="alert" class="error">${esc(tr(guide.error))}</p>` : ''}`;
-    let body;
-    if (guide.loading) body = `<p role="status">${esc(tr('loading'))}</p>`;
-    else if (guide.step === 1) body = `<h3>${esc(tr('guideModel'))}</h3><p>${esc(tr(isAdmin() ? 'firstModel' : 'modelManaged'))}</p><p class="${guide.model ? 'guide-ready' : 'topic-warning'}">${esc(tr(guide.model ? 'llmReady' : isAdmin() ? 'llmIncomplete' : 'modelContact'))}</p>${settingsLink}`;
-    else if (guide.step === 2) body = `<h3>${esc(tr('guideTopic'))}</h3><div class="setting-field"><label for="guide-topic">${esc(tr('topic'))}</label><select id="guide-topic" data-change="guideTopic"${busy ? ' disabled' : ''}><option value="">${esc(tr('firstChoose'))}</option>${guide.topics.map((t) => `<option value="${esc(t.id)}"${t.id === guide.topic ? ' selected' : ''}>${esc(t.label || t.id)}</option>`).join('')}</select></div><p>${esc(tr(!guide.topic ? 'firstChoose' : guide.detail?.config && !guide.detail.config.arxiv ? 'firstArticles' : guideSourceReady() ? 'guideSourceReady' : 'guideSourceInvalid'))}</p>${topicsLink}`;
-    else {
-      const noData = job?.error === "No papers remain in this topic's current window. Review its sources, keywords and filters in Topics, then try again.";
-      const outcome = guide.statusError || (guide.interrupted ? 'guideInterrupted' : guide.starting ? 'guideStarting' : job?.state === 'queued' ? 'taskQueued' : job?.state === 'cancelled' ? 'taskCancelled' : job?.state === 'running' ? 'guideRunning' : job?.state === 'succeeded' && job.result?.topic && job.result?.period ? 'guideComplete' : job ? noData ? 'guideNoData' : 'guideFailed' : guide.observed?.requestId ? 'taskUnknown' : 'guideStartNote');
-      const index = generationStages.indexOf(job?.stage);
-      body = `<h3>${esc(tr('guideGenerate'))}</h3><p><b>${esc(guide.topics.find((t) => t.id === (job?.topic || guide.topic))?.label || job?.topic || guide.topic)}</b></p><p id="generation-status" role="status" aria-live="polite" aria-atomic="true">${esc(tr(outcome, { topic: job?.topic || guide.topic }))}${job?.state === 'queued' ? ` · ${esc(tr('taskPosition', { n: job.position ?? '—' }))}` : ''}</p>${job && !guide.interrupted ? `<ol class="generation-stages">${generationStages.map((stage, i) => {
-        const state = job.state === 'succeeded' || i < index ? 'guideDone' : i === index ? !activeTask(job) ? 'guideStopped' : 'guideCurrent' : 'guideWaiting';
-        return `<li${i === index && job.state === 'running' ? ' aria-current="step"' : ''}><span>${esc(tr(`guide${stage[0].toUpperCase()}${stage.slice(1)}`))}</span><small>${esc(tr(state))}</small></li>`;
-      }).join('')}</ol>` : ''}${busy ? `<p class="setting-hint">${esc(tr('guideBackground'))}</p><a class="btn" data-link href="/tasks">${esc(tr('tasks'))}</a>` : ''}${job?.state === 'succeeded' && job.result?.topic && job.result?.period ? `<a class="btn primary" data-link href="${issueHref(job.result.topic, job.result.period, job.owner)}">${esc(tr('guideOpenReport'))} →</a>` : guide.interrupted ? `<a class="btn" data-link href="/reports?topic=${enc(guide.topic)}">${esc(tr('guideViewReports'))} →</a>` : ''}${job?.state === 'failed' ? `<div class="settings-actions">${noData && isAdmin() && job.owner === session?.user?.id ? `<a class="btn" data-link href="/triage?topic=${enc(job.topic)}">${esc(tr('guideReviewTriage'))} →</a>` : ''}${topicsLink}${settingsLink}</div>` : ''}`;
-    }
-    return `${heading}<section class="guide-body">${body}${warnings}</section><footer class="guide-actions">${guide.step > 1 && !busy ? `<button type="button" id="guide-back" class="btn" data-act="guideBack">${esc(tr('guideBack'))}</button>` : ''}<button type="button" id="guide-check" class="btn" data-act="guideCheck"${guide.loading || guide.starting ? ' disabled' : ''}>${esc(tr('guideCheck'))}</button>${guide.step < 3 ? `<button type="button" id="guide-next" class="btn primary" data-act="guideNext"${guide.loading || guide.error || guideDraft() || (guide.step === 1 ? !guide.model : !guideSourceReady()) ? ' disabled' : ''}>${esc(tr('guideNext'))} →</button>` : job?.state === 'succeeded' || activeTask(job) ? `<button type="button" class="btn" data-act="guideAgain">${esc(tr(activeTask(job) ? 'taskNew' : 'guideAgain'))}</button>` : `<button type="button" id="guide-start" class="btn primary" data-act="guideStart"${guideCanStart() ? '' : ' disabled'}>${esc(tr(guide.starting ? 'guideStarting' : 'guideGenerate'))}</button>`}</footer>`;
-  }
-
-  function updateGuide(focus = false) {
-    if (!guide.open) return;
-    const dialog = $('#report-guide');
-    if (!dialog) return;
-    const active = dialog.contains(document.activeElement) ? document.activeElement.id : '';
-    const html = guideHtml();
-    if (dialog.innerHTML !== html) {
-      dialog.innerHTML = html;
-      if (active) { const target = $(`#${active}`); (target && !target.disabled ? target : $('#guide-title'))?.focus(); }
-    }
-    if (!dialog.open) dialog.showModal();
-    if (focus) $('#guide-title')?.focus();
-  }
-
-  function closeGuide() {
-    guide.open = false;
-    clearTimeout(guide.timer);
-    $('#report-guide')?.close();
-  }
-
-  function scheduleGenerationCheck() {
-    clearTimeout(guide.timer);
-    if (guide.open && activeTask(guide.job) && !guide.statusError) guide.timer = setTimeout(checkGeneration, 2000);
-  }
-
-  async function checkGeneration() {
-    const request = guide.request;
-    try {
-      const id = guide.job?.id || guide.observed?.id;
-      const response = await http(id ? '/api/tasks/'+enc(id) : '/api/tasks', { cache: 'no-store' });
-      if (!response.ok && response.status !== 404) throw new Error();
-      const data = response.status === 404 ? { job: null } : await response.json();
-      if (request !== guide.request || !session?.user) return;
-      if (!id) data.job = guide.observed?.requestId ? null : (data.tasks || []).find((job) => job.owner === session.user.id && (!guide.topic || job.topic === guide.topic));
-      generationState(data);
-      if (id && !data.job) { guide.interrupted = true; guide.step = 3; rememberGeneration(null); }
-    } catch { if (request === guide.request && session?.user) { guide.checked = false; guide.statusError = 'guideUnavailable'; guide.step = 3; } }
-    updateGuide(); scheduleGenerationCheck();
-  }
-
-  async function loadGuide() {
-    const request = ++guide.request;
-    guide.loading = true; guide.error = ''; updateGuide();
-    try {
-      const responses = await Promise.all(['/api/session', '/api/topics'].map((url) => http(url, { cache: 'no-store' })));
-      if (responses.some((r) => !r.ok)) throw new Error();
-      const [currentSession, topics] = await Promise.all(responses.map((r) => r.json()));
-      if (request !== guide.request) return;
-      guide.model = currentSession.llm?.ready === true; guide.csrf = currentSession.csrf_token || guide.csrf;
-      guide.topics = topics.topics;
-      if (!guide.topic) guide.topic = guide.job?.topic || guide.topics[0]?.id || '';
-      guide.detail = null;
-      if (guide.topic) {
-        const response = await http(`/api/topics/${enc(guide.topic)}`, { cache: 'no-store' });
-        if (!response.ok) throw new Error();
-        const detail = await response.json();
-        if (request !== guide.request) return;
-        guide.detail = detail;
-      }
-    } catch { if (request === guide.request) guide.error = 'guideLoadFailed'; }
-    finally { if (request === guide.request) { guide.loading = false; updateGuide(); } }
-  }
-
-  async function openGuide(topic = '', fresh = false) {
-    if (!session?.user || ownerQuery()) return;
-    ++guide.request;
-    if (fresh || (topic && topic !== guide.topic && topic !== guide.observed?.topic)) { guide.job = null; guide.observed = null; guide.lastJobId = null; }
-    guide.open = true; guide.topic = topic || (fresh ? '' : guide.topic); guide.step = 1;
-    guide.error = ''; guide.statusError = ''; guide.checked = false; guide.interrupted = false;
-    updateGuide(true);
-    if (!fresh) await checkGeneration();
-    else { guide.checked = true; guide.csrf = session.csrf_token; }
-    await loadGuide();
-  }
-  async function openTask(button) {
-    const job = tasks.find((item) => item.id === button.dataset.id);
-    if (!job || job.owner !== session?.user?.id) return;
-    guide.job = job; guide.observed = { id: job.id, topic: job.topic }; guide.topic = job.topic;
-    await openGuide(job.topic);
-  }
-  async function startGeneration() {
-    if (!guideCanStart()) return;
-    const requestId = guide.observed?.requestId || Array.from(crypto.getRandomValues(new Uint8Array(16)), (v) => v.toString(16).padStart(2, '0')).join('');
-    const owner = session.user.id;
-    guide.starting = true; guide.error = ''; guide.interrupted = false;
-    rememberGeneration({ topic: guide.topic, requestId });
-    updateGuide();
-    try {
-      const response = await http('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': guide.csrf }, body: JSON.stringify({ topic: guide.topic, request_id: requestId }) });
-      const data = await response.json();
-      if (session?.user?.id !== owner) return;
-      if (response.ok || (response.status === 409 && data.code === 'busy')) {
-        if (!data.job) throw new Error();
-        generationState(data);
-      } else if (response.status < 500) {
-        rememberGeneration(null);
-        guide.error = { configuration: 'llmIncomplete', invalid_topic: 'guideSourceInvalid', unsupported_topic: 'firstArticles' }[data.code] || 'guideStartFailed';
-      } else await checkGeneration();
-    } catch { if (session?.user?.id === owner) await checkGeneration(); }
-    finally { guide.starting = false; if (session?.user?.id === owner) { if (guide.detail?.id !== guide.topic) await loadGuide(); updateGuide(); scheduleGenerationCheck(); if (location.pathname === '/tasks') await refreshTasks(); } }
-  }
 
   async function shelfPage(ov, q) {
     const all = await api(`/api/reports${ownerQuery() ? '?' + ownerQuery().slice(1) : ''}`);
@@ -761,7 +599,7 @@
         <div class="shelf">${issues.map(cover).join('')}</div></section>`;
     }).join('');
     return {
-      main: `<header class="head"><div style="display:flex;flex-direction:column;gap:6px"><div class="eyebrow">${esc(tr('shelfEyebrow'))}</div><h1 class="title">${esc(tr('shelf'))}</h1></div>${!ownerQuery() ? `<button type="button" class="btn" data-act="guideOpen" data-topic="${esc(topic)}">${esc(tr('guideOpen'))}</button>` : ''}</header>
+      main: `<header class="head"><div style="display:flex;flex-direction:column;gap:6px"><div class="eyebrow">${esc(tr('shelfEyebrow'))}</div><h1 class="title">${esc(tr('shelf'))}</h1></div>${!ownerQuery() ? guideLink({ topic }) : ''}</header>
         <nav class="filters" aria-label="${esc(tr('topics'))}">${chips}</nav>${groups}`,
     };
   }
@@ -841,7 +679,7 @@
           ${!ownerQuery() ? `<button type="button" class="btn" data-act="mailOpen" data-topic="${esc(r.topic)}" data-period="${esc(r.period)}"${mailBusy ? ' disabled' : ''}>${esc(tr('mailOpen'))}</button>` : ''}
           <a class="btn" href="/api/report.md?topic=${enc(r.topic)}&period=${enc(r.period)}${ownerQuery()}" download>${esc(tr('download'))}</a></div></div>
         <div class="row" style="gap:24px"><div style="flex:999 1 560px;min-width:0;max-width:860px;display:flex;flex-direction:column;gap:16px">
-          ${mailDraft && !mailDraft.test && mailDraft.topic === r.topic && mailDraft.period === r.period ? mailForm() : ''}
+          ${mailDraft && mailDraft.topic === r.topic && mailDraft.period === r.period ? mailForm() : ''}
           <article class="paper"><div class="sheet-head"><span>ISBE · ${esc(tr(r.kind))}${r.show_period === false ? '' : ` · ${esc(r.period)}`}</span><span>${esc(label)}</span></div>${doc.body.innerHTML}</article>
           <nav class="pager no-print" aria-label="${esc(tr('issues'))}">${pager('')}</nav></div>
           <aside class="issues no-print" aria-label="Report history"><div class="card" style="gap:4px"><h2 style="margin-bottom:8px">${esc(tr('issues'))}</h2>${issues}</div>
@@ -978,8 +816,8 @@
     if (!d) return '';
     const finished = ['accepted', 'unknown'].includes(mailResult?.state);
     return `<form id="mail-form" class="card settings-form no-print" aria-labelledby="mail-heading"><fieldset${mailBusy ? ' disabled' : ''}>
-      <h2 id="mail-heading">${esc(tr(d.test ? 'mailTest' : 'mailOpen'))}</h2>
-      ${!d.test ? `<p>${esc(tr('topic'))}: <b>${esc(d.topic)}</b> · ${esc(tr('mailPeriod'))}: <b>${esc(d.period)}</b></p>` : ''}
+      <h2 id="mail-heading">${esc(tr('mailOpen'))}</h2>
+      <p>${esc(tr('topic'))}: <b>${esc(d.topic)}</b> · ${esc(tr('mailPeriod'))}: <b>${esc(d.period)}</b></p>
       <p>${esc(tr('mailSubject'))}: <b>${esc(d.subject)}</b></p><p>${esc(tr('mailSender'))}: ${esc(d.sender || tr('off'))}</p>
       <div class="setting-field"><label for="mail-recipients">${esc(tr('mailRecipients'))}</label><input id="mail-recipients" type="text" value="${esc(d.recipients)}" maxlength="4096" autocomplete="off" aria-describedby="mail-hint"${finished ? ' disabled' : ''}><p id="mail-hint" class="setting-hint">${esc(tr('mailRecipientsHint'))} ${esc(tr('mailNote'))}</p></div>
       ${!d.configured ? `<p class="error">${esc(d.message || tr('off'))}</p>` : ''}
@@ -987,11 +825,11 @@
       <p id="mail-status" role="status" aria-live="polite"${mailError || mailResult?.state === 'failed' ? ' class="error"' : ''}>${esc(mailError || (mailBusy ? tr('mailSending') : mailResult ? tr({ accepted: 'mailAccepted', failed: 'mailFailed', unknown: 'mailUnknown' }[mailResult.state] || 'mailUnknown') : ''))}${mailResult?.state === 'failed' ? ` ${esc(mailResult.message)}` : ''}${mailResult?.request_id ? ` ${esc(tr('mailRequest'))}: ${esc(mailResult.request_id)}` : ''}</p>
       </fieldset></form>`;
   }
-  async function openMail(button, test = false) {
+  async function openMail(button) {
     if (mailBusy) return;
     mailBusy = true; mailResult = null; mailError = '';
-    mailDraft = { test, topic: button.dataset.topic || '', period: button.dataset.period || '', recipients: '', configured: false };
-    mailDraft.subject = test ? 'ISBE · 邮件配置测试 / Email test' : `ISBE · ${mailDraft.topic} · ${mailDraft.period}`;
+    mailDraft = { topic: button.dataset.topic || '', period: button.dataset.period || '', recipients: '', configured: false };
+    mailDraft.subject = `ISBE · ${mailDraft.topic} · ${mailDraft.period}`;
     await render();
     try {
       const response = await http('/api/mail');
@@ -1007,113 +845,17 @@
     const recipients = [...new Map(mailDraft.recipients.split(/[,;\s]+/).filter(Boolean).map((v) => [v.toLowerCase(), v])).values()].join(', ');
     if (!recipients) { mailError = tr('mailRequired'); await render(); return; }
     const d = { ...mailDraft, recipients };
-    const confirmation = `${tr('mailConfirm')}\n${!d.test ? `${tr('topic')}: ${d.topic}\n${tr('mailPeriod')}: ${d.period}\n` : ''}${tr('mailSubject')}: ${d.subject}\n${tr('mailRecipients')}: ${recipients}`;
+    const confirmation = `${tr('mailConfirm')}\n${tr('topic')}: ${d.topic}\n${tr('mailPeriod')}: ${d.period}\n${tr('mailSubject')}: ${d.subject}\n${tr('mailRecipients')}: ${recipients}`;
     if (!window.confirm(confirmation)) return;
     mailDraft.recipients = recipients; mailBusy = true; mailError = ''; mailResult = null;
     await render();
     try {
-      const response = await http(`/api/mail/${d.test ? 'test' : 'report'}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': d.csrf }, body: JSON.stringify(d.test ? { recipients } : { topic: d.topic, period: d.period, recipients }) });
+      const response = await http('/api/mail/report', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': d.csrf }, body: JSON.stringify({ topic: d.topic, period: d.period, recipients }) });
       const result = await response.json();
       if (!response.ok) { mailResult = { state: response.status >= 500 ? 'unknown' : 'failed', message: result.error || tr('mailFailed') }; }
       else mailResult = ['accepted', 'failed', 'unknown'].includes(result.state) ? result : { state: 'unknown' };
     } catch { mailResult = { state: 'unknown' }; }
     finally { mailBusy = false; await render(); $('#mail-status')?.focus(); }
-  }
-
-  // ---------- service settings ----------
-  const PROVIDER_KEYS = { anthropic: 'ANTHROPIC_API_KEY', deepseek: 'DEEPSEEK_API_KEY', openai: 'OPENAI_API_KEY' };
-  const SECRET_SETTINGS = new Set([...Object.values(PROVIDER_KEYS), 'GITHUB_TOKEN', 'ZEPTOMAIL_TOKEN', 'SMTP_PASSWORD']);
-  let settingsSnapshot = null;
-  let settingsEdits = {};
-  let settingsSaving = false;
-  let settingsNotice = '';
-  let settingsError = '';
-  let settingsAdvanced = false;
-  let settingsSourcesAdvanced = false;
-  const settingsDirty = () => Object.keys(settingsEdits).length > 0;
-  const settingsValue = (key) => {
-    if (key in settingsEdits && settingsEdits[key] !== null) return settingsEdits[key];
-    const provider = settingsEdits.ISBE_LLM_PROVIDER || settingsSnapshot.values.ISBE_LLM_PROVIDER;
-    const defaults = settingsSnapshot.provider_defaults?.[provider];
-    if ((settingsEdits[key] === null || (settingsSnapshot.sources[key] || 'default') === 'default') && defaults && key in defaults) return defaults[key];
-    return key in settingsEdits ? '' : settingsSnapshot.values[key] ?? '';
-  };
-
-  function settingsField(key, label, type = 'text') {
-    const source = settingsSnapshot.sources[key] || 'default';
-    const secret = SECRET_SETTINGS.has(key);
-    const removing = secret && settingsEdits[key] === null;
-    const locked = source === 'environment';
-    const value = secret ? settingsEdits[key] ?? '' : settingsValue(key);
-    const attrs = `id="setting-${key}" name="${key}" data-setting="${key}" aria-describedby="hint-${key}"${locked || removing ? ' disabled' : ''}`;
-    const control = type === 'select'
-      ? `<select ${attrs}>${Object.entries(key === 'ISBE_ARTICLE_DNS' ? { system:'articleDnsSystem', cloudflare:'articleDnsCloudflare' } : key === 'EMAIL_TRANSPORT' ? { smtp: 'smtp', zeptomail_api: 'zeptomail_api' } : key === 'SMTP_SECURITY' ? { tls: 'tls', starttls: 'starttls' } : key === 'ISBE_LLM_NO_AUTH' ? { false: 'authRequired', true: 'authNone' } : key === 'ISBE_FULLTEXT_EXTRACTOR' ? { llm: 'extractorLlm', metrail: 'extractorMetrail', off: 'extractorOff' } : { anthropic: 'Anthropic', deepseek: 'DeepSeek', openai: 'OpenAI / compatible' }).map(([v, name]) => `<option value="${v}"${value === v ? ' selected' : ''}>${esc(tr(name))}</option>`).join('')}</select>`
-      : type === 'textarea'
-        ? `<textarea ${attrs} rows="4" spellcheck="false" placeholder="{}">${esc(value)}</textarea>`
-        : `<input ${attrs} type="${secret ? 'password' : type}" value="${esc(value)}"${type === 'number' ? ' min="1" step="1"' : ''} ${secret ? `autocomplete="new-password" placeholder="${esc(tr(settingsSnapshot.configured[key] ? 'keepSecret' : 'newSecret'))}"` : 'autocomplete="off"'} spellcheck="false">`;
-    const sourceLabel = { environment: 'sourceEnvironment', file: 'sourceFile', default: 'sourceDefault' }[source] || 'sourceDefault';
-    const hint = [locked ? tr('environmentLock') : removing ? tr('removingSecret') : secret ? tr(settingsSnapshot.configured[key] ? 'keepSecret' : 'newSecret') : '', key === 'METRAIL_API_URL' ? tr('metrailRequired') : key === 'ISBE_ARTICLE_DNS' ? tr('articleDnsNote') : ''].filter(Boolean).join(' ');
-    return `<div class="setting-field${type === 'textarea' ? ' wide' : ''}"><div class="setting-label"><label for="setting-${key}">${esc(tr(label))}</label><span class="chip plain">${esc(tr(sourceLabel))}${secret ? ` · ${esc(tr(settingsSnapshot.configured[key] ? 'online' : 'off'))}` : ''}</span></div>${control}<div class="setting-hint" id="hint-${key}">${esc(hint)}</div>${secret && !locked && (settingsSnapshot.configured[key] || removing) ? `<button type="button" class="setting-remove" data-act="removeSecret" data-key="${key}">${esc(tr(removing ? 'undoRemove' : 'removeSecret'))}</button>` : ''}</div>`;
-  }
-
-  async function settingsPage() {
-    if (!settingsSnapshot) settingsSnapshot = await api('/api/settings');
-    if (!settingsSnapshot) throw new Error(tr('settingsUnavailable'));
-    const extractor = settingsValue('ISBE_FULLTEXT_EXTRACTOR');
-    return { main: `<header class="head"><div class="settings-intro"><div class="eyebrow">ISBE · ${esc(tr('settings'))}</div><h1 class="title">${esc(tr('settings'))}</h1><p class="sub">${esc(tr('settingsNote'))}</p></div><div class="settings-actions"><button type="button" class="btn" data-act="guideOpen">${esc(tr('guideOpen'))}</button><a class="btn" data-link href="/topics">${esc(tr('topicSettings'))} →</a></div></header>
-      <form id="settings-form" class="settings-form"><fieldset${settingsSaving ? ' disabled' : ''}>
-        <section class="card settings-section" aria-labelledby="llm-settings-h"><div class="settings-section-head"><span class="settings-index mono" aria-hidden="true">01</span><div><h2 id="llm-settings-h">${esc(tr('llmSettings'))}</h2><p>${esc(tr('llmSettingsNote'))}</p></div></div>
-          <div class="settings-grid">${settingsField('ISBE_LLM_PROVIDER', 'provider', 'select')}${settingsField('ISBE_LLM_BASE_URL', 'baseUrl', 'url')}${settingsField(PROVIDER_KEYS[settingsValue('ISBE_LLM_PROVIDER')], 'API key')}</div>
-          ${settingsValue('ISBE_LLM_PROVIDER') === 'openai' ? `<div class="settings-grid">${settingsField('ISBE_LLM_NO_AUTH', 'noAuth', 'select')}</div><p class="settings-storage">${esc(tr('noAuthNote'))}</p>` : ''}<p class="settings-storage">${esc(tr('providerDefaultsNote'))}</p><p id="llm-readiness" role="status">${esc(tr(settingsDirty() ? 'llmUnsaved' : settingsSnapshot.llm?.ready ? 'llmReady' : 'llmIncomplete'))}${!settingsDirty() && settingsSnapshot.llm?.error ? `: ${esc(settingsSnapshot.llm.error)}` : ''}</p>
-          <details id="settings-advanced"${settingsAdvanced ? ' open' : ''}><summary>${esc(tr('advanced'))}</summary><div class="settings-grid">${settingsField('ISBE_LLM_MODEL_FAST', 'fastModel')}${settingsField('ISBE_LLM_MODEL_SMART', 'smartModel')}${settingsField('ISBE_LLM_MAX_TOKENS', 'maxTokens', 'number')}${settingsField('ISBE_LLM_TIMEOUT_S', 'timeout', 'number')}${settingsField('ISBE_LLM_EXTRA_BODY', 'extraBody', 'textarea')}</div></details>
-        </section>
-        <section class="card settings-section" aria-labelledby="fulltext-settings-h"><div class="settings-section-head"><span class="settings-index mono" aria-hidden="true">02</span><div><h2 id="fulltext-settings-h">${esc(tr('fulltextSettings'))}</h2></div></div><div class="settings-grid">${settingsField('ISBE_FULLTEXT_EXTRACTOR', 'extractor', 'select')}${extractor === 'metrail' ? settingsField('METRAIL_API_URL', 'metrailUrl', 'url') : ''}</div><p class="settings-storage">${esc(tr({ llm: 'extractorLlmNote', metrail: 'extractorMetrailNote', off: 'extractorOffNote' }[extractor] || 'extractorLlmNote'))}</p>${extractor === 'llm' ? `<p class="settings-storage">${esc(tr('extractorLlmFigures'))}</p>` : ''}${settingsSnapshot.sources.ISBE_FULLTEXT_EXTRACTOR === 'default' && !('ISBE_FULLTEXT_EXTRACTOR' in settingsEdits) ? `<p class="settings-storage">${esc(tr('extractorDefaultNote'))}</p>` : ''}</section>
-        <section class="card settings-section" aria-labelledby="sources-settings-h"><div class="settings-section-head"><span class="settings-index mono" aria-hidden="true">03</span><div><h2 id="sources-settings-h">${esc(tr('sourceSettings'))}</h2><p>${esc(tr('sourceSettingsNote'))}</p></div></div><div class="settings-grid">${settingsField('ESSAIES_URL', 'essaiesUrl', 'url')}${settingsField('GITHUB_TOKEN', 'githubToken')}</div><details id="settings-sources-advanced"${settingsSourcesAdvanced ? ' open' : ''}><summary>${esc(tr('sourceAdvanced'))}</summary><div class="settings-grid">${settingsField('ARXIV_API_URL', 'arxivUrl', 'url')}${settingsField('GITHUB_API_URL', 'githubUrl', 'url')}</div></details><h3>${esc(tr('webSearch'))}</h3><p class="settings-storage">${esc(tr('webSearchSourceNote'))}</p><div class="settings-grid">${settingsField('SEARXNG_URL', 'webSearchSearxng', 'url')}${settingsField('ISBE_ARTICLE_DNS', 'articleDns', 'select')}</div></section>
-        <section class="card settings-section" aria-labelledby="mail-settings-h"><h2 id="mail-settings-h">${esc(tr('mailSettings'))}</h2><p>${esc(tr('mailNote'))}</p><p>${esc(tr(settingsSnapshot.mail?.configured ? 'online' : 'off'))}${settingsSnapshot.mail?.sender ? ` · ${esc(settingsSnapshot.mail.sender)}` : ''}</p>${settingsSnapshot.mail?.message ? `<p class="error">${esc(settingsSnapshot.mail.message)}</p>` : ''}<div class="settings-grid">${settingsField('EMAIL_TRANSPORT', 'mailTransport', 'select')}${(settingsValue('EMAIL_TRANSPORT') || 'smtp') === 'smtp' ? `${settingsField('SMTP_HOST', 'mailHost')}${settingsField('SMTP_PORT', 'mailPort', 'number')}${settingsField('SMTP_SECURITY', 'mailSecurity', 'select')}${settingsField('SMTP_USER', 'mailUser')}${settingsField('SMTP_PASSWORD', 'mailPassword')}` : `${settingsField('ZEPTOMAIL_API_URL', 'mailEndpoint', 'url')}${settingsField('ZEPTOMAIL_TOKEN', 'mailToken')}`}${settingsField('SMTP_FROM', 'mailSender', 'email')}${settingsField('SMTP_FROM_NAME', 'mailSenderName')}${settingsField('ISBE_EMAIL_DEFAULT_RECIPIENTS', 'mailDefault')}</div>${(settingsValue('EMAIL_TRANSPORT') || 'smtp') === 'smtp' ? `<p class="settings-storage">${esc(tr('mailSmtpNote'))}</p>` : ''}<button type="button" class="btn" data-act="mailTest"${mailBusy ? ' disabled' : ''}>${esc(tr('mailTest'))}</button></section>
-        <p class="settings-storage">${esc(tr('settingsStorage'))}</p>
-        <div class="settings-actions"><button type="submit" class="btn primary" id="settings-save"${!settingsDirty() ? ' disabled' : ''}>${esc(tr(settingsSaving ? 'savingSettings' : 'saveSettings'))}</button><button type="button" class="btn" id="settings-discard" data-act="discardSettings"${!settingsDirty() ? ' disabled' : ''}>${esc(tr('discardSettings'))}</button><p id="settings-status" role="status" aria-live="polite"${settingsError ? ' class="error"' : ''}>${esc(settingsError || tr(settingsSaving ? 'savingSettings' : settingsNotice || (settingsDirty() ? 'unsavedSettings' : '')))}</p></div>
-      </fieldset></form>${mailDraft?.test ? mailForm() : ''}` };
-  }
-
-  function editSetting(el) {
-    const key = el.dataset.setting;
-    if (!key || !settingsSnapshot || settingsSaving || settingsSnapshot.sources[key] === 'environment') return;
-    const value = el.value;
-    // An explicit method must stay fixed when a hidden metrail URL changes its inferred default.
-    const explicitDefault = (settingsSnapshot.sources[key] || 'default') === 'default' && (key === 'ISBE_FULLTEXT_EXTRACTOR' || ['ISBE_LLM_BASE_URL', 'ISBE_LLM_MODEL_FAST', 'ISBE_LLM_MODEL_SMART'].includes(key));
-    if (SECRET_SETTINGS.has(key) ? value === '' : !explicitDefault && value === (settingsSnapshot.values[key] ?? '')) delete settingsEdits[key];
-    else settingsEdits[key] = value || null;
-    settingsNotice = '';
-    settingsError = '';
-    const status = $('#settings-status');
-    if (status) { status.textContent = settingsDirty() ? tr('unsavedSettings') : ''; status.className = ''; }
-    if ($('#llm-readiness')) $('#llm-readiness').textContent = tr('llmUnsaved');
-    for (const id of ['#settings-save', '#settings-discard']) if ($(id)) $(id).disabled = !settingsDirty();
-  }
-
-  async function saveSettings(e) {
-    if (e.target.id !== 'settings-form') return;
-    e.preventDefault();
-    if (settingsSaving || !settingsDirty()) return;
-    const extra = settingsEdits.ISBE_LLM_EXTRA_BODY;
-    if (extra) {
-      try { const v = JSON.parse(extra); if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error(); }
-      catch { settingsError = tr('invalidExtraBody'); settingsAdvanced = true; await render(); $('#setting-ISBE_LLM_EXTRA_BODY')?.focus(); return; }
-    }
-    settingsSaving = true;
-    settingsError = '';
-    await render();
-    try {
-      const r = await http('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-ISBE-CSRF': settingsSnapshot.csrf_token }, body: JSON.stringify(settingsEdits) });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error || String(r.status));
-      settingsSnapshot = data;
-      settingsEdits = {};
-      settingsNotice = 'savedSettings';
-      memo.delete('/api/settings');
-      memo.delete('/api/overview');
-    } catch (err) { settingsError = err.message; }
-    finally { settingsSaving = false; await render(); $('#settings-status')?.scrollIntoView({ block: 'nearest' }); }
   }
 
   // ---------- topic configuration ----------
@@ -1191,7 +933,7 @@
   async function topicsPage() {
     if (!topicsSnapshot) topicsSnapshot = await api('/api/topics');
     if (!topicsSnapshot) throw new Error(tr('topicMissing'));
-    return { main: `<header class="head"><div class="settings-intro"><div class="eyebrow">ISBE · ${esc(tr('topicSettings'))}</div><h1 class="title">${esc(tr('topicSettings'))}</h1><p class="sub">${esc(tr(isAdmin() ? 'topicSettingsNote' : 'topicOwnNote'))}</p></div><div class="settings-actions"><button type="button" class="btn" data-act="guideOpen" data-topic="${esc(topicDetail?.id || '')}">${esc(tr('guideOpen'))}</button>${isAdmin() ? `<a class="btn" data-link href="/settings">${esc(tr('settings'))} →</a>` : ''}</div></header>
+    return { main: `<header class="head"><div class="settings-intro"><div class="eyebrow">ISBE · ${esc(tr('topicSettings'))}</div><h1 class="title">${esc(tr('topicSettings'))}</h1><p class="sub">${esc(tr(isAdmin() ? 'topicSettingsNote' : 'topicOwnNote'))}</p></div><div class="settings-actions">${guideLink({ topic: topicDetail?.id || '' })}${isAdmin() ? `<a class="btn" href="/settings">${esc(tr('settings'))} →</a>` : ''}</div></header>
       <div class="topics-editor"><aside class="card topic-sidebar"><button type="button" class="btn primary" data-act="topicNew"${topicBusy ? ' disabled' : ''}>+ ${esc(tr('topicNew'))}</button><div class="setting-field"><label for="topic-search">${esc(tr('topicSearch'))}</label><input type="search" id="topic-search" data-input="topicSearch" value="${esc(topicSearch)}" autocomplete="off"></div><div id="topic-list" class="topic-list">${topicListHtml()}</div></aside><div class="topic-editor"><p id="topic-status" class="${topicError || topicConflict ? 'error' : 'topic-status'}" role="status" aria-live="polite" tabindex="-1">${esc(topicStatus())}</p>${topicForm()}${topicNotice === 'topicSaved' && topicDetail?.id ? firstReportGuide(topicDetail.id) : ''}</div></div>` };
   }
 
@@ -1292,7 +1034,6 @@
     const invalid = validateTopic(config);
     if (invalid) { topicError = tr(invalid[0]); topicConflict = false; if (invalid[1].startsWith('retrieval.')) topicRulesOpen = true; await render(); $(`#topic-${invalid[1].replaceAll('.', '-')}`)?.focus(); return; }
     const creating = topicDetail.id === null;
-    let createdId = '';
     topicBusy = true; topicError = ''; topicNotice = ''; topicConflict = false;
     await render();
     try {
@@ -1300,10 +1041,8 @@
       acceptTopic(detail);
       topicsSnapshot.topics = topicsSnapshot.topics.filter((t) => t.id !== detail.id).concat({ id: detail.id, label: detail.config.label, active: detail.config.active !== false, revision: detail.revision, error: detail.error }).sort((a, b) => a.id.localeCompare(b.id));
       memo.clear(); topicNotice = 'topicSaved';
-      if (creating) createdId = detail.id;
     } catch (err) { topicError = err.message; topicConflict = err.status === 409 && topicDetail.id !== null; }
     finally { topicBusy = false; await render(); $('#topic-status')?.focus(); }
-    if (createdId) await openGuide(createdId);
   }
 
   async function deleteTopic() {
@@ -1448,7 +1187,7 @@
   }
   function searchReadinessHtml() {
     // A plan saved for Baidu (removed) still loads; the server refuses to save or run it.
-    return `${searchDraft?.provider === 'baidu' ? `<p class="error">${esc(tr('webSearchBaiduRemovedHint'))}</p>` : `<p>${esc(tr(searchConfigured() ? 'webSearchReady' : 'webSearchUnavailable'))}</p>`}<a data-link href="/settings#sources-settings-h">${esc(tr('webSearchSettings'))} →</a>`;
+    return `${searchDraft?.provider === 'baidu' ? `<p class="error">${esc(tr('webSearchBaiduRemovedHint'))}</p>` : `<p>${esc(tr(searchConfigured() ? 'webSearchReady' : 'webSearchUnavailable'))}</p>`}<a href="/settings#sources-settings-h">${esc(tr('webSearchSettings'))} →</a>`;
   }
   function searchField(key, label, type = 'text') {
     return `<div class="setting-field"><label for="search-${key}">${esc(tr(label))}</label><input id="search-${key}" data-search="${key}" type="${type}" value="${esc(searchDraft[key])}"${key === 'id' && searchDetail ? ' disabled' : ''}${['name','topic'].includes(key) ? ' maxlength="120"' : ''}${['region','institution'].includes(key) ? ' maxlength="60"' : ''}${type === 'number' ? ' min="1" max="20" step="1"' : ''}${['region','institution'].includes(key) ? '' : ' required'}></div>`;
@@ -1786,7 +1525,7 @@
   }
 
   // ---------- routing ----------
-  const PAGES = { '/': overviewPage, '/reports': reportPage, '/triage': triagePage, '/runs': runsPage, '/settings': settingsPage, '/topics': topicsPage, '/tasks': tasksPage, '/users': usersPage, '/sources': sourcesPage };
+  const PAGES = { '/overview': overviewPage, '/reports': reportPage, '/triage': triagePage, '/runs': runsPage, '/topics': topicsPage, '/tasks': tasksPage, '/users': usersPage, '/sources': sourcesPage };
   let seq = 0;
   let historyIndex = Number(history.state?.isbeIndex) || 0;
   let restoringHistory = false;
@@ -1795,40 +1534,30 @@
   async function render() {
     const mine = ++seq;
     applyTheme();
-    let page = PAGES[location.pathname] ? location.pathname : '/';
+    let page = PAGES[location.pathname] ? location.pathname : '/overview';
     clearTimeout(tasksTimer);
     clearTimeout(sourceTimer);
     try { await getSession(); } catch { authError = 'sessionUnavailable'; }
     if (mine !== seq) return;
     if (!session?.user) { $('#app').innerHTML = loginHtml(); document.title = 'ISBE · '+tr('login'); return; }
-    if ((!isAdmin() && ['/settings','/runs','/triage','/users','/sources'].includes(page)) || (page === '/users' && session.mode !== 'shared')) {
-      page = '/'; history.replaceState(history.state, '', '/'); currentPage = '/';
+    if ((!isAdmin() && ['/runs','/triage','/users','/sources'].includes(page)) || (page === '/users' && session.mode !== 'shared')) {
+      page = '/overview'; history.replaceState(history.state, '', '/overview'); currentPage = '/overview';
     }
     const q = new URLSearchParams(location.search);
     let html;
     try {
-      const ov = !isAdmin() || ['/settings', '/topics', '/tasks', '/users', '/sources'].includes(page) ? null : await api(`/api/overview${page === '/reports' && ownerQuery() ? '?' + ownerQuery().slice(1) : ''}`);
+      const ov = !isAdmin() || ['/topics', '/tasks', '/users', '/sources'].includes(page) ? null : await api(`/api/overview${page === '/reports' && ownerQuery() ? '?' + ownerQuery().slice(1) : ''}`);
       html = shell(page, ov, await PAGES[page](ov, q));
     } catch (err) {
-      html = shell(page, null, { main: `<div class="card error" role="alert">${esc(err.message)}${['/settings', '/topics'].includes(page) ? `<button type="button" class="btn" data-act="${page === '/settings' ? 'retrySettings' : 'retryTopics'}">${esc(tr('retry'))}</button>` : ''}</div>` });
+      html = shell(page, null, { main: `<div class="card error" role="alert">${esc(err.message)}${page === '/topics' ? `<button type="button" class="btn" data-act="retryTopics">${esc(tr('retry'))}</button>` : ''}</div>` });
     }
     if (mine !== seq) return; // a newer render started meanwhile
     $('#app').innerHTML = html;
-    updateGuide();
-    const titles = { '/': 'overview', '/reports': 'reports', '/triage': 'triage', '/runs': 'runs', '/settings': 'settings', '/topics': 'topicSettings', '/tasks': 'tasks', '/users': 'users', '/sources': 'sources' };
+    const titles = { '/overview': 'overview', '/reports': 'reports', '/triage': 'triage', '/runs': 'runs', '/topics': 'topicSettings', '/tasks': 'tasks', '/users': 'users', '/sources': 'sources' };
     document.title = `ISBE · ${tr(titles[page])}`;
     if (page === '/tasks') scheduleTasks();
     if (page === '/sources') scheduleSources();
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
-  }
-  function leaveSettings(nextPage) {
-    if (currentPage !== '/settings' || nextPage === '/settings') return true;
-    if (settingsSaving || (settingsDirty() && !window.confirm(tr('leaveSettings')))) return false;
-    settingsSnapshot = null;
-    settingsEdits = {};
-    settingsNotice = '';
-    settingsError = '';
-    return true;
   }
   function leaveTopics(nextPage) {
     if (currentPage !== '/topics' || nextPage === '/topics') return true;
@@ -1840,9 +1569,8 @@
   const go = (url) => {
     if (mailBusy) return;
     const nextPage = new URL(url, location.href).pathname;
-    if (!leaveSettings(nextPage) || !leaveTopics(nextPage) || !leaveSources(nextPage)) return;
+    if (!leaveTopics(nextPage) || !leaveSources(nextPage)) return;
     history.pushState({ isbeIndex: ++historyIndex }, '', url);
-    if (guide.open) closeGuide();
     currentPage = nextPage;
     memo.clear();
     $('#app').querySelector('.main')?.insertAdjacentHTML('afterbegin', `<div class="muted" role="status">${esc(tr('loading'))}</div>`);
@@ -1887,20 +1615,11 @@
     sourceMaterialsRefresh: async () => { await readSourceMaterials(); updateSources(); },
     sourcePage: async (b) => { sourceOffset = Number(b.dataset.offset); await readSourceMaterials(); updateSources(); },
     sourceTimeline: (b) => toggleSourceTimeline(b.dataset.id),
-    guideOpen: (b) => openGuide(b.dataset.topic, b.dataset.fresh === 'true'),
     logout: signOut,
     tasksRefresh: refreshTasks,
     taskCancel: cancelTask,
-    taskOpen: openTask,
     userActive: (b) => { if (b.dataset.active === 'true' || window.confirm(tr('userDisableConfirm'))) return changeUser('/api/users/'+enc(b.dataset.id), 'PUT', { active: b.dataset.active === 'true' }); },
-    guideClose: closeGuide,
-    guideCheck: async () => { if (!guide.loading && !guide.starting) { await checkGeneration(); await loadGuide(); } },
-    guideNext: () => { if (!guide.loading && !guide.error && !guideDraft() && (guide.step === 1 ? guide.model : guideSourceReady())) { guide.step = Math.min(3, guide.step + 1); updateGuide(true); } },
-    guideBack: () => { if (!guide.starting && !activeTask(guide.job)) { guide.step = Math.max(1, guide.step - 1); updateGuide(true); } },
-    guideStart: startGeneration,
-    guideAgain: () => { if (!guide.starting) { guide.job = null; guide.observed = null; guide.topic = ''; guide.step = 1; guide.interrupted = false; clearTimeout(guide.timer); loadGuide(); updateGuide(true); } },
     mailOpen: (b) => openMail(b),
-    mailTest: (b) => openMail(b, true),
     mailClose: () => { if (!mailBusy) { mailDraft = null; mailResult = null; mailError = ''; render(); } },
     retryTopics: () => { memo.delete('/api/topics'); topicsSnapshot = null; render(); },
     topicSelect: (b) => selectTopic(b.dataset.id),
@@ -1922,15 +1641,6 @@
       const feeds = clone(topicFeeds()); const index = Number(b.dataset.index);
       if (!Number.isInteger(index) || index < 0 || index >= feeds.length) return;
       feeds.splice(index, 1); topicEdits['rss.feeds'] = feeds; updateTopicStatus(); render();
-    },
-    retrySettings: () => { memo.delete('/api/settings'); render(); },
-    discardSettings: () => { if (!settingsSaving) { settingsEdits = {}; settingsNotice = ''; settingsError = ''; render(); } },
-    removeSecret: (b) => {
-      if (settingsSaving) return;
-      const key = b.dataset.key;
-      if (settingsEdits[key] === null) delete settingsEdits[key];
-      else settingsEdits[key] = null;
-      settingsNotice = ''; settingsError = ''; render();
     },
     panel: () => { panel = !panel; render(); },
     lang: (b) => { prefs.lang = b.dataset.v; savePrefs(); render(); },
@@ -1962,11 +1672,8 @@
     editSource(el);
     if (el.dataset.sourceCheck || el.dataset.change === 'sourceSelectPage') selectCatalogSources(el);
     if (el.dataset.change === 'sourceDateFilter' && ['', 'in_range', 'out_of_range', 'unknown', 'conflict'].includes(el.value)) { sourceDateFilter = el.value; sourceOffset = 0; syncSourceUrl(); readSourceMaterials().then(updateSources); }
-    if (el.dataset.change === 'guideTopic' && !guide.starting && !activeTask(guide.job)) { guide.topic = el.value; guide.job = null; guide.observed = null; guide.interrupted = false; loadGuide(); }
     if (el.dataset.topic || el.dataset.topicFeed !== undefined) editTopic(el);
     if (el.dataset.topic === 'arxivEnabled') render().then(() => $('#topic-arxivEnabled')?.focus());
-    if (el.dataset.setting) editSetting(el);
-    if (['ISBE_LLM_PROVIDER', 'ISBE_FULLTEXT_EXTRACTOR', 'EMAIL_TRANSPORT'].includes(el.dataset.setting)) render().then(() => $(`#setting-${el.dataset.setting}`)?.focus());
     if (el.dataset.change === 'triageTopic') go(`/triage?topic=${enc(el.value)}`);
     if (el.dataset.input === 'hue') { savePrefs(); render(); }
   });
@@ -1976,7 +1683,6 @@
     if (e.target.id === 'mail-recipients' && mailDraft && !mailBusy) { mailDraft.recipients = e.target.value; mailError = ''; }
     if (e.target.dataset.topic || e.target.dataset.topicFeed !== undefined) editTopic(e.target);
     if (e.target.dataset.input === 'topicSearch') { topicSearch = e.target.value; const list = $('#topic-list'); if (list && topicsSnapshot) list.innerHTML = topicListHtml(); }
-    if (e.target.dataset.setting) editSetting(e.target);
     if (e.target.dataset.input !== 'hue') return;
     prefs.theme = 'custom';
     prefs.hue = Number(e.target.value);
@@ -1989,8 +1695,6 @@
   document.addEventListener('toggle', async (e) => {
     const d = e.target;
     if (d instanceof HTMLDetailsElement && d.classList.contains('media-original')) { await toggleReportArticle(d); return; }
-    if (d.id === 'settings-advanced') { settingsAdvanced = d.open; return; }
-    if (d.id === 'settings-sources-advanced') { settingsSourcesAdvanced = d.open; return; }
     if (d.id === 'topic-rules') { topicRulesOpen = d.open; return; }
     if (d.id === 'source-tools') { sourceToolsOpen = d.open; return; }
     if (d.id === 'source-import-details') { sourceImportOpen = d.open; return; }
@@ -2006,18 +1710,16 @@
       body.innerHTML = `<span class="error">${esc(err.message)}</span>`;
     }
   }, true);
-  document.addEventListener('submit', (e) => e.target.id === 'login-form' ? signIn(e) : e.target.id === 'media-weekly-form' ? createMediaWeekly(e) : e.target.id === 'web-search-form' ? saveSearch(false,e) : e.target.id === 'source-search-form' ? applySourceFilters(e) : e.target.id === 'source-form' ? saveSource(e) : e.target.id === 'source-discovery-form' ? discoverSources(e) : e.target.id === 'source-import-form' ? importSources(e) : e.target.id === 'user-create' ? createUser(e) : e.target.dataset?.userPassword ? resetUserPassword(e) : e.target.id === 'mail-form' ? sendMail(e) : e.target.id === 'topic-form' ? saveTopic(e) : e.target.id === 'settings-form' ? saveSettings(e) : undefined);
-  document.addEventListener('cancel', (e) => { if (e.target.id === 'report-guide') { e.preventDefault(); closeGuide(); } }, true);
-  window.addEventListener('beforeunload', (e) => { if (settingsDirty() || settingsSaving || topicDirty() || topicBusy || mailBusy || sourceDirty() || sourceBusy) { e.preventDefault(); e.returnValue = ''; } });
+  document.addEventListener('submit', (e) => e.target.id === 'login-form' ? signIn(e) : e.target.id === 'media-weekly-form' ? createMediaWeekly(e) : e.target.id === 'web-search-form' ? saveSearch(false,e) : e.target.id === 'source-search-form' ? applySourceFilters(e) : e.target.id === 'source-form' ? saveSource(e) : e.target.id === 'source-discovery-form' ? discoverSources(e) : e.target.id === 'source-import-form' ? importSources(e) : e.target.id === 'user-create' ? createUser(e) : e.target.dataset?.userPassword ? resetUserPassword(e) : e.target.id === 'mail-form' ? sendMail(e) : e.target.id === 'topic-form' ? saveTopic(e) : undefined);
+  window.addEventListener('beforeunload', (e) => { if (topicDirty() || topicBusy || mailBusy || sourceDirty() || sourceBusy) { e.preventDefault(); e.returnValue = ''; } });
   window.addEventListener('popstate', async (e) => {
     if (restoringHistory) { restoringHistory = false; return; }
     const nextIndex = Number(e.state?.isbeIndex) || 0;
-    if (mailBusy || !leaveSettings(location.pathname) || !leaveTopics(location.pathname) || !leaveSources(location.pathname)) { restoringHistory = true; history.go(historyIndex - nextIndex); return; }
+    if (mailBusy || !leaveTopics(location.pathname) || !leaveSources(location.pathname)) { restoringHistory = true; history.go(historyIndex - nextIndex); return; }
     historyIndex = nextIndex;
     currentPage = location.pathname;
-    if (guide.open) closeGuide();
     if (currentPage === '/sources' && sourceLoaded) { restoreSourceUrl(); await refreshSources(); }
     memo.clear(); render();
   });
-  render().then(() => { if (session?.user) { guide.observed = readGenerationMarker(); if (guide.observed) openGuide(guide.observed.topic); } });
+  render();
 })();

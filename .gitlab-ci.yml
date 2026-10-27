@@ -1,0 +1,226 @@
+# CI for merge requests and main (docs/testing.md#ci). The Python and front-end
+# jobs are independent: one failing never hides the other's results.
+#
+# Each job runs what scripts/py-test, scripts/py-lint and scripts/web-test run
+# locally, in the same images (python:3.14-slim + uv, node:24-slim).
+
+workflow:
+  rules:
+    # A branch with an open merge request runs the merge request pipeline only.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "evidence"
+      when: never
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+# A new push to a branch cancels its older, still-running pipeline (GitLab's
+# "auto-cancel redundant pipelines" only stops interruptible jobs).
+default:
+  interruptible: true
+
+stages: [lint, test, build]
+
+# PyPI and npm drop connections from this network now and then, so installs
+# run up to four times. Only installs: a failing test is never retried.
+.retry:
+  - |
+    retry() {
+      for try in 1 2 3 4; do
+        "$@" && return 0
+        echo "retry: attempt $try of '$*' failed" >&2
+        [ "$try" = 4 ] || sleep $((try * 10))
+      done
+      return 1
+    }
+
+.python:
+  image: python:3.14-slim
+  variables:
+    UV_CACHE_DIR: $CI_PROJECT_DIR/.uv-cache
+    UV_LINK_MODE: copy
+    # PyPI downloads from this network drop now and then; retry instead of failing the job.
+    UV_HTTP_RETRIES: "6"
+    UV_HTTP_TIMEOUT: "120"
+    # The runner host reaches PyPI only through the Tsinghua mirror. Override
+    # these as project CI/CD variables to use another mirror (all three empty:
+    # pypi.org itself).
+    PIP_INDEX_URL: https://pypi.tuna.tsinghua.edu.cn/simple
+    UV_DEFAULT_INDEX: https://pypi.tuna.tsinghua.edu.cn/simple
+    # uv.lock pins file URLs on files.pythonhosted.org, which `uv sync --frozen`
+    # downloads as written; the mirror serves the same /packages/ paths.
+    PYPI_FILES_MIRROR: https://pypi.tuna.tsinghua.edu.cn
+  cache:
+    key:
+      files: [uv.lock]
+    paths: [.uv-cache/]
+  before_script:
+    - !reference [.retry]
+    - '[ -z "$PIP_INDEX_URL" ] && unset PIP_INDEX_URL || true'
+    - '[ -z "$UV_DEFAULT_INDEX" ] && unset UV_DEFAULT_INDEX || true'
+    - retry pip install --quiet --no-cache-dir --root-user-action=ignore uv==0.13.3
+    - |
+      if [ -n "$PYPI_FILES_MIRROR" ]; then
+        sed -i "s#https://files.pythonhosted.org/#${PYPI_FILES_MIRROR%/}/#g" uv.lock
+      fi
+    - retry uv sync --frozen --quiet
+  after_script:
+    # Keep only what CI cannot rebuild cheaply, so the cache does not grow forever.
+    - uv cache prune --ci || true
+
+.node:
+  image: node:24-slim
+  cache:
+    key:
+      files: [frontend/package-lock.json]
+    paths: [.npm-cache/]
+  variables:
+    npm_config_fetch_retries: "6"
+    # The runner host reaches npm only through a mirror; npm rewrites the
+    # registry.npmjs.org URLs in package-lock.json to it. Override as a project
+    # CI/CD variable (https://registry.npmjs.org/ for npm itself).
+    npm_config_registry: https://mirrors.cloud.tencent.com/npm/
+  before_script:
+    - !reference [.retry]
+    # A dropped download of an optional platform package (the native builds of
+    # lightningcss and rolldown) leaves npm ci "successful" without it, so the
+    # install only counts once both load.
+    - >
+      retry sh -c 'npm --prefix frontend ci --no-audit --no-fund --cache "$CI_PROJECT_DIR/.npm-cache"
+      && cd frontend && node -e "require(\"lightningcss\")"
+      && node --input-type=module -e "await import(\"rolldown\")"'
+
+py-lint:
+  extends: .python
+  stage: lint
+  script:
+    - uv run --frozen --no-sync ruff check
+
+py-test:
+  extends: .python
+  stage: test
+  needs: []
+  script:
+    - >
+      uv run --frozen --no-sync pytest --cov --cov-report=term --cov-report=xml
+      --junitxml=report.xml
+  coverage: '/^TOTAL\s+(?:\d+\s+){4}(\d+(?:\.\d+)?)%/'
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths: [coverage.xml, report.xml]
+    reports:
+      junit: report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+web-classic:
+  image: node:24-slim
+  stage: test
+  needs: []
+  script:
+    - node --test web/*.test.cjs tests/*.test.cjs
+
+web-lint:
+  extends: .node
+  stage: lint
+  script:
+    - cd frontend
+    - npm run lint
+    - npx prettier --config .prettierrc.json --check ../scripts/*.mjs
+
+web-test:
+  extends: .node
+  stage: test
+  needs: []
+  script:
+    - cd frontend
+    - >
+      npx vitest run --coverage --reporter=default --reporter=junit
+      --outputFile.junit=junit.xml
+  coverage: '/^Lines\s*:\s*(\d+(?:\.\d+)?)%/'
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths: [frontend/coverage/, frontend/junit.xml]
+    reports:
+      junit: frontend/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: frontend/coverage/cobertura-coverage.xml
+
+web-build:
+  extends: .node
+  stage: build
+  needs: []
+  script:
+    # tsc --noEmit, then the Vite build that `isbe serve` ships.
+    - npm --prefix frontend run build
+  artifacts:
+    expire_in: 7 days
+    paths: [isbe/_assets/app/]
+
+# The Dockerfile, built as `docker build` would (#118). The runner has no
+# Docker daemon to share (no privileged mode, no socket), so kaniko builds it
+# in the job's own filesystem and pushes the image to this project's
+# registry, where docker-smoke runs it. Docker Hub is out of reach from the
+# runner host, so the base images come from a mirror (DOCKER_BASE, also a
+# project CI/CD variable; docker.io/library is Docker Hub itself).
+docker-image:
+  stage: build
+  needs: []
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  variables:
+    DOCKER_BASE: docker.m.daocloud.io/library
+    PYPI_MIRROR: https://pypi.tuna.tsinghua.edu.cn/simple
+    PYPI_FILES_MIRROR: https://pypi.tuna.tsinghua.edu.cn
+    NPM_MIRROR: https://mirrors.cloud.tencent.com/npm/
+  script:
+    - mkdir -p /kaniko/.docker
+    - >
+      printf '{"auths":{"%s":{"username":"%s","password":"%s"}}}'
+      "$CI_REGISTRY" "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" > /kaniko/.docker/config.json
+    # The project registry is plain HTTP on the LAN: only it may skip TLS.
+    - >
+      /kaniko/executor --context "$CI_PROJECT_DIR" --dockerfile "$CI_PROJECT_DIR/Dockerfile"
+      --build-arg "REGISTRY=$DOCKER_BASE"
+      --build-arg "PYPI_MIRROR=$PYPI_MIRROR"
+      --build-arg "PYPI_FILES_MIRROR=$PYPI_FILES_MIRROR"
+      --build-arg "NPM_MIRROR=$NPM_MIRROR"
+      --insecure-registry "$CI_REGISTRY" --skip-tls-verify-registry "$CI_REGISTRY"
+      --cache=true --cache-repo "$CI_REGISTRY_IMAGE/cache"
+      --destination "$CI_REGISTRY_IMAGE/ci:$CI_COMMIT_SHORT_SHA"
+
+# The checks docs/deployment.md asks for after an upgrade, then the console
+# served from the image docker-image built.
+docker-smoke:
+  stage: build
+  needs: [docker-image]
+  image:
+    name: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_SHORT_SHA
+    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - isbe --version
+    - python -c "import isbe.web.server; print('ok')"
+    - test -f /opt/isbe/lib/python3.14/site-packages/isbe/_assets/app/index.html
+    - isbe --data /tmp/d init
+    - isbe --data /tmp/d serve --bind 127.0.0.1:8080 &
+    - |
+      python - <<'PY'
+      import time, urllib.request
+      for _ in range(30):
+          try:
+              page = urllib.request.urlopen("http://127.0.0.1:8080/").read().decode()
+              break
+          except OSError:
+              time.sleep(1)
+      else:
+          raise SystemExit("isbe serve did not answer on 127.0.0.1:8080")
+      assert "/app/assets/" in page, page[:300]
+      print("console served")
+      PY

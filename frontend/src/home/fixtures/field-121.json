@@ -1,0 +1,752 @@
+{
+  "source": "a real 121-paper question run (radar nowcasting), papers reduced to what layoutField reads",
+  "papers": [
+    {
+      "key": "arxiv:2211.15046",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q5", "q7"]
+    },
+    {
+      "key": "arxiv:2005.04988",
+      "included": true,
+      "cited": 65,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2601.20342",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:2608.06082",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q6"]
+    },
+    {
+      "key": "arxiv:1905.09932",
+      "included": true,
+      "cited": 54,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:2609.37038",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q8"]
+    },
+    {
+      "key": "arxiv:2406.04867",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q2"]
+    },
+    {
+      "key": "arxiv:2102.08175",
+      "included": true,
+      "cited": 15,
+      "queries": ["q1", "q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2311.17961",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2"]
+    },
+    {
+      "key": "arxiv:1912.12132",
+      "included": true,
+      "cited": 240,
+      "queries": ["q1", "q2", "q3", "q7"]
+    },
+    {
+      "key": "arxiv:2111.09954",
+      "included": true,
+      "cited": 17,
+      "queries": ["q1", "q2", "q4", "q7"]
+    },
+    {
+      "key": "arxiv:2307.10843",
+      "included": true,
+      "cited": 2,
+      "queries": ["q1", "q2", "q3", "q4", "q8"]
+    },
+    {
+      "key": "arxiv:2512.22317",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2410.13314",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q6", "q8"]
+    },
+    {
+      "key": "arxiv:2402.13737",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q5", "q8"]
+    },
+    {
+      "key": "arxiv:1905.05037",
+      "included": true,
+      "cited": 28,
+      "queries": ["q1", "q2", "q3", "q4", "q7"]
+    },
+    {
+      "key": "arxiv:2304.12891",
+      "included": true,
+      "cited": 25,
+      "queries": ["q1", "q5"]
+    },
+    {
+      "key": "arxiv:2605.31204",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6"]
+    },
+    {
+      "key": "arxiv:2507.00845",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q7"]
+    },
+    {
+      "key": "arxiv:2605.14597",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2412.01091",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q2", "q3", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2504.19408",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2608.30205",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2412.11480",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2605.10046",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2603.13818",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6"]
+    },
+    {
+      "key": "arxiv:2509.00017",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q2", "q8"]
+    },
+    {
+      "key": "arxiv:2511.11197",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q6"]
+    },
+    {
+      "key": "arxiv:2510.16031",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:1009.0687",
+      "included": false,
+      "cited": 1,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2609.37487",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2512.16967",
+      "included": false,
+      "cited": 0,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2012.05015",
+      "included": true,
+      "cited": 2,
+      "queries": ["q1", "q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2601.03633",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q7"]
+    },
+    {
+      "key": "arxiv:1106.2143",
+      "included": false,
+      "cited": 3,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2409.06732",
+      "included": true,
+      "cited": 3,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:2110.01843",
+      "included": false,
+      "cited": 4,
+      "queries": ["q1", "q2", "q3", "q8"]
+    },
+    {
+      "key": "arxiv:2609.34836",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2603.26108",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:1506.04214",
+      "included": true,
+      "cited": 6648,
+      "queries": ["q1", "q4"]
+    },
+    {
+      "key": "arxiv:1812.10915",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:1907.08069",
+      "included": true,
+      "cited": 19,
+      "queries": ["q1", "q2", "q4", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2108.06868",
+      "included": true,
+      "cited": 13,
+      "queries": ["q1", "q2", "q3", "q4"]
+    },
+    {
+      "key": "arxiv:2202.10555",
+      "included": true,
+      "cited": 55,
+      "queries": ["q1", "q2", "q3", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2509.25263",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2409.10367",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:1706.03458",
+      "included": true,
+      "cited": 617,
+      "queries": ["q1", "q2", "q4", "q6"]
+    },
+    {
+      "key": "arxiv:2402.10747",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q2", "q3", "q6"]
+    },
+    {
+      "key": "arxiv:2502.16116",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:2303.06663",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:2511.11090",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q6", "q8"]
+    },
+    {
+      "key": "arxiv:2210.12853",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2312.00258",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q6"]
+    },
+    {
+      "key": "arxiv:2201.13408",
+      "included": false,
+      "cited": 2,
+      "queries": ["q1", "q2", "q3", "q6"]
+    },
+    {
+      "key": "arxiv:2401.09881",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q5", "q8"]
+    },
+    {
+      "key": "arxiv:2410.05805",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:2410.08641",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q8"]
+    },
+    {
+      "key": "arxiv:2006.15165",
+      "included": false,
+      "cited": 3,
+      "queries": ["q1", "q4"]
+    },
+    {
+      "key": "arxiv:2608.08436",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2512.08974",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:2604.15377",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2606.16342",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:2510.07953",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2605.14606",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2512.17924",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q7"]
+    },
+    {
+      "key": "arxiv:2602.05204",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2205.02457",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q4", "q7"]
+    },
+    {
+      "key": "arxiv:2401.07958",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q8"]
+    },
+    {
+      "key": "arxiv:2407.11317",
+      "included": true,
+      "cited": 2,
+      "queries": ["q1", "q2", "q8"]
+    },
+    {
+      "key": "arxiv:1810.11811",
+      "included": false,
+      "cited": 1,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2407.02089",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:2501.08411",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q6", "q8"]
+    },
+    {
+      "key": "arxiv:2201.02296",
+      "included": false,
+      "cited": 1,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:2511.04659",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2510.13050",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2512.14898",
+      "included": false,
+      "cited": 0,
+      "queries": ["q1", "q2", "q4"]
+    },
+    {
+      "key": "arxiv:2302.09990",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7"]
+    },
+    {
+      "key": "arxiv:2211.16824",
+      "included": true,
+      "cited": 3,
+      "queries": ["q1", "q2", "q3", "q7"]
+    },
+    {
+      "key": "arxiv:2309.05828",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2606.19026",
+      "included": false,
+      "cited": 0,
+      "queries": ["q1", "q4", "q6", "q8"]
+    },
+    {
+      "key": "arxiv:2312.06734",
+      "included": true,
+      "cited": 3,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2110.01035",
+      "included": true,
+      "cited": 2,
+      "queries": ["q1", "q2", "q3", "q4", "q6", "q7"]
+    },
+    {
+      "key": "arxiv:2610.26486",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7"]
+    },
+    {
+      "key": "arxiv:2602.02096",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q7"]
+    },
+    {
+      "key": "arxiv:2609.17175",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q4", "q5", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2510.14962",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q3", "q6", "q7"]
+    },
+    {
+      "key": "arxiv:2609.00544",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q5", "q8"]
+    },
+    {
+      "key": "arxiv:2512.21118",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2401.09424",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2601.19298",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2307.10422",
+      "included": true,
+      "cited": 29,
+      "queries": ["q1", "q2"]
+    },
+    {
+      "key": "arxiv:2410.14103",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2502.16444",
+      "included": false,
+      "cited": 0,
+      "queries": ["q1", "q2", "q4"]
+    },
+    {
+      "key": "arxiv:2112.01085",
+      "included": true,
+      "cited": 4,
+      "queries": ["q1", "q2", "q3", "q4", "q6", "q7"]
+    },
+    {
+      "key": "arxiv:2310.19515",
+      "included": true,
+      "cited": 1,
+      "queries": ["q1", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2605.28153",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q8"]
+    },
+    {
+      "key": "arxiv:2504.09994",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q2", "q3", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2609.38926",
+      "included": true,
+      "cited": 0,
+      "queries": ["q1", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2605.10950",
+      "included": false,
+      "cited": 0,
+      "queries": ["q1"]
+    },
+    {
+      "key": "arxiv:2402.18044",
+      "included": true,
+      "cited": 9,
+      "queries": ["q1", "q6", "q7"]
+    },
+    {
+      "key": "arxiv:2110.10833",
+      "included": false,
+      "cited": 5,
+      "queries": ["q2", "q4"]
+    },
+    {
+      "key": "arxiv:2610.09996",
+      "included": false,
+      "cited": 0,
+      "queries": ["q2", "q4"]
+    },
+    {
+      "key": "arxiv:2505.10271",
+      "included": true,
+      "cited": 0,
+      "queries": ["q2", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2204.05795",
+      "included": false,
+      "cited": 2,
+      "queries": ["q2"]
+    },
+    {
+      "key": "arxiv:2410.23159",
+      "included": true,
+      "cited": 1,
+      "queries": ["q2", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2603.13589",
+      "included": true,
+      "cited": 0,
+      "queries": ["q2", "q7"]
+    },
+    {
+      "key": "arxiv:2308.06733",
+      "included": true,
+      "cited": 13,
+      "queries": ["q2", "q3", "q5"]
+    },
+    {
+      "key": "arxiv:2509.08369",
+      "included": true,
+      "cited": 1,
+      "queries": ["q2"]
+    },
+    {
+      "key": "arxiv:2004.07906",
+      "included": true,
+      "cited": 0,
+      "queries": ["q2", "q3", "q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2211.01001",
+      "included": true,
+      "cited": 3,
+      "queries": ["q2", "q7"]
+    },
+    {
+      "key": "arxiv:2207.05833",
+      "included": true,
+      "cited": 102,
+      "queries": ["q2", "q6"]
+    },
+    {
+      "key": "arxiv:2406.06081",
+      "included": false,
+      "cited": 21,
+      "queries": ["q2"]
+    },
+    {
+      "key": "arxiv:2408.05761",
+      "included": true,
+      "cited": 0,
+      "queries": ["q2", "q7"]
+    },
+    {
+      "key": "arxiv:2311.18398",
+      "included": true,
+      "cited": 1,
+      "queries": ["q3"]
+    },
+    {
+      "key": "arxiv:2601.17268",
+      "included": true,
+      "cited": 0,
+      "queries": ["q6", "q7", "q8"]
+    },
+    {
+      "key": "arxiv:2605.24067",
+      "included": true,
+      "cited": 0,
+      "queries": ["q7"]
+    },
+    {
+      "key": "arxiv:2603.20468",
+      "included": false,
+      "cited": 0,
+      "queries": ["q7"]
+    },
+    {
+      "key": "arxiv:2610.12189",
+      "included": true,
+      "cited": 0,
+      "queries": ["q7"]
+    },
+    {
+      "key": "arxiv:2110.05196",
+      "included": false,
+      "cited": 4,
+      "queries": ["q8"]
+    },
+    {
+      "key": "arxiv:1610.06667",
+      "included": false,
+      "cited": 3,
+      "queries": ["q8"]
+    },
+    {
+      "key": "arxiv:2602.07108",
+      "included": false,
+      "cited": 0,
+      "queries": ["q8"]
+    }
+  ],
+  "citations": [
+    ["arxiv:1907.08069", "arxiv:1506.04214"],
+    ["arxiv:2005.04988", "arxiv:1506.04214"],
+    ["arxiv:2005.04988", "arxiv:1912.12132"],
+    ["arxiv:2012.05015", "arxiv:1506.04214"],
+    ["arxiv:2012.05015", "arxiv:1905.09932"],
+    ["arxiv:2012.05015", "arxiv:1912.12132"],
+    ["arxiv:2102.08175", "arxiv:1506.04214"],
+    ["arxiv:2102.08175", "arxiv:1706.03458"],
+    ["arxiv:2108.06868", "arxiv:1506.04214"],
+    ["arxiv:2108.06868", "arxiv:1907.08069"],
+    ["arxiv:2110.01843", "arxiv:1506.04214"],
+    ["arxiv:2110.01843", "arxiv:1912.12132"],
+    ["arxiv:2111.09954", "arxiv:1506.04214"],
+    ["arxiv:2202.10555", "arxiv:1506.04214"],
+    ["arxiv:2202.10555", "arxiv:1706.03458"],
+    ["arxiv:2202.10555", "arxiv:1912.12132"],
+    ["arxiv:2302.09990", "arxiv:1506.04214"],
+    ["arxiv:2302.09990", "arxiv:1706.03458"],
+    ["arxiv:2402.18044", "arxiv:1506.04214"]
+  ]
+}

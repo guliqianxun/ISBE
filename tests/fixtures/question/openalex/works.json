@@ -1,0 +1,2985 @@
+{
+ "note": "Singleton /works answers (select=openalex.SELECT) recorded 2026-10-27; tests wrap them in list replies.",
+ "works": [
+  {
+   "id": "https://openalex.org/W3003709258",
+   "doi": "https://doi.org/10.1029/2020ms002203",
+   "title": "WeatherBench: A Benchmark Data Set for Data‐Driven Weather Forecasting",
+   "display_name": "WeatherBench: A Benchmark Data Set for Data‐Driven Weather Forecasting",
+   "publication_year": 2020,
+   "type": "article",
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": null,
+      "display_name": "Stephan Rasp",
+      "orcid": "https://orcid.org/0000-0001-8676-2687",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-8676-2687"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I62916508",
+       "display_name": "Technical University of Munich",
+       "ror": "https://ror.org/02kkvpp62",
+       "country_code": "DE",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I62916508"
+       ]
+      }
+     ],
+     "countries": [
+      "DE"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "Stephan Rasp",
+     "raw_affiliation_strings": [
+      "Department of Informatics Technical University of Munich  Munich Germany"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-8676-2687",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Informatics Technical University of Munich  Munich Germany",
+       "institution_ids": [
+        "https://openalex.org/I62916508"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": null,
+      "display_name": "Peter D. Dueben",
+      "orcid": "https://orcid.org/0000-0002-4610-3326",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-4610-3326"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I154986956",
+       "display_name": "European Centre for Medium-Range Weather Forecasts",
+       "ror": "https://ror.org/014w0fd65",
+       "country_code": "GB",
+       "type": "other",
+       "lineage": [
+        "https://openalex.org/I154986956"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Peter D. Dueben",
+     "raw_affiliation_strings": [
+      "European Centre for Medium‐range Weather Forecasts  Reading UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-4610-3326",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "European Centre for Medium‐range Weather Forecasts  Reading UK",
+       "institution_ids": [
+        "https://openalex.org/I154986956"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5041000976",
+      "display_name": "Sebastian Scher",
+      "orcid": "https://orcid.org/0000-0002-6314-8833",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-6314-8833"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I161593684",
+       "display_name": "Stockholm University",
+       "ror": "https://ror.org/05f0yaq80",
+       "country_code": "SE",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I161593684"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210161097",
+       "display_name": "Bolin Centre for Climate Research",
+       "ror": "https://ror.org/058zxsr17",
+       "country_code": "SE",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I1293302089",
+        "https://openalex.org/I161593684",
+        "https://openalex.org/I4210161097",
+        "https://openalex.org/I86987016"
+       ]
+      }
+     ],
+     "countries": [
+      "SE"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Sebastian Scher",
+     "raw_affiliation_strings": [
+      "Department of Meteorology and Bolin Centre for Climate Research Stockholm University  Stockholm Sweden"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-6314-8833",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Meteorology and Bolin Centre for Climate Research Stockholm University  Stockholm Sweden",
+       "institution_ids": [
+        "https://openalex.org/I161593684",
+        "https://openalex.org/I4210161097"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": null,
+      "display_name": "Jonathan A. Weyn",
+      "orcid": "https://orcid.org/0000-0002-4789-7594",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-4789-7594"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I201448701",
+       "display_name": "University of Washington",
+       "ror": "https://ror.org/00cvxb145",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Jonathan A. Weyn",
+     "raw_affiliation_strings": [
+      "Department of Atmospheric Sciences University of Washington  Seattle WA USA"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-4789-7594",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Atmospheric Sciences University of Washington  Seattle WA USA",
+       "institution_ids": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": null,
+      "display_name": "Soukayna Mouatadid",
+      "orcid": "https://orcid.org/0000-0002-0927-6789",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-0927-6789"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I185261750",
+       "display_name": "University of Toronto",
+       "ror": "https://ror.org/03dbr7087",
+       "country_code": "CA",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I185261750"
+       ]
+      }
+     ],
+     "countries": [
+      "CA"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Soukayna Mouatadid",
+     "raw_affiliation_strings": [
+      "Department of Computer Science University of Toronto  Toronto Ontario Canada"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-0927-6789",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science University of Toronto  Toronto Ontario Canada",
+       "institution_ids": [
+        "https://openalex.org/I185261750"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5047248117",
+      "display_name": "Nils Thuerey",
+      "orcid": "https://orcid.org/0000-0001-6647-8910",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-6647-8910"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I62916508",
+       "display_name": "Technical University of Munich",
+       "ror": "https://ror.org/02kkvpp62",
+       "country_code": "DE",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I62916508"
+       ]
+      }
+     ],
+     "countries": [
+      "DE"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Nils Thuerey",
+     "raw_affiliation_strings": [
+      "Department of Informatics Technical University of Munich  Munich Germany"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-6647-8910",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Informatics Technical University of Munich  Munich Germany",
+       "institution_ids": [
+        "https://openalex.org/I62916508"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1029/2020ms002203",
+    "doi": "https://doi.org/10.1029/2020ms002203",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.1029/2020ms002203",
+    "pdf_url": "https://agupubs.onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2020MS002203",
+    "source": {
+     "id": "https://openalex.org/S185824406",
+     "display_name": "Journal of Advances in Modeling Earth Systems",
+     "issn_l": "1942-2466",
+     "issn": [
+      "1942-2466"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj",
+      "dongbi-a",
+      "jufo-2",
+      "norway-1",
+      "poland-200",
+      "russia-white-list-1",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320595",
+     "host_organization_name": "Wiley",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320595"
+     ],
+     "host_organization_lineage_names": [
+      "Wiley"
+     ],
+     "type": "journal"
+    },
+    "license": "cc-by",
+    "license_id": "https://openalex.org/licenses/cc-by",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Journal of Advances in Modeling Earth Systems",
+    "raw_type": "journal-article"
+   },
+   "locations": [
+    {
+     "id": "doi:10.1029/2020ms002203",
+     "doi": "https://doi.org/10.1029/2020ms002203",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1029/2020ms002203",
+     "pdf_url": "https://agupubs.onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2020MS002203",
+     "source": {
+      "id": "https://openalex.org/S185824406",
+      "display_name": "Journal of Advances in Modeling Earth Systems",
+      "issn_l": "1942-2466",
+      "issn": [
+       "1942-2466"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "doaj",
+       "dongbi-a",
+       "jufo-2",
+       "norway-1",
+       "poland-200",
+       "russia-white-list-1",
+       "vabb-shw"
+      ],
+      "host_organization": "https://openalex.org/P4310320595",
+      "host_organization_name": "Wiley",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320595"
+      ],
+      "host_organization_lineage_names": [
+       "Wiley"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Journal of Advances in Modeling Earth Systems",
+     "raw_type": "journal-article"
+    },
+    {
+     "id": "pmh:oai:arXiv.org:2002.00469",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "http://arxiv.org/abs/2002.00469",
+     "pdf_url": "https://arxiv.org/pdf/2002.00469",
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "text"
+    },
+    {
+     "id": "pmh:oai:doaj.org/article:db7463c2769d4534a00fa07937b96c7a",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://doaj.org/article/db7463c2769d4534a00fa07937b96c7a",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401280",
+      "display_name": "DOAJ (DOAJ: Directory of Open Access Journals)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": null,
+      "host_organization_name": null,
+      "host_organization_lineage": [],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by-sa",
+     "license_id": "https://openalex.org/licenses/cc-by-sa",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "Journal of Advances in Modeling Earth Systems, Vol 12, Iss 11, Pp n/a-n/a (2020)",
+     "raw_type": "article"
+    },
+    {
+     "id": "pmh:oai:e-docs.geo-leo.de:11858/9072",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "http://resolver.sub.uni-goettingen.de/purl?gldocs-11858/9072",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4377196338",
+      "display_name": "Geo-Leo e-docs (Deutsche Initiative für Netzwerkinformation)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I4210097468",
+      "host_organization_name": "Deutsche Initiative für Netzwerkinformation",
+      "host_organization_lineage": [
+       "https://openalex.org/I4210097468"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by-nd",
+     "license_id": "https://openalex.org/licenses/cc-by-nd",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "info:eu-repo/semantics/article"
+    },
+    {
+     "id": "pmh:oai:mediatum.ub.tum.de:node/1524895",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "http://mediatum.ub.tum.de/node?id=1524895",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306400453",
+      "display_name": "mediaTUM – the media and publications repository of the Technical University Munich (Technical University Munich)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I62916508",
+      "host_organization_name": "Technical University of Munich",
+      "host_organization_lineage": [
+       "https://openalex.org/I62916508"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "",
+     "raw_type": "dataset"
+    },
+    {
+     "id": "pmh:oai:mediatum.ub.tum.de:node/1597509",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://mediatum.ub.tum.de/1597509",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306400453",
+      "display_name": "mediaTUM – the media and publications repository of the Technical University Munich (Technical University Munich)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I62916508",
+      "host_organization_name": "Technical University of Munich",
+      "host_organization_lineage": [
+       "https://openalex.org/I62916508"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "other-oa",
+     "license_id": "https://openalex.org/licenses/other-oa",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "",
+     "raw_type": "article"
+    }
+   ],
+   "cited_by_count": 661,
+   "abstract_inverted_index": {
+    "Abstract": [
+     0
+    ],
+    "Data‐driven": [
+     1
+    ],
+    "approaches,": [
+     2
+    ],
+    "most": [
+     3
+    ],
+    "prominently": [
+     4
+    ],
+    "deep": [
+     5,
+     130
+    ],
+    "learning,": [
+     6
+    ],
+    "have": [
+     7
+    ],
+    "become": [
+     8
+    ],
+    "powerful": [
+     9
+    ],
+    "tools": [
+     10
+    ],
+    "for": [
+     11,
+     64,
+     78,
+     156
+    ],
+    "prediction": [
+     12
+    ],
+    "in": [
+     13,
+     35,
+     100,
+     168
+    ],
+    "many": [
+     14
+    ],
+    "domains.": [
+     15
+    ],
+    "A": [
+     16
+    ],
+    "natural": [
+     17
+    ],
+    "question": [
+     18
+    ],
+    "to": [
+     19,
+     29,
+     96
+    ],
+    "ask": [
+     20
+    ],
+    "is": [
+     21,
+     143,
+     152
+    ],
+    "whether": [
+     22
+    ],
+    "data‐driven": [
+     23,
+     65,
+     169
+    ],
+    "methods": [
+     24
+    ],
+    "could": [
+     25
+    ],
+    "also": [
+     26
+    ],
+    "be": [
+     27
+    ],
+    "used": [
+     28
+    ],
+    "predict": [
+     30
+    ],
+    "global": [
+     31
+    ],
+    "weather": [
+     32,
+     67,
+     170
+    ],
+    "patterns": [
+     33
+    ],
+    "days": [
+     34
+    ],
+    "advance.": [
+     36
+    ],
+    "First": [
+     37
+    ],
+    "studies": [
+     38,
+     55
+    ],
+    "show": [
+     39
+    ],
+    "promise": [
+     40
+    ],
+    "but": [
+     41
+    ],
+    "the": [
+     42,
+     89,
+     98,
+     149
+    ],
+    "lack": [
+     43
+    ],
+    "of": [
+     44,
+     74
+    ],
+    "a": [
+     45,
+     60,
+     72,
+     114
+    ],
+    "common": [
+     46
+    ],
+    "data": [
+     47,
+     62,
+     86,
+     141,
+     163
+    ],
+    "set": [
+     48,
+     63,
+     142,
+     164
+    ],
+    "and": [
+     49,
+     80,
+     107,
+     148
+    ],
+    "evaluation": [
+     50,
+     109
+    ],
+    "metrics": [
+     51,
+     110
+    ],
+    "make": [
+     52
+    ],
+    "intercomparison": [
+     53
+    ],
+    "between": [
+     54,
+     117
+    ],
+    "difficult.": [
+     56
+    ],
+    "Here": [
+     57
+    ],
+    "we": [
+     58,
+     121
+    ],
+    "present": [
+     59
+    ],
+    "benchmark": [
+     61
+    ],
+    "medium‐range": [
+     66
+    ],
+    "forecasting": [
+     68,
+     138
+    ],
+    "(specifically": [
+     69
+    ],
+    "3–5": [
+     70
+    ],
+    "days),": [
+     71
+    ],
+    "topic": [
+     73
+    ],
+    "high": [
+     75
+    ],
+    "scientific": [
+     76
+    ],
+    "interest": [
+     77
+    ],
+    "atmospheric": [
+     79
+    ],
+    "computer": [
+     81
+    ],
+    "scientists": [
+     82
+    ],
+    "alike.": [
+     83
+    ],
+    "We": [
+     84,
+     104,
+     159
+    ],
+    "provide": [
+     85,
+     122
+    ],
+    "derived": [
+     87
+    ],
+    "from": [
+     88,
+     125
+    ],
+    "ERA5": [
+     90
+    ],
+    "archive": [
+     91
+    ],
+    "that": [
+     92,
+     161
+    ],
+    "has": [
+     93
+    ],
+    "been": [
+     94
+    ],
+    "processed": [
+     95
+    ],
+    "facilitate": [
+     97
+    ],
+    "use": [
+     99
+    ],
+    "machine": [
+     101
+    ],
+    "learning": [
+     102,
+     131
+    ],
+    "models.": [
+     103,
+     139
+    ],
+    "propose": [
+     105
+    ],
+    "simple": [
+     106,
+     126
+    ],
+    "clear": [
+     108
+    ],
+    "which": [
+     111
+    ],
+    "will": [
+     112,
+     165
+    ],
+    "enable": [
+     113
+    ],
+    "direct": [
+     115
+    ],
+    "comparison": [
+     116
+    ],
+    "different": [
+     118
+    ],
+    "methods.": [
+     119
+    ],
+    "Further,": [
+     120
+    ],
+    "baseline": [
+     123
+    ],
+    "scores": [
+     124
+    ],
+    "linear": [
+     127
+    ],
+    "regression": [
+     128
+    ],
+    "techniques,": [
+     129
+    ],
+    "models,": [
+     132
+    ],
+    "as": [
+     133,
+     135
+    ],
+    "well": [
+     134
+    ],
+    "purely": [
+     136
+    ],
+    "physical": [
+     137
+    ],
+    "The": [
+     140
+    ],
+    "publicly": [
+     144
+    ],
+    "available": [
+     145
+    ],
+    "at": [
+     146
+    ],
+    "https://github.com/pangeo‐data/WeatherBench": [
+     147
+    ],
+    "companion": [
+     150
+    ],
+    "code": [
+     151
+    ],
+    "reproducible": [
+     153
+    ],
+    "with": [
+     154
+    ],
+    "tutorials": [
+     155
+    ],
+    "getting": [
+     157
+    ],
+    "started.": [
+     158
+    ],
+    "hope": [
+     160
+    ],
+    "this": [
+     162
+    ],
+    "accelerate": [
+     166
+    ],
+    "research": [
+     167
+    ],
+    "forecasting.": [
+     171
+    ]
+   },
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/medium-range-weather-forecasting",
+     "display_name": "medium-range weather forecasting",
+     "score": 0.8529999852180481
+    },
+    {
+     "id": "https://openalex.org/keywords/benchmark-dataset",
+     "display_name": "benchmark dataset",
+     "score": 0.7730000019073486
+    },
+    {
+     "id": "https://openalex.org/keywords/era5-reanalysis",
+     "display_name": "ERA5 reanalysis",
+     "score": 0.7390000224113464
+    },
+    {
+     "id": "https://openalex.org/keywords/forecast-evaluation-metrics",
+     "display_name": "forecast evaluation metrics",
+     "score": 0.7570000290870667
+    },
+    {
+     "id": "https://openalex.org/keywords/model-intercomparison",
+     "display_name": "model intercomparison",
+     "score": 0.3799999952316284
+    }
+   ],
+   "referenced_works": [
+    "https://openalex.org/W1485009520",
+    "https://openalex.org/W1569592761",
+    "https://openalex.org/W1789155650",
+    "https://openalex.org/W1810943226",
+    "https://openalex.org/W1901129140",
+    "https://openalex.org/W1976255336",
+    "https://openalex.org/W2025720061",
+    "https://openalex.org/W2047421660",
+    "https://openalex.org/W2064675550",
+    "https://openalex.org/W2091361900",
+    "https://openalex.org/W2095705004",
+    "https://openalex.org/W2110417468",
+    "https://openalex.org/W2112796928",
+    "https://openalex.org/W2117539524",
+    "https://openalex.org/W2128469217",
+    "https://openalex.org/W2153105681",
+    "https://openalex.org/W2169101778",
+    "https://openalex.org/W2176178328",
+    "https://openalex.org/W2176412452",
+    "https://openalex.org/W2193503481",
+    "https://openalex.org/W2194775991",
+    "https://openalex.org/W2296277783",
+    "https://openalex.org/W2552465644",
+    "https://openalex.org/W2593110912",
+    "https://openalex.org/W2601923741",
+    "https://openalex.org/W2625614184",
+    "https://openalex.org/W2748164729",
+    "https://openalex.org/W2770594110",
+    "https://openalex.org/W2790521266",
+    "https://openalex.org/W2803408063",
+    "https://openalex.org/W2808559252",
+    "https://openalex.org/W2891039272",
+    "https://openalex.org/W2898187790",
+    "https://openalex.org/W2900615125",
+    "https://openalex.org/W2913323966",
+    "https://openalex.org/W2913728931",
+    "https://openalex.org/W2919115771",
+    "https://openalex.org/W2930756996",
+    "https://openalex.org/W2950193666",
+    "https://openalex.org/W2951787414",
+    "https://openalex.org/W2952046647",
+    "https://openalex.org/W2956255334",
+    "https://openalex.org/W2960236945",
+    "https://openalex.org/W2963446712",
+    "https://openalex.org/W2963942037",
+    "https://openalex.org/W2963973018",
+    "https://openalex.org/W2964128214",
+    "https://openalex.org/W2969273247",
+    "https://openalex.org/W2969309273",
+    "https://openalex.org/W2973731563",
+    "https://openalex.org/W2985916778",
+    "https://openalex.org/W2993514765",
+    "https://openalex.org/W2998557500",
+    "https://openalex.org/W2999228179",
+    "https://openalex.org/W3018068085",
+    "https://openalex.org/W3025325835",
+    "https://openalex.org/W3025949386",
+    "https://openalex.org/W3047833863",
+    "https://openalex.org/W3130645858",
+    "https://openalex.org/W3145817416",
+    "https://openalex.org/W4213041519",
+    "https://openalex.org/W4249857356",
+    "https://openalex.org/W4390513844"
+   ]
+  },
+  {
+   "id": "https://openalex.org/W4221149294",
+   "doi": "https://doi.org/10.48550/arxiv.2202.07575",
+   "title": "Forecasting Global Weather with Graph Neural Networks",
+   "display_name": "Forecasting Global Weather with Graph Neural Networks",
+   "publication_year": 2022,
+   "type": "preprint",
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5107858812",
+      "display_name": "Ryan Keisler",
+      "orcid": "https://orcid.org/0000-0002-5922-1137",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-5922-1137"
+      ]
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": true,
+     "raw_author_name": "Keisler, Ryan",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    }
+   ],
+   "primary_location": {
+    "id": "pmh:oai:arXiv.org:2202.07575",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "http://arxiv.org/abs/2202.07575",
+    "pdf_url": "https://arxiv.org/pdf/2202.07575",
+    "source": {
+     "id": "https://openalex.org/S4306400194",
+     "display_name": "arXiv (Cornell University)",
+     "issn_l": "2331-8422",
+     "issn": [
+      "2331-8422"
+     ],
+     "is_oa": true,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I205783295",
+     "host_organization_name": "Cornell University",
+     "host_organization_lineage": [
+      "https://openalex.org/I205783295"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": null,
+    "raw_type": "text"
+   },
+   "locations": [
+    {
+     "id": "pmh:oai:arXiv.org:2202.07575",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "http://arxiv.org/abs/2202.07575",
+     "pdf_url": "https://arxiv.org/pdf/2202.07575",
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "text"
+    },
+    {
+     "id": "doi:10.48550/arxiv.2202.07575",
+     "doi": "https://doi.org/10.48550/arxiv.2202.07575",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.48550/arxiv.2202.07575",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": null,
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "Preprint"
+    }
+   ],
+   "cited_by_count": 120,
+   "abstract_inverted_index": {
+    "We": [
+     0,
+     101
+    ],
+    "present": [
+     1
+    ],
+    "a": [
+     2
+    ],
+    "data-driven": [
+     3,
+     74,
+     108
+    ],
+    "approach": [
+     4
+    ],
+    "for": [
+     5
+    ],
+    "forecasting": [
+     6
+    ],
+    "global": [
+     7
+    ],
+    "weather": [
+     8
+    ],
+    "using": [
+     9,
+     97
+    ],
+    "graph": [
+     10
+    ],
+    "neural": [
+     11
+    ],
+    "networks.": [
+     12
+    ],
+    "The": [
+     13,
+     44
+    ],
+    "system": [
+     14
+    ],
+    "learns": [
+     15
+    ],
+    "to": [
+     16,
+     33,
+     79,
+     110
+    ],
+    "step": [
+     17
+    ],
+    "forward": [
+     18
+    ],
+    "the": [
+     19,
+     42
+    ],
+    "current": [
+     20
+    ],
+    "3D": [
+     21
+    ],
+    "atmospheric": [
+     22
+    ],
+    "state": [
+     23
+    ],
+    "by": [
+     24
+    ],
+    "six": [
+     25
+    ],
+    "hours,": [
+     26
+    ],
+    "and": [
+     27,
+     68,
+     76,
+     86,
+     95
+    ],
+    "multiple": [
+     28
+    ],
+    "steps": [
+     29
+    ],
+    "are": [
+     30
+    ],
+    "chained": [
+     31
+    ],
+    "together": [
+     32
+    ],
+    "produce": [
+     34
+    ],
+    "skillful": [
+     35
+    ],
+    "forecasts": [
+     36,
+     113
+    ],
+    "going": [
+     37
+    ],
+    "out": [
+     38
+    ],
+    "several": [
+     39
+    ],
+    "days": [
+     40
+    ],
+    "into": [
+     41
+    ],
+    "future.": [
+     43
+    ],
+    "underlying": [
+     45
+    ],
+    "model": [
+     46,
+     109
+    ],
+    "is": [
+     47,
+     77
+    ],
+    "trained": [
+     48
+    ],
+    "on": [
+     49,
+     61,
+     92
+    ],
+    "reanalysis": [
+     50,
+     98
+    ],
+    "data": [
+     51,
+     56
+    ],
+    "from": [
+     52,
+     57,
+     84,
+     105,
+     114
+    ],
+    "ERA5": [
+     53
+    ],
+    "or": [
+     54
+    ],
+    "forecast": [
+     55
+    ],
+    "GFS.": [
+     58,
+     115
+    ],
+    "Test": [
+     59
+    ],
+    "performance": [
+     60
+    ],
+    "metrics": [
+     62
+    ],
+    "such": [
+     63
+    ],
+    "as": [
+     64
+    ],
+    "Z500": [
+     65
+    ],
+    "(geopotential": [
+     66
+    ],
+    "height)": [
+     67
+    ],
+    "T850": [
+     69
+    ],
+    "(temperature)": [
+     70
+    ],
+    "improves": [
+     71
+    ],
+    "upon": [
+     72
+    ],
+    "previous": [
+     73
+    ],
+    "approaches": [
+     75
+    ],
+    "comparable": [
+     78
+    ],
+    "operational,": [
+     80
+    ],
+    "full-resolution,": [
+     81
+    ],
+    "physical": [
+     82
+    ],
+    "models": [
+     83
+    ],
+    "GFS": [
+     85
+    ],
+    "ECMWF,": [
+     87
+    ],
+    "at": [
+     88
+    ],
+    "least": [
+     89
+    ],
+    "when": [
+     90,
+     96
+    ],
+    "evaluated": [
+     91
+    ],
+    "1-degree": [
+     93
+    ],
+    "scales": [
+     94
+    ],
+    "initial": [
+     99
+    ],
+    "conditions.": [
+     100
+    ],
+    "also": [
+     102
+    ],
+    "show": [
+     103
+    ],
+    "results": [
+     104
+    ],
+    "connecting": [
+     106
+    ],
+    "this": [
+     107
+    ],
+    "live,": [
+     111
+    ],
+    "operational": [
+     112
+    ]
+   },
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/global-weather-forecasting",
+     "display_name": "global weather forecasting",
+     "score": 0.9570000171661377
+    },
+    {
+     "id": "https://openalex.org/keywords/graph-neural-networks",
+     "display_name": "graph neural networks",
+     "score": 0.9010000228881836
+    },
+    {
+     "id": "https://openalex.org/keywords/multi-step-forecasting",
+     "display_name": "multi-step forecasting",
+     "score": 0.6650000214576721
+    },
+    {
+     "id": "https://openalex.org/keywords/era5-reanalysis",
+     "display_name": "ERA5 reanalysis",
+     "score": 0.8360000252723694
+    },
+    {
+     "id": "https://openalex.org/keywords/geopotential-height",
+     "display_name": "geopotential height",
+     "score": 0.8880000114440918
+    },
+    {
+     "id": "https://openalex.org/keywords/temperature-prediction",
+     "display_name": "temperature prediction",
+     "score": 0.5759999752044678
+    }
+   ],
+   "referenced_works": []
+  },
+  {
+   "id": "https://openalex.org/W1485009520",
+   "doi": "https://doi.org/10.48550/arxiv.1506.04214",
+   "title": "Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting",
+   "display_name": "Convolutional LSTM Network: A Machine Learning Approach for Precipitation Nowcasting",
+   "publication_year": 2015,
+   "type": "preprint",
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5091515481",
+      "display_name": "Xingjian Shi",
+      "orcid": "https://orcid.org/0000-0002-2700-7742",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-2700-7742"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I200769079",
+       "display_name": "Hong Kong University of Science and Technology",
+       "ror": "https://ror.org/00q4vv597",
+       "country_code": "HK",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I200769079"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210104672",
+       "display_name": "Hong Kong Observatory",
+       "ror": "https://ror.org/01bvxvq19",
+       "country_code": "CN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ],
+     "countries": [
+      "CN",
+      "HK"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Shi, Xingjian",
+     "raw_affiliation_strings": [
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+       "institution_ids": [
+        "https://openalex.org/I200769079",
+        "https://openalex.org/I4210104672"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology",
+       "institution_ids": [
+        "https://openalex.org/I200769079"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5018500051",
+      "display_name": "Zhourong Chen",
+      "orcid": "https://orcid.org/0000-0003-3704-6400",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-3704-6400"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I200769079",
+       "display_name": "Hong Kong University of Science and Technology",
+       "ror": "https://ror.org/00q4vv597",
+       "country_code": "HK",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I200769079"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210104672",
+       "display_name": "Hong Kong Observatory",
+       "ror": "https://ror.org/01bvxvq19",
+       "country_code": "CN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ],
+     "countries": [
+      "CN",
+      "HK"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Chen, Zhourong",
+     "raw_affiliation_strings": [
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+       "institution_ids": [
+        "https://openalex.org/I200769079",
+        "https://openalex.org/I4210104672"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology",
+       "institution_ids": [
+        "https://openalex.org/I200769079"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5101533496",
+      "display_name": "Hao Wang",
+      "orcid": "https://orcid.org/0000-0002-7308-938X",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-7308-938X"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I200769079",
+       "display_name": "Hong Kong University of Science and Technology",
+       "ror": "https://ror.org/00q4vv597",
+       "country_code": "HK",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I200769079"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210104672",
+       "display_name": "Hong Kong Observatory",
+       "ror": "https://ror.org/01bvxvq19",
+       "country_code": "CN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ],
+     "countries": [
+      "CN",
+      "HK"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Wang, Hao",
+     "raw_affiliation_strings": [
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+       "institution_ids": [
+        "https://openalex.org/I200769079",
+        "https://openalex.org/I4210104672"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology",
+       "institution_ids": [
+        "https://openalex.org/I200769079"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5073139380",
+      "display_name": "Dit‐Yan Yeung",
+      "orcid": "https://orcid.org/0000-0003-3716-8125",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-3716-8125"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I200769079",
+       "display_name": "Hong Kong University of Science and Technology",
+       "ror": "https://ror.org/00q4vv597",
+       "country_code": "HK",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I200769079"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210104672",
+       "display_name": "Hong Kong Observatory",
+       "ror": "https://ror.org/01bvxvq19",
+       "country_code": "CN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ],
+     "countries": [
+      "CN",
+      "HK"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Yeung, Dit-Yan",
+     "raw_affiliation_strings": [
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+       "institution_ids": [
+        "https://openalex.org/I200769079",
+        "https://openalex.org/I4210104672"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology",
+       "institution_ids": [
+        "https://openalex.org/I200769079"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5101899480",
+      "display_name": "Wai Kin Wong",
+      "orcid": "https://orcid.org/0000-0001-8724-0696",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-8724-0696"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I200769079",
+       "display_name": "Hong Kong University of Science and Technology",
+       "ror": "https://ror.org/00q4vv597",
+       "country_code": "HK",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I200769079"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210104672",
+       "display_name": "Hong Kong Observatory",
+       "ror": "https://ror.org/01bvxvq19",
+       "country_code": "CN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ],
+     "countries": [
+      "CN",
+      "HK"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Wong, Wai-kin",
+     "raw_affiliation_strings": [
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+      "Hong Kong Observatory Hong Kong, China"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+       "institution_ids": [
+        "https://openalex.org/I200769079",
+        "https://openalex.org/I4210104672"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Hong Kong Observatory Hong Kong, China",
+       "institution_ids": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5057734311",
+      "display_name": "Wang‐chun Woo",
+      "orcid": "https://orcid.org/0000-0001-5401-0333",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-5401-0333"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I200769079",
+       "display_name": "Hong Kong University of Science and Technology",
+       "ror": "https://ror.org/00q4vv597",
+       "country_code": "HK",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I200769079"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210104672",
+       "display_name": "Hong Kong Observatory",
+       "ror": "https://ror.org/01bvxvq19",
+       "country_code": "CN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ],
+     "countries": [
+      "CN",
+      "HK"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Woo, Wang-chun",
+     "raw_affiliation_strings": [
+      "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+      "Hong Kong Observatory Hong Kong, China"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Computer Science and Engineering Hong Kong University of Science and Technology Hong Kong Observatory Hong Kong , China",
+       "institution_ids": [
+        "https://openalex.org/I200769079",
+        "https://openalex.org/I4210104672"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Hong Kong Observatory Hong Kong, China",
+       "institution_ids": [
+        "https://openalex.org/I4210104672"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "pmh:oai:arXiv.org:1506.04214",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "http://arxiv.org/abs/1506.04214",
+    "pdf_url": "https://arxiv.org/pdf/1506.04214",
+    "source": {
+     "id": "https://openalex.org/S4306400194",
+     "display_name": "arXiv (Cornell University)",
+     "issn_l": "2331-8422",
+     "issn": [
+      "2331-8422"
+     ],
+     "is_oa": true,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I205783295",
+     "host_organization_name": "Cornell University",
+     "host_organization_lineage": [
+      "https://openalex.org/I205783295"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": null,
+    "raw_type": "text"
+   },
+   "locations": [
+    {
+     "id": "pmh:oai:arXiv.org:1506.04214",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "http://arxiv.org/abs/1506.04214",
+     "pdf_url": "https://arxiv.org/pdf/1506.04214",
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "text"
+    },
+    {
+     "id": "mag:2953118818",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "http://export.arxiv.org/pdf/1506.04214",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "arXiv (Cornell University)",
+     "raw_type": null
+    },
+    {
+     "id": "pmh:oai:repository.hkust.edu.hk:1783.1-72919",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://lbdiscover.ust.hk/uresolver?url_ver=Z39.88-2004&rft_val_fmt=info:ofi/fmt:kev:mtx:journal&rfr_id=info:sid/HKUST:SPI&rft.genre=article&rft.issn=TBA&rft.volume=&rft.issue=&rft.date=2015&rft.spage=&rft.aulast=Shi&rft.aufirst=Xingjian&rft.atitle=Convolutional+LSTM+network%3A+A+machine+learning+approach+for+precipitation+nowcasting&rft.title=Advances+in+Neural+Information+Processing+Systems%3A+Twenty-Ninth+Annual+Conference+on+Neural+Information+Processing+Systems+%28NIPS%29%2C+Montreal%2C+Quebec%2C+Canada",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401796",
+      "display_name": "Rare & Special e-Zone (The Hong Kong University of Science and Technology)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I200769079",
+      "host_organization_name": "Hong Kong University of Science and Technology",
+      "host_organization_lineage": [
+       "https://openalex.org/I200769079"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "Conference paper"
+    },
+    {
+     "id": "pmh:oai:repository.ust.hk:1783.1-72919",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://www.scopus.com/record/display.url?eid=2-s2.0-84965121965&origin=inward",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401796",
+      "display_name": "Rare & Special e-Zone (The Hong Kong University of Science and Technology)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I200769079",
+      "host_organization_name": "Hong Kong University of Science and Technology",
+      "host_organization_lineage": [
+       "https://openalex.org/I200769079"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "",
+     "raw_type": "Conference paper"
+    },
+    {
+     "id": "doi:10.48550/arxiv.1506.04214",
+     "doi": "https://doi.org/10.48550/arxiv.1506.04214",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.48550/arxiv.1506.04214",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": null,
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "Preprint"
+    }
+   ],
+   "cited_by_count": 7706,
+   "abstract_inverted_index": {
+    "The": [
+     0
+    ],
+    "goal": [
+     1
+    ],
+    "of": [
+     2,
+     21
+    ],
+    "precipitation": [
+     3,
+     46,
+     101,
+     125
+    ],
+    "nowcasting": [
+     4,
+     47,
+     102
+    ],
+    "is": [
+     5
+    ],
+    "to": [
+     6,
+     73,
+     93
+    ],
+    "predict": [
+     7
+    ],
+    "the": [
+     8,
+     37,
+     57,
+     60,
+     68,
+     79,
+     86,
+     100,
+     119
+    ],
+    "future": [
+     9
+    ],
+    "rainfall": [
+     10
+    ],
+    "intensity": [
+     11
+    ],
+    "in": [
+     12,
+     54,
+     77
+    ],
+    "a": [
+     13,
+     17,
+     49
+    ],
+    "local": [
+     14
+    ],
+    "region": [
+     15
+    ],
+    "over": [
+     16
+    ],
+    "relatively": [
+     18
+    ],
+    "short": [
+     19
+    ],
+    "period": [
+     20
+    ],
+    "time.": [
+     22
+    ],
+    "Very": [
+     23
+    ],
+    "few": [
+     24
+    ],
+    "previous": [
+     25
+    ],
+    "studies": [
+     26
+    ],
+    "have": [
+     27,
+     74
+    ],
+    "examined": [
+     28
+    ],
+    "this": [
+     29,
+     42
+    ],
+    "crucial": [
+     30
+    ],
+    "and": [
+     31,
+     59,
+     81,
+     90,
+     114,
+     118
+    ],
+    "challenging": [
+     32
+    ],
+    "weather": [
+     33
+    ],
+    "forecasting": [
+     34,
+     52
+    ],
+    "problem": [
+     35,
+     53
+    ],
+    "from": [
+     36
+    ],
+    "machine": [
+     38
+    ],
+    "learning": [
+     39
+    ],
+    "perspective.": [
+     40
+    ],
+    "In": [
+     41
+    ],
+    "paper,": [
+     43
+    ],
+    "we": [
+     44,
+     84
+    ],
+    "formulate": [
+     45
+    ],
+    "as": [
+     48
+    ],
+    "spatiotemporal": [
+     50,
+     64,
+     111
+    ],
+    "sequence": [
+     51
+    ],
+    "which": [
+     55
+    ],
+    "both": [
+     56,
+     78
+    ],
+    "input": [
+     58
+    ],
+    "prediction": [
+     61
+    ],
+    "target": [
+     62
+    ],
+    "are": [
+     63
+    ],
+    "sequences.": [
+     65
+    ],
+    "By": [
+     66
+    ],
+    "extending": [
+     67
+    ],
+    "fully": [
+     69
+    ],
+    "connected": [
+     70
+    ],
+    "LSTM": [
+     71,
+     88
+    ],
+    "(FC-LSTM)": [
+     72
+    ],
+    "convolutional": [
+     75,
+     87
+    ],
+    "structures": [
+     76
+    ],
+    "input-to-state": [
+     80
+    ],
+    "state-to-state": [
+     82
+    ],
+    "transitions,": [
+     83
+    ],
+    "propose": [
+     85
+    ],
+    "(ConvLSTM)": [
+     89
+    ],
+    "use": [
+     91
+    ],
+    "it": [
+     92
+    ],
+    "build": [
+     94
+    ],
+    "an": [
+     95
+    ],
+    "end-to-end": [
+     96
+    ],
+    "trainable": [
+     97
+    ],
+    "model": [
+     98
+    ],
+    "for": [
+     99,
+     124
+    ],
+    "problem.": [
+     103
+    ],
+    "Experiments": [
+     104
+    ],
+    "show": [
+     105
+    ],
+    "that": [
+     106
+    ],
+    "our": [
+     107
+    ],
+    "ConvLSTM": [
+     108
+    ],
+    "network": [
+     109
+    ],
+    "captures": [
+     110
+    ],
+    "correlations": [
+     112
+    ],
+    "better": [
+     113
+    ],
+    "consistently": [
+     115
+    ],
+    "outperforms": [
+     116
+    ],
+    "FC-LSTM": [
+     117
+    ],
+    "state-of-the-art": [
+     120
+    ],
+    "operational": [
+     121
+    ],
+    "ROVER": [
+     122
+    ],
+    "algorithm": [
+     123
+    ],
+    "nowcasting.": [
+     126
+    ]
+   },
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/precipitation-nowcasting",
+     "display_name": "precipitation nowcasting",
+     "score": 0.9950000047683716
+    },
+    {
+     "id": "https://openalex.org/keywords/convolutional-lstm",
+     "display_name": "convolutional LSTM",
+     "score": 0.8199999928474426
+    },
+    {
+     "id": "https://openalex.org/keywords/rainfall-intensity-prediction",
+     "display_name": "rainfall intensity prediction",
+     "score": 0.8240000009536743
+    },
+    {
+     "id": "https://openalex.org/keywords/spatiotemporal-correlation",
+     "display_name": "spatio-temporal correlation",
+     "score": 0.8100000023841858
+    }
+   ],
+   "referenced_works": [
+    "https://openalex.org/W588441650",
+    "https://openalex.org/W962117656",
+    "https://openalex.org/W1514535095",
+    "https://openalex.org/W1568514080",
+    "https://openalex.org/W1606347560",
+    "https://openalex.org/W1810943226",
+    "https://openalex.org/W1815076433",
+    "https://openalex.org/W1867429401",
+    "https://openalex.org/W1903029394",
+    "https://openalex.org/W1905882502",
+    "https://openalex.org/W1947481528",
+    "https://openalex.org/W1982479097",
+    "https://openalex.org/W2024414272",
+    "https://openalex.org/W2030459037",
+    "https://openalex.org/W2064675550",
+    "https://openalex.org/W2079565659",
+    "https://openalex.org/W2116435618",
+    "https://openalex.org/W2130942839",
+    "https://openalex.org/W2157331557",
+    "https://openalex.org/W2557283755",
+    "https://openalex.org/W2787727108",
+    "https://openalex.org/W2950635152",
+    "https://openalex.org/W2951183276",
+    "https://openalex.org/W2952453038",
+    "https://openalex.org/W4233546237",
+    "https://openalex.org/W4308909683"
+   ]
+  },
+  {
+   "id": "https://openalex.org/W1569592761",
+   "doi": "https://doi.org/10.1175/2008bams2604.1",
+   "title": "300 Billion Served",
+   "display_name": "300 Billion Served",
+   "publication_year": 2009,
+   "type": "article",
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5005246825",
+      "display_name": "Jeffrey K. Lazo",
+      "orcid": "https://orcid.org/0000-0002-8051-4516",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-8051-4516"
+      ]
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": false,
+     "raw_author_name": "Jeffrey K. Lazo",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5083497727",
+      "display_name": "Rebecca Elisabeth Morss",
+      "orcid": "https://orcid.org/0000-0001-6267-3436",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-6267-3436"
+      ]
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": false,
+     "raw_author_name": "Rebecca E. Morss",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5009195783",
+      "display_name": "Julie L. Demuth",
+      "orcid": "https://orcid.org/0000-0001-8918-9839",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-8918-9839"
+      ]
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": false,
+     "raw_author_name": "Julie L. Demuth",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1175/2008bams2604.1",
+    "doi": "https://doi.org/10.1175/2008bams2604.1",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1175/2008bams2604.1",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S140302479",
+     "display_name": "Bulletin of the American Meteorological Society",
+     "issn_l": "0003-0007",
+     "issn": [
+      "0003-0007",
+      "1520-0477"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "dongbi-a",
+      "jufo-2",
+      "norway-2",
+      "poland-200",
+      "russia-white-list-1",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320260",
+     "host_organization_name": "American Meteorological Society",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320260"
+     ],
+     "host_organization_lineage_names": [
+      "American Meteorological Society"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Bulletin of the American Meteorological Society",
+    "raw_type": "journal-article"
+   },
+   "locations": [
+    {
+     "id": "doi:10.1175/2008bams2604.1",
+     "doi": "https://doi.org/10.1175/2008bams2604.1",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1175/2008bams2604.1",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S140302479",
+      "display_name": "Bulletin of the American Meteorological Society",
+      "issn_l": "0003-0007",
+      "issn": [
+       "0003-0007",
+       "1520-0477"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "dongbi-a",
+       "jufo-2",
+       "norway-2",
+       "poland-200",
+       "russia-white-list-1",
+       "vabb-shw"
+      ],
+      "host_organization": "https://openalex.org/P4310320260",
+      "host_organization_name": "American Meteorological Society",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320260"
+      ],
+      "host_organization_lineage_names": [
+       "American Meteorological Society"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Bulletin of the American Meteorological Society",
+     "raw_type": "journal-article"
+    }
+   ],
+   "cited_by_count": 225,
+   "abstract_inverted_index": {
+    "Abstract": [
+     0
+    ],
+    "Understanding": [
+     1
+    ],
+    "the": [
+     2,
+     19,
+     63,
+     75,
+     96,
+     146
+    ],
+    "public's": [
+     3
+    ],
+    "sources,": [
+     4
+    ],
+    "perceptions,": [
+     5
+    ],
+    "uses,": [
+     6
+    ],
+    "and": [
+     7,
+     44,
+     61,
+     109
+    ],
+    "values": [
+     8
+    ],
+    "of": [
+     9,
+     128
+    ],
+    "weather": [
+     10,
+     49,
+     147
+    ],
+    "forecasts": [
+     11,
+     17,
+     80,
+     92,
+     108,
+     114,
+     124,
+     141
+    ],
+    "is": [
+     12
+    ],
+    "integral": [
+     13
+    ],
+    "to": [
+     14,
+     39,
+     87,
+     143
+    ],
+    "providing": [
+     15
+    ],
+    "those": [
+     16
+    ],
+    "in": [
+     18,
+     113
+    ],
+    "most": [
+     20
+    ],
+    "societally": [
+     21
+    ],
+    "beneficial": [
+     22
+    ],
+    "manner.": [
+     23
+    ],
+    "To": [
+     24
+    ],
+    "begin": [
+     25
+    ],
+    "developing": [
+     26
+    ],
+    "this": [
+     27
+    ],
+    "knowledge,": [
+     28
+    ],
+    "we": [
+     29,
+     100
+    ],
+    "conducted": [
+     30
+    ],
+    "a": [
+     31,
+     126,
+     152
+    ],
+    "nationwide": [
+     32
+    ],
+    "survey": [
+     33
+    ],
+    "with": [
+     34,
+     107
+    ],
+    "more": [
+     35,
+     88
+    ],
+    "than": [
+     36,
+     89
+    ],
+    "1,500": [
+     37
+    ],
+    "respondents": [
+     38,
+     103
+    ],
+    "assess": [
+     40
+    ],
+    "1)": [
+     41
+    ],
+    "where,": [
+     42
+    ],
+    "when,": [
+     43
+    ],
+    "how": [
+     45,
+     52,
+     57
+    ],
+    "often": [
+     46
+    ],
+    "they": [
+     47,
+     53,
+     58,
+     65,
+     122,
+     136
+    ],
+    "obtain": [
+     48
+    ],
+    "forecasts;": [
+     50,
+     55,
+     60
+    ],
+    "2)": [
+     51
+    ],
+    "perceive": [
+     54
+    ],
+    "3)": [
+     56
+    ],
+    "use": [
+     59,
+     123,
+     140
+    ],
+    "4)": [
+     62
+    ],
+    "value": [
+     64
+    ],
+    "place": [
+     66
+    ],
+    "on": [
+     67
+    ],
+    "current": [
+     68
+    ],
+    "forecast": [
+     69
+    ],
+    "information.": [
+     70
+    ],
+    "Our": [
+     71
+    ],
+    "results": [
+     72
+    ],
+    "indicate": [
+     73
+    ],
+    "that": [
+     74,
+     102,
+     121,
+     135
+    ],
+    "average": [
+     76
+    ],
+    "U.S.": [
+     77,
+     97
+    ],
+    "adult": [
+     78
+    ],
+    "obtains": [
+     79
+    ],
+    "115": [
+     81
+    ],
+    "times": [
+     82
+    ],
+    "per": [
+     83,
+     93
+    ],
+    "month,": [
+     84
+    ],
+    "which": [
+     85
+    ],
+    "totals": [
+     86
+    ],
+    "300": [
+     90
+    ],
+    "billion": [
+     91
+    ],
+    "year": [
+     94
+    ],
+    "by": [
+     95
+    ],
+    "public.": [
+     98
+    ],
+    "Overall,": [
+     99
+    ],
+    "find": [
+     101
+    ],
+    "are": [
+     104
+    ],
+    "highly": [
+     105
+    ],
+    "satisfied": [
+     106
+    ],
+    "have": [
+     110
+    ],
+    "decreasing": [
+     111
+    ],
+    "confidence": [
+     112
+    ],
+    "as": [
+     115
+    ],
+    "lead": [
+     116
+    ],
+    "time": [
+     117
+    ],
+    "increases.": [
+     118
+    ],
+    "Respondents": [
+     119
+    ],
+    "indicated": [
+     120
+    ],
+    "across": [
+     125
+    ],
+    "range": [
+     127
+    ],
+    "decision-making": [
+     129
+    ],
+    "contexts.": [
+     130
+    ],
+    "Moreover,": [
+     131
+    ],
+    "nearly": [
+     132
+    ],
+    "three-quarters": [
+     133
+    ],
+    "stated": [
+     134
+    ],
+    "usually": [
+     137
+    ],
+    "or": [
+     138
+    ],
+    "always": [
+     139
+    ],
+    "simply": [
+     142
+    ],
+    "know": [
+     144
+    ],
+    "what": [
+     145
+    ],
+    "will": [
+     148
+    ],
+    "be": [
+     149
+    ],
+    "like.": [
+     150
+    ],
+    "Using": [
+     151
+    ],
+    "simplified": [
+     153
+    ],
+    "valuation...": [
+     154
+    ]
+   },
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/weather-forecasting",
+     "display_name": "weather forecasting",
+     "score": 0.9089999794960022
+    },
+    {
+     "id": "https://openalex.org/keywords/forecast-confidence",
+     "display_name": "forecast confidence",
+     "score": 0.734000027179718
+    },
+    {
+     "id": "https://openalex.org/keywords/forecast-lead-time",
+     "display_name": "forecast lead time",
+     "score": 0.7789999842643738
+    },
+    {
+     "id": "https://openalex.org/keywords/decision-making-context",
+     "display_name": "decision-making context",
+     "score": 0.4580000042915344
+    }
+   ],
+   "referenced_works": [
+    "https://openalex.org/W245387374",
+    "https://openalex.org/W619654876",
+    "https://openalex.org/W1507004422",
+    "https://openalex.org/W1873057782",
+    "https://openalex.org/W1967496553",
+    "https://openalex.org/W2025832956",
+    "https://openalex.org/W2042913158",
+    "https://openalex.org/W2056694077",
+    "https://openalex.org/W2094147994",
+    "https://openalex.org/W2099697766",
+    "https://openalex.org/W2147589517",
+    "https://openalex.org/W2155094271",
+    "https://openalex.org/W2217101718",
+    "https://openalex.org/W2318094544",
+    "https://openalex.org/W2891423662",
+    "https://openalex.org/W2919281286",
+    "https://openalex.org/W4285719527"
+   ]
+  }
+ ]
+}

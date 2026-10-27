@@ -1,0 +1,542 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:question_event",
+  "title": "question_event@1: one entry in a run's event stream",
+  "description": "`seq` starts at 1 and increases by one per event within a run, so a client that reconnects asks for everything after the last seq it saw, and a page can be rebuilt from the events alone. A run's last event is `done`.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "seq",
+    "at",
+    "type",
+    "data"
+  ],
+  "properties": {
+    "schema": {
+      "const": "question_event@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    },
+    "type": {
+      "enum": [
+        "state",
+        "stage",
+        "plan",
+        "hit",
+        "dedup",
+        "verdict",
+        "override",
+        "expand",
+        "citations",
+        "graph",
+        "error",
+        "done"
+      ]
+    },
+    "data": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "state"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/state"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "stage"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/stage"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "plan"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/plan"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hit"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/hit"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "dedup"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/dedup"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "verdict"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/verdict"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "override"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/override"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "expand"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/expand"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "citations"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/citations"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "graph"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/graph"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "error"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/error"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "done"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/done"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "stage_name": {
+      "enum": [
+        "plan",
+        "search",
+        "screen",
+        "expand",
+        "graph"
+      ]
+    },
+    "stage": {
+      "description": "A stage began, ended, or was skipped (e.g. expansion turned off).",
+      "type": "object",
+      "required": [
+        "stage",
+        "state"
+      ],
+      "properties": {
+        "stage": {
+          "$ref": "#/$defs/stage_name"
+        },
+        "state": {
+          "enum": [
+            "begin",
+            "end",
+            "skipped"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "plan": {
+      "type": "object",
+      "required": [
+        "plan"
+      ],
+      "properties": {
+        "plan": {
+          "$ref": "urn:isbe:question:question_plan"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hit": {
+      "description": "A query returned a paper. `new` is false when the paper was already in the run: the star brightens instead of a new one appearing.",
+      "type": "object",
+      "required": [
+        "query_id",
+        "rank",
+        "paper",
+        "new"
+      ],
+      "properties": {
+        "query_id": {
+          "$ref": "urn:isbe:question:common#/$defs/local_id"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "paper": {
+          "$ref": "urn:isbe:question:common#/$defs/paper"
+        },
+        "new": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dedup": {
+      "description": "Papers first seen as separate members turned out to be one (e.g. a DOI and an arXiv id of the same work).",
+      "type": "object",
+      "required": [
+        "kept",
+        "merged"
+      ],
+      "properties": {
+        "kept": {
+          "$ref": "urn:isbe:question:common#/$defs/identity_key"
+        },
+        "merged": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "urn:isbe:question:common#/$defs/identity_key"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "verdict": {
+      "type": "object",
+      "required": [
+        "verdict"
+      ],
+      "properties": {
+        "verdict": {
+          "$ref": "urn:isbe:question:screen_verdict"
+        }
+      },
+      "additionalProperties": false
+    },
+    "override": {
+      "type": "object",
+      "required": [
+        "override"
+      ],
+      "properties": {
+        "override": {
+          "$ref": "urn:isbe:question:screen_override"
+        }
+      },
+      "additionalProperties": false
+    },
+    "expand": {
+      "description": "Citation expansion found a paper next to an included one. It is screened like any other candidate.",
+      "type": "object",
+      "required": [
+        "from_key",
+        "via",
+        "paper",
+        "new"
+      ],
+      "properties": {
+        "from_key": {
+          "$ref": "urn:isbe:question:common#/$defs/identity_key"
+        },
+        "via": {
+          "enum": [
+            "cites",
+            "cited_by"
+          ]
+        },
+        "paper": {
+          "$ref": "urn:isbe:question:common#/$defs/paper"
+        },
+        "new": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "citations": {
+      "description": "The expand stage looked up more of the run's citations: `looked_up` papers so far in this stage (archive batch and full lookups), `edges` the citation edges now known between candidates (GET .../citations). Comes after each batch of lookups.",
+      "type": "object",
+      "required": [
+        "scope",
+        "looked_up",
+        "edges"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "archive",
+            "all"
+          ]
+        },
+        "looked_up": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "edges": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "graph": {
+      "description": "A graph was built; clients fetch it from `/graph` and can cache it by fingerprint.",
+      "type": "object",
+      "required": [
+        "fingerprint",
+        "nodes",
+        "edges",
+        "communities"
+      ],
+      "properties": {
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16,64}$"
+        },
+        "nodes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "edges": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "communities": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "description": "Something failed. With `fatal: false` the run carries on (one query, screening batch or citation lookup failed) and ends `partial`; with `fatal: true` a `state` failed and a `done` event with status failed follow.",
+      "type": "object",
+      "required": [
+        "stage",
+        "message",
+        "fatal"
+      ],
+      "properties": {
+        "stage": {
+          "$ref": "#/$defs/stage_name"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fatal": {
+          "type": "boolean"
+        },
+        "query_id": {
+          "$ref": "urn:isbe:question:common#/$defs/local_id"
+        },
+        "batch_id": {
+          "$ref": "urn:isbe:question:common#/$defs/local_id"
+        },
+        "key": {
+          "$ref": "urn:isbe:question:common#/$defs/identity_key",
+          "description": "The paper whose citation lookup failed."
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The upstream's own error, without the advice `message` adds (\"essaies could not be reached: [Errno 113] No route to host\"): what a console shows under its translated advice for `code`."
+        },
+        "code": {
+          "description": "What kind of failure it is, for the console to explain in the reader's language (docs/question/api.md#problem-codes). Events written before the codes have none.",
+          "enum": [
+            "essaies_unreachable",
+            "essaies_down",
+            "essaies_not_set",
+            "openalex_quota",
+            "query_failed",
+            "search_failed",
+            "citations_failed",
+            "essaies_old",
+            "openalex_unreachable",
+            "openalex_down",
+            "openalex_rejected",
+            "model_unreachable",
+            "model_not_configured",
+            "model_rejected",
+            "model_failed",
+            "plan_fallback",
+            "stage_failed"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "done": {
+      "description": "The run ended. `partial` means it finished with non-fatal errors.",
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed",
+            "partial",
+            "cancelled",
+            "failed"
+          ]
+        },
+        "metrics": {
+          "$ref": "urn:isbe:question:question_metrics"
+        }
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "description": "The run's status changed. A run starts queued; pause, resume and cancel are state changes too.",
+      "type": "object",
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "paused",
+            "cancelled",
+            "failed",
+            "done"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:isbe:question:question_plan",
+  "title": "question_plan@1: the search plan for one question",
+  "description": "Written by the model, by the fallback (the question itself as the only query) or by a person editing an earlier version. Each edit is a new version; earlier versions are kept.",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "version",
+    "created_at",
+    "source",
+    "question",
+    "lang",
+    "reformulation",
+    "subject_terms",
+    "method_terms",
+    "outcome_terms",
+    "keyword_layers",
+    "queries",
+    "criteria",
+    "rationale"
+  ],
+  "properties": {
+    "schema": {
+      "const": "question_plan@1"
+    },
+    "run_id": {
+      "$ref": "urn:isbe:question:common#/$defs/run_id"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "parent_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "description": "The version this one was edited from."
+    },
+    "created_at": {
+      "$ref": "urn:isbe:question:common#/$defs/timestamp"
+    },
+    "source": {
+      "enum": [
+        "model",
+        "fallback",
+        "human"
+      ]
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lang": {
+      "$ref": "urn:isbe:question:common#/$defs/lang",
+      "description": "The language the question was asked in. Queries are English."
+    },
+    "engine": {
+      "enum": [
+        "openalex",
+        "arxiv",
+        "plain"
+      ],
+      "description": "The search engine the queries are written for (isbe.question.compose); openalex when absent."
+    },
+    "reformulation": {
+      "type": "string",
+      "description": "An academic restatement shown on the plan card."
+    },
+    "concepts": {
+      "description": "The question's concepts as the model named them: a role and the interchangeable terms papers use (synonyms, spellings, an abbreviation and its full form), plain words. The queries are composed from them for the search engine; empty for the fallback and for plans made before concepts existed (then absent).",
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "terms"
+        ],
+        "properties": {
+          "role": {
+            "enum": [
+              "subject",
+              "method",
+              "context",
+              "outcome",
+              "landmark"
+            ]
+          },
+          "terms": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 6,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "subject_terms": {
+      "$ref": "#/$defs/terms"
+    },
+    "method_terms": {
+      "$ref": "#/$defs/terms"
+    },
+    "outcome_terms": {
+      "$ref": "#/$defs/terms"
+    },
+    "keyword_layers": {
+      "type": "object",
+      "required": [
+        "canonical",
+        "mainstream",
+        "emerging",
+        "method_centric",
+        "cross_domain"
+      ],
+      "properties": {
+        "canonical": {
+          "$ref": "#/$defs/terms"
+        },
+        "mainstream": {
+          "$ref": "#/$defs/terms"
+        },
+        "emerging": {
+          "$ref": "#/$defs/terms"
+        },
+        "method_centric": {
+          "$ref": "#/$defs/terms"
+        },
+        "cross_domain": {
+          "$ref": "#/$defs/terms"
+        }
+      },
+      "additionalProperties": false
+    },
+    "queries": {
+      "description": "Run in priority order (1 first); lower priorities only when the higher ones return too few papers.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "query",
+          "layer",
+          "priority"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "urn:isbe:question:common#/$defs/local_id"
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "layer": {
+            "enum": [
+              "canonical",
+              "mainstream",
+              "emerging",
+              "method_centric",
+              "cross_domain",
+              "original"
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "description": "Results to ask for; absent means the search stage's default. Composed broad queries ask for more.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "year_from": {
+      "anyOf": [
+        {
+          "$ref": "urn:isbe:question:common#/$defs/year"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "year_to": {
+      "anyOf": [
+        {
+          "$ref": "urn:isbe:question:common#/$defs/year"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "criteria": {
+      "description": "What screening includes and excludes. Empty lists mean the model screens against the question alone.",
+      "type": "object",
+      "required": [
+        "include",
+        "exclude"
+      ],
+      "properties": {
+        "include": {
+          "$ref": "#/$defs/terms"
+        },
+        "exclude": {
+          "$ref": "#/$defs/terms"
+        }
+      },
+      "additionalProperties": false
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "llm": {
+      "$ref": "urn:isbe:question:common#/$defs/llm_usage"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "terms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
